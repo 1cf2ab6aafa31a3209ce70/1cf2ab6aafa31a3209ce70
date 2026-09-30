@@ -31,13 +31,15 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 
 The spikes are timeboxed decisions, not open-ended research. A failed spike must still produce evidence and an explicit scope decision. Later work starts only when the preceding row's exit criteria are met.
 
+**Current progress:** Preflight completed on 2026-09-30. The [audit results](roadmap/audits/preflight-open-source-reuse.md) retain Donpa and Leaves as design references and decline GateEngine for the starting foundation; no external code or assets are included. [ADR-001](roadmap/decisions/ADR-001-first-party-foundation.md) chooses first-party prototypes and a hardware fallback. **Next: Spike 00**, including platform selection and measured renderer validation.
+
 ## Where existing repositories fit
 
 | Candidate | Decision point | Potential use |
 | --- | --- | --- |
-| [Donpa Squad](https://github.com/vlumi/donpa) | Preflight → Epics 01, 02, 04, 07 | Study its pure game-core/UI split, thin platform targets, save strategy, and test setup. Audit and exclude its cloud, sharing, Game Center, and reserved brand assets. |
-| [Leaves of Blocks](https://github.com/timveil/leaves-of-blocks) | Preflight → Epics 08–09 | Study block interaction, accessibility, localization, tests, and release tooling. Exclude local gameplay analytics and optional Game Center. |
-| [GateEngine](https://github.com/STREGAsGate/GateEngine) | Preflight → Spike 00 | Compare a Swift 2D/3D engine against the smaller SpriteKit + RealityKit approach on the chosen devices. Adopt only if a measured vertical slice justifies its scope and dependencies. |
+| [Donpa Squad](https://github.com/vlumi/donpa) | Preflight → Epics 01, 02, 04, 07 | Reference its rules/render split, thin platform targets, save strategy, and tests. Its core also contains cloud/keychain adapters; no package or assets are approved for inclusion. |
+| [Leaves of Blocks](https://github.com/timveil/leaves-of-blocks) | Preflight → Epics 08–09 | Reference block geometry, accessibility labels/reduced-motion patterns, localization checks, and CI structure. Accessible board placement needs independent work; analytics, Game Center, assets, and tooling remain excluded. |
+| [GateEngine](https://github.com/STREGAsGate/GateEngine) | Preflight → Spike 00 | Declined by preflight for the starting foundation. Reconsider a measured comparison only if first-party prototypes reveal an unmet requirement; adoption needs a new dependency review. |
 | [Voxels](https://github.com/heckj/Voxels) and [dynamic RealityKit mesh example](https://github.com/metal-by-example/metal-spatial-dynamic-mesh) | Spike 11 → Epic 12 | Test voxel storage/surface extraction and frequently updated RealityKit geometry for the dig mechanic. These are terrain references, not app shells. |
 
 The preflight decision records whether each candidate will supply code, a narrow algorithm, an architectural pattern, or no reusable material. No candidate becomes a dependency by appearing in this table.

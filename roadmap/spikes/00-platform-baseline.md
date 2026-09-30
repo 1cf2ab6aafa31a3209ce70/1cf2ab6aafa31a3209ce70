@@ -4,6 +4,8 @@
 
 **Timebox:** Two developer days. **Entry:** The preflight reuse audit has a documented foundation decision. **Next:** Epic 01.
 
+**Inherited decision:** [ADR-001](../decisions/ADR-001-first-party-foundation.md) starts with original first-party prototypes. Donpa and Leaves are references only; GateEngine was not retained, so investigation item 5 is conditional on reopening that decision for a measured unmet requirement. See the [preflight evidence](../audits/preflight-open-source-reuse.md) for build results and limitations.
+
 ## Investigation
 
 1. Build a disposable SwiftUI shell with a SpriteKit scene on iPhone, iPad, and macOS hardware or simulators available to the team. Check resize, safe areas, pause/resume, touch, pointer, and keyboard input.
