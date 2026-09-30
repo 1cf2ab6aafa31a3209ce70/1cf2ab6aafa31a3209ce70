@@ -11,6 +11,7 @@
 3. Establish deterministic rule state independent of mesh timing. Test collision and scoring under different render frame rates.
 4. Test accessibility and input on touch and any committed macOS platform. Identify a non-precision control path.
 5. Recheck Apple's current renderer guidance before implementation. Keep RealityKit as the default; record measured reasons for any Metal compute/custom-renderer extension or SpriteKit approximation.
+6. Evaluate [Voxels](https://github.com/heckj/Voxels) for data and surface generation and the [RealityKit dynamic-mesh example](https://github.com/metal-by-example/metal-spatial-dynamic-mesh) for mesh updates. Build only the narrow benchmark needed, then record license, API, performance, and adoption decisions.
 
 ## Exit evidence
 

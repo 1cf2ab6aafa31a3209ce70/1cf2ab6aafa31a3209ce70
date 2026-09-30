@@ -11,6 +11,7 @@
 3. Build SpriteKit scenes, feedback, tutorials, accessible controls, and original art/audio. Keep board simulation separate from animation timing.
 4. Author a curated bundled level set for each title and validate every level. Use generation only where seeds and solvability checks make results reproducible.
 5. Integrate title-specific settings, level results, saves, localization, and release metadata. Extract a small shared grid helper only if both finished implementations need it.
+6. Revisit the preflight findings on Leaves of Blocks for approved interaction or release patterns; keep its analytics/history and optional online features out of both titles.
 
 ## Acceptance
 

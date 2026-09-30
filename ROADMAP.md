@@ -14,6 +14,7 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 
 | Order | Type | Brief | Exit artifact |
 | --- | --- | --- | --- |
+| Preflight | Spike | [Open-source reuse audit](roadmap/spikes/preflight-open-source-reuse.md) | Build, privacy, license, and adoption decision for candidate repos |
 | 00 | Spike | [Platform and rendering baseline](roadmap/spikes/00-platform-baseline.md) | Platform matrix and renderer decision record |
 | 01 | Epic | [Repository and privacy foundation](roadmap/epics/01-foundation.md) | Buildable monorepo skeleton and contribution rules |
 | 02 | Epic | [Shared app shell](roadmap/epics/02-app-shell.md) | Playable lifecycle shell on the chosen platforms |
@@ -30,13 +31,24 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 
 The spikes are timeboxed decisions, not open-ended research. A failed spike must still produce evidence and an explicit scope decision. Later work starts only when the preceding row's exit criteria are met.
 
+## Where existing repositories fit
+
+| Candidate | Decision point | Potential use |
+| --- | --- | --- |
+| [Donpa Squad](https://github.com/vlumi/donpa) | Preflight → Epics 01, 02, 04, 07 | Study its pure game-core/UI split, thin platform targets, save strategy, and test setup. Audit and exclude its cloud, sharing, Game Center, and reserved brand assets. |
+| [Leaves of Blocks](https://github.com/timveil/leaves-of-blocks) | Preflight → Epics 08–09 | Study block interaction, accessibility, localization, tests, and release tooling. Exclude local gameplay analytics and optional Game Center. |
+| [GateEngine](https://github.com/STREGAsGate/GateEngine) | Preflight → Spike 00 | Compare a Swift 2D/3D engine against the smaller SpriteKit + RealityKit approach on the chosen devices. Adopt only if a measured vertical slice justifies its scope and dependencies. |
+| [Voxels](https://github.com/heckj/Voxels) and [dynamic RealityKit mesh example](https://github.com/metal-by-example/metal-spatial-dynamic-mesh) | Spike 11 → Epic 12 | Test voxel storage/surface extraction and frequently updated RealityKit geometry for the dig mechanic. These are terrain references, not app shells. |
+
+The preflight decision records whether each candidate will supply code, a narrow algorithm, an architectural pattern, or no reusable material. No candidate becomes a dependency by appearing in this table.
+
 ## Working definition of done
 
 For every epic: build both debug and release configurations; run automated tests for pure logic and content validation; exercise the user-facing path on supported devices; update contributor documentation; and check that no app target acquired network, tracking, ad, commerce, or telemetry capabilities. Record the exact supported OS/device matrix in the repository after spike 00.
 
 ## Current workspace
 
-At planning time this directory contains no source files or Git repository. The briefs describe a greenfield implementation; paths and target names are proposed, not references to existing code.
+This Git repository currently contains roadmap documents and no game source. The briefs describe a greenfield implementation; paths and target names are proposed, not references to existing code.
 
 ## Technical basis
 

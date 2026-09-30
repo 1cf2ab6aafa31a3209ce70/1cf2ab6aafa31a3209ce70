@@ -2,7 +2,7 @@
 
 **Outcome:** A new contributor can clone and build a native Apple monorepo with shared packages and separate title targets. The repository establishes offline, no-telemetry rules before gameplay code appears.
 
-**Entry:** Spike 00 is complete; its platform and renderer decisions are recorded. **Next:** Epic 02. This epic depends on all earlier ordered work.
+**Entry:** Preflight and Spike 00 are complete; their reuse, platform, and renderer decisions are recorded. **Next:** Epic 02. This epic depends on all earlier ordered work.
 
 ## Scope and tasks
 
@@ -11,6 +11,7 @@
 3. Add a license suitable for code and a separate asset-license policy; add `CONTRIBUTING.md`, architectural decision records, and an original-content provenance template.
 4. Add build/test scripts and CI for every supported target. Validate that a clean checkout builds without secrets or external runtime services.
 5. Document the app privacy contract and add a dependency/entitlement/Info.plist review checklist. Prevent accidental inclusion of tracking, ads, payments, network client SDKs, and data collection.
+6. Apply preflight-approved code or architecture patterns with required license notices and pinned revisions; keep excluded features and assets out of the build.
 
 ## Acceptance
 
