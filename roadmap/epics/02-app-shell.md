@@ -4,6 +4,12 @@
 
 **Entry:** Epic 01 builds on the platform matrix from spike 00. **Next:** Spike 03. This epic depends on all earlier ordered work.
 
+## Implementation — 2026-10-01
+
+**Status:** Complete. Final mobile builds, 21 core tests, 14 platform tests and all 13 app/UI tests on each acceptance geometry passed. Independent integration, bundle and screenshot review found no unresolved material issue. [ADR-004](../decisions/ADR-004-mobile-shell-lifecycle.md) records explicit resume, preparation identity, scene ownership and session-only settings. The [evidence report](../audits/epic-02-app-shell.md) maps the implementation and checks to acceptance. Spike 03's entry gate is satisfied.
+
+The development practice uses shared SwiftUI menus and results around a title-owned SpriteKit scene. `GameCore` owns legal transitions and independent lifecycle/audio pause reasons; `GamePlatform` owns the shared controller/UI, authored audio, optional haptics and one interruption observer. Settings currently apply in memory, and English is the practice's supported language. No durable save or title-specific puzzle rule is introduced.
+
 ## Scope and tasks
 
 1. Define a small title registration interface and a flow coordinator that owns state transitions, loading errors, pause/resume, restart, and level completion. Keep game rules in the title module.

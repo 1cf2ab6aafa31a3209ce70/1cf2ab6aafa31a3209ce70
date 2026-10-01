@@ -1,6 +1,6 @@
 # Contributing
 
-This repository contains an original mobile foundation and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Gameplay, a playable app shell and complete titles remain roadmap work.
+This repository contains an original mobile foundation, a playable lifecycle shell and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Puzzle rules, levels, durable saves and complete titles remain roadmap work.
 
 ## Start here
 
@@ -15,7 +15,7 @@ bash scripts/verify.sh
 bash scripts/test-mobile.sh
 ```
 
-The first command checks generated-project consistency and architecture/privacy boundaries, builds the core package and its test target plus the platform package, and builds Debug/Release for a generic simulator plus unsigned Release for generic iOS. The second runs the mobile development-title smoke test on the two selected simulator geometries. Open `GameCore.xcworkspace` with scheme `DevelopmentTitle`. Follow the [root README](README.md) for project generation, simulator selection and exact tool requirements. The empty core intentionally has no invented domain API or runtime test cases; structural checks validate its dependency boundary. Add executable logic tests with the first domain behavior. These checks establish the empty foundation's build boundary; they do not certify a complete game, physical performance, runtime privacy or minimum-OS execution.
+The first command checks generated-project consistency and architecture/privacy boundaries, runs core and platform logic tests, and builds Debug/Release for a generic simulator plus unsigned Release for generic iOS. The second runs app-hosted model and UI tests on the two selected simulator geometries. Open `GameCore.xcworkspace` with scheme `DevelopmentTitle`. Follow the [root README](README.md) for project generation, simulator selection and exact tool requirements. Tests cover meaningful transitions, preparation, feedback lifetime and user-facing shell paths. These checks do not certify a complete game, physical performance, runtime privacy or minimum-OS execution.
 
 The disposable experiment has its own build/test commands in its README. Its renderer integration evidence does not make the experiment a production package or title.
 
@@ -24,11 +24,13 @@ The disposable experiment has its own build/test commands in its README. Its ren
 Keep changes focused and explain the behavior or decision they change. Include relevant validation and remaining uncertainty. Preserve the roadmap's dependencies unless an explicit decision revises them. Simulator results must be labeled with runtime and geometry; a deployment-target build is not execution on the minimum OS.
 
 - `Packages/GameCore` contains renderer-independent domain interfaces and pure logic. It must not import title or renderer implementations.
-- `Packages/GamePlatform` depends on `GameCore` and owns Apple platform adapters.
-- `Games/<Title>` contains a title's entry point, rules, rendering and bundled content. `Games/DevelopmentTitle` is the empty development target.
+- `Packages/GamePlatform` depends on `GameCore` and owns the reusable mobile shell/controller and Apple platform adapters. Its SwiftUI shell accepts title-provided renderer and gameplay views without importing a title.
+- `Games/<Title>` contains a title's entry point, rules, rendering and bundled content. `Games/DevelopmentTitle` exercises the shared flow with an original practice scene.
 - `experiments` contains disposable investigations outside production targets.
 
 Keep each title's identity, assets, levels, bundle identifier and future save namespace separate. Add tests for observable domain invariants and meaningful adapter behavior as features arrive; avoid tests that only repeat trivial implementation details. Inspect generated files in the same change as their generator inputs.
+
+The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity, single-window ownership and session-only settings. Do not add persistence before Spike 03's save decision or treat this small registration type as the final game-module contract. App-hosted tests may inject preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
 
 ## Privacy, dependencies and content
 

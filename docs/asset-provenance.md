@@ -6,7 +6,7 @@ The repository’s [MIT license](../LICENSE) covers project-authored code, docum
 
 ## Record template
 
-Create a record beside a title's content or in its documented inventory, and update it when the material changes. Use the `Games/<Title>` boundary; the empty development target has no finished title assets. Do not create an approved inventory entry solely because a file exists.
+Create a record beside a title's content or in its documented inventory, and update it when the material changes. Use the `Games/<Title>` boundary; the development practice has an [original-content record](../Games/DevelopmentTitle/CONTENT.md), but no finished title assets. Do not create an approved inventory entry solely because a file exists.
 
 ```markdown
 # Content record: <name>
