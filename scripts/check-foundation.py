@@ -127,7 +127,8 @@ def check_project():
             continue
         settings = item["buildSettings"]
         require(not settings.get("CODE_SIGN_ENTITLEMENTS"), "Foundation must not add signing entitlements")
-        require(not settings.get("INFOPLIST_FILE"), "Review custom Info.plist before adding it to the foundation")
+        require(settings.get("INFOPLIST_FILE") in {None, "Games/DevelopmentTitle/Info.plist"},
+                "Review any additional custom Info.plist")
         for key in settings:
             if key.startswith("INFOPLIST_KEY_"):
                 require(key.removeprefix("INFOPLIST_KEY_") in allowed_info,
@@ -135,6 +136,10 @@ def check_project():
     attributes = project_root.get("attributes", {}).get("TargetAttributes", {})
     for target in attributes.values():
         require(not target.get("SystemCapabilities"), "Review added project capabilities")
+    info = plistlib.loads((ROOT / "Games/DevelopmentTitle/Info.plist").read_bytes())
+    require(info == {"UIApplicationSceneManifest": {
+        "UIApplicationSupportsMultipleScenes": False, "UISceneConfigurations": {}}},
+        "Development title must retain its reviewed single-window scene configuration")
 
 
 def source_without_comments(source):
