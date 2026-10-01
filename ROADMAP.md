@@ -1,6 +1,6 @@
 # Privacy-first native game-core roadmap
 
-This is an ordered backlog for an open-source Apple-platform monorepo. The goal is to ship original unscrew/panel, block/tile match, and dig-the-ground games from one reusable core. Each linked epic or spike is a standalone brief. Complete the rows in order: every row inherits the decisions and completed work of all earlier rows.
+This is an ordered backlog for an open-source Apple-platform monorepo. The goal is to ship original unscrew/panel, block/tile match, and dig-the-ground games from one reusable core. Current implementation targets iOS/iPadOS; macOS is deferred. Each linked epic or spike is a standalone brief. Complete the rows in order: every row inherits the decisions and completed work of all earlier rows.
 
 ## Product rules
 
@@ -8,7 +8,7 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 - App code makes no network requests and requests no tracking permission. Saves and settings stay on the device. App Store distribution may involve Apple-operated services outside the app; privacy claims must describe the app accurately.
 - Each title has its own identity, assets, levels, bundle identifier, and save namespace. Shared code owns lifecycle, settings, local progression, content loading, platform adapters, and common UI; title modules own rules and rendering.
 - The repository uses first-party Apple frameworks by default. Any new dependency needs a written license, maintenance, privacy, and reproducibility review.
-- Levels and art must be original or licensed for redistribution. Similar mechanics are acceptable; copied assets, level layouts, names, and store presentation are not.
+- Project-authored code, documentation and resources use the [MIT license](LICENSE); third-party material retains its own licenses and notices. Levels and art must be original or licensed for redistribution. Similar mechanics are acceptable; copied assets, level layouts, names, and store presentation are not.
 
 ## Ordered work
 
@@ -31,7 +31,17 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 
 The spikes are timeboxed decisions, not open-ended research. A failed spike must still produce evidence and an explicit scope decision. Later work starts only when the preceding row's exit criteria are met.
 
-**Current progress:** Preflight completed on 2026-09-30. The [audit results](roadmap/audits/preflight-open-source-reuse.md) retain Donpa and Leaves as design references and decline GateEngine for the starting foundation; no external code or assets are included. [ADR-001](roadmap/decisions/ADR-001-first-party-foundation.md) chooses first-party prototypes and a hardware fallback. **In progress: Spike 00.** Its [disposable experiment](experiments/platform-baseline/README.md), [provisional ADR-002](roadmap/decisions/ADR-002-platform-rendering-baseline.md), and [evidence report](roadmap/audits/spike-00-platform-baseline.md) record host/simulator builds and pure tests. The corrected collider and sustained-settling integration test passed on both device-geometry simulators; landscape containment assertions also passed on both geometries. Final Debug/Release host/simulator builds, eight pure tests and the source privacy scan passed. macOS pointer/keyboard interaction was observed in a partial run; full macOS runtime validation remains open. Final mobile landscape captures were visually inspected on both simulator geometries. Physical acceptance and minimum-runtime validation remain open. Epic 01 implementation remains gated.
+**Current progress:** Preflight completed on 2026-09-30. The [reuse audit](roadmap/audits/preflight-open-source-reuse.md) retains Donpa and Leaves as references only and declines GateEngine; no candidate code or assets are included. **Spike 00 completed for mobile foundation development on 2026-10-01** under [ADR-003](roadmap/decisions/ADR-003-simulator-mobile-foundation.md), which replaces physical-device and macOS gates with simulator acceptance. The [retained evidence](roadmap/audits/spike-00-platform-baseline.md) includes successful Debug/Release simulator builds, eight pure tests and final interaction runs on iOS 26 simulators with iPhone 12 and iPad (9th generation) geometry. Simulator results do not establish physical performance or minimum-OS runtime behavior. **Epic 01 implementation and local checks complete; hosted CI acceptance pending.** Its original mobile skeleton passed Debug/Release builds, two simulator smoke runs and an independent clean filesystem-copy build. The [Epic 01 evidence](roadmap/audits/epic-01-mobile-foundation.md) distinguishes these local passes from configured CI, which has not run. Epic 02 has not begun.
+
+## Parallel work — 2026-10-01
+
+| Track | Artifact / next action | Execution boundary |
+| --- | --- | --- |
+| Mobile foundation | [Epic 01](roadmap/epics/01-foundation.md), [contribution guide](CONTRIBUTING.md), [privacy contract](docs/privacy-contract.md), [content provenance](docs/asset-provenance.md) | Implemented; local builds/UI smoke and clean-copy checks passed. Configured hosted CI acceptance remains pending |
+| Mobile validation | [Simulator acceptance record](roadmap/acceptance/spike-00-device-record.md) | Use simulators and available profiling; minimum-runtime and distribution checks remain explicit, without waiting for physical devices or Mac validation |
+| Later spike preparation | [Scenario and evidence plans](roadmap/plans/later-spike-test-plans.md) | Spike 03 waits for Epic 02, Spike 06 for Epic 05, and Spike 11 for Epic 10 |
+
+Independent documentation and test planning may proceed in parallel. Later implementation keeps its listed dependencies; the revised simulator acceptance policy specifically enables Epic 01 and does not decide storage, module or final terrain contracts.
 
 ## Where existing repositories fit
 
@@ -46,11 +56,11 @@ The preflight decision records whether each candidate will supply code, a narrow
 
 ## Working definition of done
 
-For every epic: build both debug and release configurations; run automated tests for pure logic and content validation; exercise the user-facing path on supported devices; update contributor documentation; and check that no app target acquired network, tracking, ad, commerce, or telemetry capabilities. Record the exact supported OS/device matrix in the repository after spike 00.
+For every epic: build both debug and release configurations; run automated tests for pure logic and content validation; exercise the user-facing path on the supported mobile simulator geometries; update contributor documentation; and check that no app target acquired network, tracking, ad, commerce, or telemetry capabilities. Record runtime, geometry and source identity with validation results. iOS/iPadOS 18.0 is the deployment floor; minimum-runtime execution and distribution checks remain explicit under ADR-003. Physical devices and macOS are not required for current foundation work.
 
 ## Current workspace
 
-This Git repository contains roadmap documents and an original disposable platform experiment under `experiments/platform-baseline`. There is no production game core, app shell or title implementation. Paths and targets proposed by later briefs remain planned work; the experiment does not establish production contracts.
+This Git repository contains roadmap documents and an original disposable platform experiment under `experiments/platform-baseline`. Epic 01 is adding the production mobile package/title skeleton; no gameplay, playable lifecycle shell or complete title is established by that skeleton. Later feature contracts remain planned work, and the experiment remains separate from production targets.
 
 ## Technical basis
 
