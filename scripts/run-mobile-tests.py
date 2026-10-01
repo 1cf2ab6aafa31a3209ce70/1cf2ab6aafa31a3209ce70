@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Run mobile smoke tests on owned disposable simulators; never touch other devices."""
+"""Run mobile app and UI tests on owned disposable simulators; never touch other devices."""
 import argparse
 import hashlib
 import json
@@ -141,27 +141,29 @@ def main():
     for model, device_type in MODELS:
         device = None
         try:
-            device = run(["xcrun", "simctl", "create", f"GameCore Foundation {model} {uuid.uuid4().hex[:8]}",
+            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
                           device_type, runtime["identifier"]])
             metadata["devices"].append({"model": model, "type": device_type, "id": device})
             (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
             run(["xcrun", "simctl", "boot", device])
-            run(["xcrun", "simctl", "bootstatus", device, "-b"], timeout=180)
+            run(["xcrun", "simctl", "bootstatus", device, "-b"],
+                log=output / f"{model}-boot.log", timeout=300)
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
                          "-maximum-test-execution-time-allowance", "90", "test-without-building"],
-                log=output / f"{model}.log", timeout=300)
+                log=output / f"{model}.log", timeout=600)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
         finally:
             if device:
                 # Only UUIDs returned by create in this invocation are cleaned up.
                 for operation in ("shutdown", "delete"):
                     try:
-                        run(["xcrun", "simctl", operation, device], timeout=30)
+                        run(["xcrun", "simctl", operation, device],
+                            log=output / f"{model}-{operation}.log", timeout=90)
                     except RuntimeError as error:
                         print(f"Cleanup warning ({model}): {error}", file=sys.stderr)
-    print("Mobile smoke tests passed; no physical performance claim", flush=True)
+    print("Mobile app and UI tests passed; no physical performance claim", flush=True)
 
 
 if __name__ == "__main__":
