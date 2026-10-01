@@ -1,6 +1,3 @@
-/// Renderer-independent game logic belongs in this module.
-///
-/// This foundation deliberately introduces no gameplay, flow, or save contracts.
-/// Core model files may use Foundation, but must not import Apple UI frameworks
-/// or depend on platform adapters or title modules.
+/// Renderer-independent shell state and title rules belong in this module.
+/// UI, rendering and device services are supplied by the app and its adapters.
 import Foundation
