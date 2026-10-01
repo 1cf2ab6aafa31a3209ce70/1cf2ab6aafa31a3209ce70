@@ -2,7 +2,7 @@
 
 An original, disposable SwiftUI application with an 8 × 8 SpriteKit block board, an unscrew-panel input/rendering placeholder, and a RealityKit surface-excavation experiment. It uses Apple SDKs and generated geometry/colors; there are no external packages or assets. This is an experiment, not the production shell or game core.
 
-The acceptance devices selected for this spike are **iPhone 12 and iPad (9th generation)**. Mobile ships first; macOS is a development/portability target with release deferred. The proposed deployment floors are iOS/iPadOS 18 and macOS 15, matching the non-AR `RealityView` API used here. Physical-device and minimum-runtime validation remain required; simulator results cannot approve those gates.
+[ADR-003](../../roadmap/decisions/ADR-003-simulator-mobile-foundation.md) accepts this spike for mobile foundation development using **iPhone 12 and iPad (9th generation) simulator geometries**. No physical device is available or required for this work; macOS is deferred. The mobile deployment floor is iOS/iPadOS 18. Minimum-runtime execution remains a distribution-readiness check; simulator results do not establish physical performance. The experiment retains its historical macOS 15 target and observations, outside current mobile scope.
 
 ## Build and run
 
@@ -13,10 +13,11 @@ From this folder:
 ```sh
 python3 scripts/generate-project.py
 open PlatformBaseline.xcodeproj
-bash scripts/verify.sh
+swift test --scratch-path /tmp/gamecore-baseline-logic
+bash scripts/privacy-scan.sh
 ```
 
-Choose `PlatformBaseline` and an iOS 18+ device/simulator or My Mac. Device deployment needs your own signing team; no team or provisioning credentials are committed. The verification script builds unsigned Debug/Release macOS and iOS Simulator applications, runs pure-logic tests and a limited source privacy scan, and writes products under `/tmp`. Xcode services/compiler plugins must be allowed to run by the local execution environment. The script does not launch UI tests or certify runtime network behavior.
+Choose `PlatformBaseline` and an iOS 18+ simulator. Xcode services/compiler plugins must be allowed to run by the local execution environment. The pure tests and source scan do not launch UI tests or certify runtime network behavior. The historical experiment `scripts/verify.sh` still includes macOS builds; current mobile foundation checks use the [root commands](../../README.md#build-and-run), which do not require Mac application validation. Physical deployment, if ever used, needs a signing team; no signing credentials are committed.
 
 For repeatable simulator interaction checks, substitute an available simulator UUID from `bash scripts/inventory.sh`:
 
@@ -31,7 +32,7 @@ xcodebuild -project PlatformBaseline.xcodeproj -scheme PlatformBaseline \
   -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=NO test-without-building
 ```
 
-For local macOS UI tests, sign the runner ad hoc (no developer team is needed):
+Historical optional macOS commands are retained for reproducibility of prior observations; they are not current mobile work or acceptance requirements. An ad hoc signed runner was used (no developer team):
 
 ```sh
 xcodebuild -project PlatformBaseline.xcodeproj -scheme PlatformBaseline \
@@ -43,9 +44,9 @@ xcodebuild -project PlatformBaseline.xcodeproj -scheme PlatformBaseline \
   -parallel-testing-enabled NO CODE_SIGNING_ALLOWED=YES CODE_SIGN_IDENTITY=- test-without-building
 ```
 
-The unsigned macOS test runner was killed during bootstrap in this environment; the ad hoc signed runner executed. That launch failure does not establish an app-renderer failure. macOS keyboard testing explicitly focuses the renderer before sending keys. Runtime tests still require local Xcode/automation permissions.
+The unsigned macOS test runner was killed during bootstrap in this environment; the ad hoc signed runner executed. That launch failure does not establish an app-renderer failure. macOS keyboard testing explicitly focuses the renderer before sending keys. These historical runtime tests required local Xcode/automation permissions.
 
-Use a new result-bundle path for each run. UI tests exercise board and panel activation, blocked paused input, terrain regeneration/contact, rotation, and background/reactivation; retained attachments contain screenshots and local measurements. A partial macOS run observed pointer activation, arrow navigation, Space activation and terrain rest, but the full macOS suite did not pass; later retries had inconsistent window/input delivery. They do not replace hardware keyboard, VoiceOver, sustained performance, memory-pressure, or physical-device checks. Use the physical-device procedure below before accepting the spike.
+Use a new result-bundle path for each run. UI tests exercise board and panel activation, blocked paused input, terrain regeneration/contact, rotation, and background/reactivation; retained attachments contain screenshots and local measurements. A partial macOS run observed pointer activation, arrow navigation, Space activation and terrain rest, but the full macOS suite did not pass; later retries had inconsistent window/input delivery. Simulator tests do not establish hardware keyboard, VoiceOver, sustained physical performance or memory-pressure behavior. ADR-003 accepts the mobile foundation from the retained simulator evidence; the procedure below is historical guidance for optional future hardware observations, not a remaining gate.
 
 ## Controls and probe boundaries
 
@@ -60,10 +61,12 @@ Do not compare samples taken during builds, simulator boot, screen recording, or
 
 ## Physical acceptance procedure
 
+Historical optional procedure, retained from ADR-002. It does not require acquiring a device or block current development; use the [simulator acceptance record](../../roadmap/acceptance/spike-00-device-record.md) for the active policy and benchmark protocol.
+
 1. Record exact device model, OS, Xcode/toolchain, configuration, orientation, refresh rate, and build revision. Build Release and run on the selected iPhone 12 and iPad (9th generation), including the minimum OS where available.
 2. Run blocks and panel for five minutes each. Perform repeated touches, rotate, pause/resume, background/reactivate, and confirm state/selection and hit coordinates remain valid. Exercise iPad pointer and a hardware keyboard separately. Use Instruments to capture actual display pacing, allocations/peak footprint, and input responsiveness; preserve an exported summary.
-3. Run the 25-command terrain sequence, repeat it after reset, and record mesh/collision timings plus actual frame pacing and peak memory during updates. Verify that surface taps map to the touched patch, the sphere contacts the current mesh, and pause/rotation/backgrounding cannot update a removed or suspended scene. Inspect crater depth readability and collision near edges.
-4. Proposed initial budgets: 60 Hz interaction; p95 presented frame interval ≤20 ms and p99 ≤33.4 ms over the sustained run; peak footprint ≤150 MiB for board/panel and ≤250 MiB for this tiny terrain workload. Target p95 mesh generation ≤4 ms and p95 collision regeneration ≤12 ms. These are provisional acceptance targets, not observed device results or guarantees for Epic 12's final terrain.
+3. Follow the [fixed terrain command and sample protocol](../../roadmap/acceptance/spike-00-device-record.md#fixed-terrain-command-and-sample-protocol): reset, run 25 drill-button commands with installation/settling waits and a minimum three-second cadence, reset and repeat, and retain all 50 mesh/collision samples plus actual presentation and peak-memory captures. Test freehand input and lifecycle separately: surface taps map to the touched patch, the sphere contacts the current mesh, and pause/rotation/backgrounding cannot update a removed or suspended scene. Inspect crater depth readability and collision near edges.
+4. Proposed initial budgets: 60 Hz interaction; p95 presented frame interval ≤20 ms and p99 ≤33.4 ms over the sustained run; peak footprint ≤150 MiB for board/panel and ≤250 MiB for this tiny terrain workload. Target p95 mesh generation ≤4 ms and p95 collision regeneration ≤12 ms. These are historical physical workload targets, not observed device results, simulator pass thresholds or guarantees for Epic 12's final terrain.
 5. Record failures and scope changes in [the platform decision](../../roadmap/decisions/ADR-002-platform-rendering-baseline.md). If terrain misses the budget, first investigate collision resolution/update frequency; do not introduce Metal or an engine without a measured benefit. A 2D excavation title remains the fallback.
 
-The [spike report](../../roadmap/audits/spike-00-platform-baseline.md) records executed commands/results and remaining gates. [Terrain notes](terrain-notes.md) explain the mesh/collision responsibilities and their limits.
+The [spike report](../../roadmap/audits/spike-00-platform-baseline.md) preserves September 30 commands/results and historical limitations; ADR-003 supersedes its physical and macOS entry gates. [Terrain notes](terrain-notes.md) explain the mesh/collision responsibilities and their limits.

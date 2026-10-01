@@ -1,7 +1,7 @@
 # ADR-002 — Platform and rendering baseline
 
 **Date:** 2026-09-30  
-**Status:** Provisional. Host/simulator builds, simulator integration evidence and partial macOS input/terrain observations are recorded; full macOS runtime validation, physical acceptance and minimum-runtime checks remain open. Spike 00 is not complete.  
+**Status:** Historical provisional decision. [ADR-003](ADR-003-simulator-mobile-foundation.md) supersedes its physical-device and macOS completion gates on 2026-10-01 and accepts the mobile foundation using simulator evidence. The observations and original budget proposals below are retained as recorded.
 **Owner:** Platform/rendering maintainer.
 
 ## Context
