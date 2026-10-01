@@ -1,0 +1,5 @@
+.agent-telemetry/
+.DS_Store
+**/.build/
+**/xcuserdata/
+**/*.xcresult/
