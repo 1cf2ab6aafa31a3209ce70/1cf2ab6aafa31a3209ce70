@@ -3,3 +3,5 @@
 **/.build/
 **/xcuserdata/
 **/*.xcresult/
+**/__pycache__/
+**/*.pyc
