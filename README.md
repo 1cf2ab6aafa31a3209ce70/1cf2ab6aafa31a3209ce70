@@ -17,6 +17,8 @@ bash scripts/test-mobile.sh
 
 `verify.sh` checks generated-project consistency and package/privacy boundaries, runs the pure `GameCore` and `GamePlatform` tests, then builds Debug/Release for generic iOS Simulator and unsigned Release for generic iOS. It prints its temporary output directory; optionally pass a new absolute directory as the first argument. The generic iOS build is a compile check, not a device run.
 
+`GamePlatform` declares macOS 10.15 as the minimum for command-line package logic tests. The application remains iOS/iPadOS-only.
+
 `test-mobile.sh` runs app-hosted model tests and UI paths on disposable iPhone 12 and iPad (9th generation) simulator geometries. It selects the newest installed iOS runtime ≥18 unless `GAMECORE_SIM_RUNTIME_VERSION` specifies an exact installed version. It retains logs, runtime inventory, source hashes and `.xcresult` bundles in its printed temporary directory, and removes only the simulators it created. An optional output argument must be a new absolute directory.
 
 Core tests cover valid and invalid flow transitions, stale preparation results and overlapping pause reasons. Platform tests cover feedback gating and notification lifetime. Mobile tests cover the retained scene, preparation recovery, navigation, session-only settings, foreground pause, rotation, large text and Reduce Motion.

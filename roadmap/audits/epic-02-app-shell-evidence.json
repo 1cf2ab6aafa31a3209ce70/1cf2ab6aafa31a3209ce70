@@ -1,7 +1,7 @@
 {
   "date": "2026-10-01",
   "branch": "codex/mobile-app-shell",
-  "sourceState": "Local validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual source hashes identify tested inputs. All recorded inputs still match the final working tree.",
+  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 30 remain unchanged after the two separately recorded host manifest/workflow fixes.",
   "uiRunInventory": {
     "xcode": "Xcode 27.0\nBuild version 27A266a",
     "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
@@ -56,7 +56,7 @@
       }
     ]
   },
-  "sourceHashesMatchFinalWorkingTree": true,
+  "sourceHashesMatchFinalWorkingTree": false,
   "localVerification": {
     "command": "bash scripts/verify.sh /private/tmp/gamecore-epic02-accessible-verification-20261001",
     "result": "Passed",
@@ -260,7 +260,23 @@
     "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/attempts/2",
     "detail": "See separate Epic01 evidence, including startup retry and hosted cleanup warnings."
   },
-  "shellHostedCI": "Workflow configured; shell publication/execution is separate from these local results.",
+  "shellHostedCI": {
+    "initialRun": {
+      "run": 36941455713,
+      "attempt": 1,
+      "head": "a781051c0cf3672a1b0d169c8e6f4ede2c6817e8",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36941455713",
+      "conclusion": "failure",
+      "structuralChecks": "Passed",
+      "coreTests": 21,
+      "platformTests": "Not executed: package compilation failed",
+      "mobileBuilds": "Not executed",
+      "mobileTests": "Skipped",
+      "diagnostic": "MainActor and assumeIsolated require macOS 10.15; implicit SwiftPM host floor was lower.",
+      "toolchainCheck": "Step reported success despite xcodebuild -version | head -1 causing a broken-pipe exception."
+    },
+    "postFixHostedVerification": "Pending; a new clean run must confirm the pinned toolchain and mobile paths."
+  },
   "reviewFindings": {
     "ids": [
       "E02-01",
@@ -272,10 +288,16 @@
       "E02-07",
       "E02-08",
       "E02-09",
-      "E02-10"
+      "E02-10",
+      "E02-11",
+      "E02-12"
     ],
     "sourceDisposition": "Addressed",
-    "unresolvedMaterialFindings": 0
+    "unresolvedMaterialFindings": 0,
+    "hostedVerificationPending": [
+      "E02-11",
+      "E02-12"
+    ]
   },
   "limits": [
     "No iOS18 runtime execution",
@@ -307,5 +329,37 @@
       "/private/tmp/gamecore-epic02-accessible-iphone-screens",
       "/private/tmp/gamecore-epic02-accessible-ipad-screens"
     ]
+  },
+  "sourceHashesMatchedPrePublicationWorkingTree": true,
+  "postPublicationSourceChanges": {
+    "recordedInputCount": 32,
+    "unchangedInputCount": 30,
+    "changedInputs": {
+      "Packages/GamePlatform/Package.swift": {
+        "historicalSHA256": "cea290511940e89878b90220221741bf093dbf88839638fb2d38b1eecb130646",
+        "currentSHA256": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467"
+      },
+      ".github/workflows/mobile.yml": {
+        "historicalSHA256": "e29de127b9b46667a755e2be8c003713954e90b7daf37b86c2526a9eac99977f",
+        "currentSHA256": "dcf5f113784f5331a5c4543b0cea4310ad72d4c0cced96110b830cdc32ef2e9c"
+      }
+    },
+    "commits": {
+      "E02-11": "901dc3a",
+      "E02-12": "9322e37"
+    },
+    "scope": "Package CLI test-host minimum and workflow version check only; no mobile production source or app target changed."
+  },
+  "postPublicationLocalVerification": {
+    "command": "bash scripts/verify.sh /private/tmp/gamecore-epic02-host-floor-verification-20261001",
+    "result": "Passed",
+    "coreTests": 21,
+    "platformTests": 14,
+    "simulatorDebug": "Passed",
+    "simulatorRelease": "Passed",
+    "unsignedIOSRelease": "Passed",
+    "output": "/private/tmp/gamecore-epic02-host-floor-verification-20261001",
+    "toolchainCheck": "Full captured output accepted the matching local Xcode expectation and rejected the different pinned hosted expectation; no early-closing pipe.",
+    "mobileSimulatorExecution": "Not repeated locally for host manifest/workflow-only changes; pre-publication results are preserved above."
   }
 }
