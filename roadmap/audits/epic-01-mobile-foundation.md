@@ -4,7 +4,7 @@
 
 **Branch:** `codex/mobile-foundation`
 
-**Status:** Implementation and local build/UI checks complete. Configured hosted CI acceptance is pending; Epic 02 has not begun. Runner interruption/cleanup fixtures passed; review found no remaining material issue.
+**Status:** Complete. Local verification and hosted mobile CI passed; Epic 02’s entry gate is satisfied. Runner interruption/cleanup fixtures passed; review found no remaining material issue.
 
 ## Scope and source identity
 
@@ -23,7 +23,7 @@ bash scripts/verify.sh /private/tmp/gamecore-mobile-foundation-20261001
 bash scripts/test-mobile.sh /private/tmp/gamecore-mobile-foundation-ui-20261001
 ```
 
-The configured workflow uses `macos-26`, Xcode 26.6 (`17F113`) and simulator runtime 26.5. That hosted toolchain has not been executed here. Local Xcode 27 results do not establish a passing hosted workflow.
+The hosted workflow passed on a clean committed checkout of `2d7bcf925963640fb53395f47a887009941a45ef` using `macos-26`, Xcode 26.6 (`17F113`) and iOS Simulator 26.5 (`23F77`). [Run 36933015783](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36933015783) completed successfully on 2026-10-01. Downloaded artifact inventory records `worktreeDirty: false`; both finalized simulator result bundles report one passing test with zero failures or skips. Build, simulator tests and evidence upload all passed. These hosted results supplement the distinct local Xcode 27 observations.
 
 ## Results
 
@@ -56,6 +56,6 @@ Full outputs remain in temporary local storage and may be removed by system clea
 | Runner fixture summary | `/var/folders/b2/p6vsggfd46b7pbtjgdjxt1440000gn/T/gamecore-group-retry-review-kgeg144t/summary.txt` |
 | Bundle inspection | `/private/tmp/gamecore-foundation-clean-verification-kk0l00m6/bundle-review.json` |
 
-## Remaining acceptance
+## Acceptance closure and release limits
 
-Run the configured hosted workflow after publication of a committed change. Implementation, local checks and review are complete; hosted CI is the remaining foundation acceptance confirmation. No physical device or Mac application check is required. Minimum-OS execution, accessibility, representative workloads, runtime privacy and distribution signing remain mobile release checks as features arrive. The earlier experiment's eight pure tests are separate evidence, not production core test coverage.
+The published foundation branch and passing hosted workflow close Epic 01 acceptance. Implementation, local checks and review are complete. No physical device or Mac application check is required. Minimum-OS execution, accessibility, representative workloads, runtime privacy and distribution signing remain mobile release checks as features arrive. The earlier experiment's eight pure tests are separate evidence, not production core test coverage.
