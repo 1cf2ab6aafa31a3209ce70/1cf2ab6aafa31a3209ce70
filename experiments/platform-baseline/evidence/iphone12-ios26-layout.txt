@@ -1,0 +1,24 @@
+Final layout integration excerpt, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-iphone12-layout.log
+Runtime: iOS 26.0; geometry: iPhone 12; execution: development Mac
+Scene-update intervals/current footprint only; physical acceptance remains open.
+Source snapshot: layout-run-source-sha256.txt
+Landscape capture: iphone12-ios26-landscape.png
+
+SPIKE00 BLOCKS: Window 358 intervals · p50/p95/p99 16.7/16.7/29.6 ms · worst 35.9 ms · >33.3 ms 3 · footprint 40.2 MiB
+SPIKE00 PANEL: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 37.5 ms · >33.3 ms 1 · footprint 43.6 MiB
+SPIKE00 CONTACT: Sphere contact y=-0.007 x=-0.480 z=-0.480 dug=(-0.480,-0.480) revision=2
+SPIKE00 SETTLED CURRENT: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 SETTLED: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 MESH: Revision 2 · mesh 1.15 ms · collision 15.09 ms
+SPIKE00 TERRAIN: Window 424 intervals · p50/p95/p99 16.7/16.9/18.3 ms · worst 62.6 ms · >33.3 ms 2 · footprint 67.5 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 1.01 ms · collision 18.27 ms
+SPIKE00 LANDSCAPE WINDOW: (0.0, 0.0, 844.0, 390.0)
+SPIKE00 LANDSCAPE CONTROL: probe.pause (742.6666666666666, 22.0, 46.33333333333337, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.drill (195.66666666666666, 304.0, 115.99999999999997, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.reset (319.66666666666663, 304.0, 97.00000000000006, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.surface (71.0, 106.0, 470.0, 120.0)
+SPIKE00 RESUME: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 31.7 ms · >33.3 ms 0 · footprint 73.8 MiB
+	 Executed 1 test, with 0 failures (0 unexpected) in 44.654 (44.655) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 44.654 (44.656) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 44.654 (44.657) seconds

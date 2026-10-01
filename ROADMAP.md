@@ -31,7 +31,7 @@ This is an ordered backlog for an open-source Apple-platform monorepo. The goal 
 
 The spikes are timeboxed decisions, not open-ended research. A failed spike must still produce evidence and an explicit scope decision. Later work starts only when the preceding row's exit criteria are met.
 
-**Current progress:** Preflight completed on 2026-09-30. The [audit results](roadmap/audits/preflight-open-source-reuse.md) retain Donpa and Leaves as design references and decline GateEngine for the starting foundation; no external code or assets are included. [ADR-001](roadmap/decisions/ADR-001-first-party-foundation.md) chooses first-party prototypes and a hardware fallback. **Next: Spike 00**, including platform selection and measured renderer validation.
+**Current progress:** Preflight completed on 2026-09-30. The [audit results](roadmap/audits/preflight-open-source-reuse.md) retain Donpa and Leaves as design references and decline GateEngine for the starting foundation; no external code or assets are included. [ADR-001](roadmap/decisions/ADR-001-first-party-foundation.md) chooses first-party prototypes and a hardware fallback. **In progress: Spike 00.** Its [disposable experiment](experiments/platform-baseline/README.md), [provisional ADR-002](roadmap/decisions/ADR-002-platform-rendering-baseline.md), and [evidence report](roadmap/audits/spike-00-platform-baseline.md) record host/simulator builds and pure tests. The corrected collider and sustained-settling integration test passed on both device-geometry simulators; landscape containment assertions also passed on both geometries. Final Debug/Release host/simulator builds, eight pure tests and the source privacy scan passed. macOS pointer/keyboard interaction was observed in a partial run; full macOS runtime validation remains open. Final mobile landscape captures were visually inspected on both simulator geometries. Physical acceptance and minimum-runtime validation remain open. Epic 01 implementation remains gated.
 
 ## Where existing repositories fit
 
@@ -50,7 +50,7 @@ For every epic: build both debug and release configurations; run automated tests
 
 ## Current workspace
 
-This Git repository currently contains roadmap documents and no game source. The briefs describe a greenfield implementation; paths and target names are proposed, not references to existing code.
+This Git repository contains roadmap documents and an original disposable platform experiment under `experiments/platform-baseline`. There is no production game core, app shell or title implementation. Paths and targets proposed by later briefs remain planned work; the experiment does not establish production contracts.
 
 ## Technical basis
 

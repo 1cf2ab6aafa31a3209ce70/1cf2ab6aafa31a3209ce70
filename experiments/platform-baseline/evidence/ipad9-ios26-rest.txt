@@ -1,0 +1,18 @@
+Simulator evidence excerpt, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-ipad9-rest.log
+Runtime: iOS 26.0; geometry: ipad9; execution: development Mac
+Scene-update callbacks and current footprint only; no physical-device acceptance.
+Source snapshot: simulator-run-source-sha256.txt
+
+SPIKE00 BLOCKS: Window 414 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 77.6 ms · >33.3 ms 3 · footprint 39.4 MiB
+SPIKE00 PANEL: Window 300 intervals · p50/p95/p99 16.7/16.7/16.9 ms · worst 45.9 ms · >33.3 ms 2 · footprint 42.0 MiB
+SPIKE00 CONTACT: Sphere contact y=-0.007 x=-0.480 z=-0.480 dug=(-0.480,-0.480) revision=2
+SPIKE00 SETTLED CURRENT: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 SETTLED: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 MESH: Revision 2 · mesh 1.18 ms · collision 14.91 ms
+SPIKE00 TERRAIN: Window 422 intervals · p50/p95/p99 16.7/16.8/18.4 ms · worst 479.6 ms · >33.3 ms 1 · footprint 69.1 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 0.87 ms · collision 13.71 ms
+SPIKE00 RESUME: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 16.7 ms · >33.3 ms 0 · footprint 71.3 MiB
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.510 (45.512) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.510 (45.512) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.510 (45.513) seconds
