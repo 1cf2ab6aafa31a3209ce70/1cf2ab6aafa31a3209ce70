@@ -66,11 +66,15 @@ def check_packages():
     local = dependencies[0]["fileSystem"][0]
     require(Path(local["path"]).resolve() == ROOT / "Packages/GameCore",
             "GamePlatform local package must resolve to Packages/GameCore")
-    require(len(platform["targets"]) == 1 and platform["targets"][0]["name"] == "GamePlatform"
-            and platform["targets"][0]["type"] == "regular",
-            "Review changes to GamePlatform target inventory")
-    require(target_dependencies(platform["targets"][0]) == [("product", "GameCore", "gamecore")],
+    platform_targets = {target["name"]: target for target in platform["targets"]}
+    require(set(platform_targets) == {"GamePlatform", "GamePlatformTests"}
+            and platform_targets["GamePlatform"]["type"] == "regular",
+            "Expected platform implementation and its test target")
+    require(target_dependencies(platform_targets["GamePlatform"]) == [("product", "GameCore", "gamecore")],
             "GamePlatform target must depend only on the GameCore product")
+    require(platform_targets["GamePlatformTests"]["type"] == "test"
+            and target_dependencies(platform_targets["GamePlatformTests"]) == [("target", "GamePlatform")],
+            "GamePlatformTests must depend only on GamePlatform")
 
 
 def check_project():

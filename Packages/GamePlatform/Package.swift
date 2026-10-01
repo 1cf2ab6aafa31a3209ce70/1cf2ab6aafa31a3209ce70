@@ -11,6 +11,7 @@ let package = Package(
             name: "GamePlatform",
             dependencies: [.product(name: "GameCore", package: "GameCore")]
         ),
+        .testTarget(name: "GamePlatformTests", dependencies: ["GamePlatform"]),
     ],
     swiftLanguageVersions: [.v5]
 )
