@@ -171,6 +171,7 @@ public struct ShellActionButton: View {
         Button(action: action) {
             Text(title)
                 .font(.headline)
+                .foregroundStyle(Color.primary)
                 .multilineTextAlignment(.center)
                 .frame(maxWidth: .infinity, minHeight: 44)
                 .padding(.vertical, 4)
