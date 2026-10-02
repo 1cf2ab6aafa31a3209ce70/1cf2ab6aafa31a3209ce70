@@ -1,6 +1,6 @@
 # Later spike test preparation
 
-**Status:** Spike 03 executed; [decision and evidence](../audits/spike-03-save-durability.md) record its scope and results. Spike 06 and Spike 11 remain preparation only; their entry gates are unchanged.
+**Status:** Spike 03 executed; [decision and evidence](../audits/spike-03-save-durability.md) record its scope and results. [Epic 05 acceptance](../audits/epic-05-bundled-content.md) establishes the level contract, so Spike 06’s entry gate is met. Spike 06 and Spike 11 remain preparation only; neither investigation has started, and Spike 11 still waits for Epic 10.
 
 These plans make future investigations reproducible. Execute each only after its entry gate is met; the roadmap remains ordered. [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md) accepts simulator-only mobile foundation development with an iOS/iPadOS 18.0 deployment floor. Use iPhone 12 and iPad (9th generation) simulator geometry; physical hardware is unavailable and macOS is outside current scope. Retained simulator timings are diagnostic observations, not physical performance or minimum-runtime certification.
 

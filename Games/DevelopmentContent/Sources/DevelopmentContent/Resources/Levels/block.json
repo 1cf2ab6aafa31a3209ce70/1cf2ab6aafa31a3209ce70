@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "block-sample-01",
+  "gameType": "block",
+  "contentVersion": 1,
+  "seed": 100,
+  "payload": {
+    "columns": 3,
+    "rows": 2,
+    "occupiedCells": [
+      0,
+      1,
+      4
+    ],
+    "asset": "marker.svg",
+    "nextLevelIDs": []
+  },
+  "localizationKeys": [
+    "sample.title"
+  ]
+}

@@ -1,3 +1,4 @@
+import DevelopmentContent
 import GameCore
 import GamePlatform
 import SwiftUI
@@ -28,6 +29,7 @@ final class ShellModel: ObservableObject {
         self.init(feedback: ShellFeedbackController(), store: store, storageError: storageError, preparation: {
             await Task.yield()
             try Task.checkCancellation()
+            _ = try BundledContent.load()
         })
     }
 

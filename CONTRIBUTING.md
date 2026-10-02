@@ -1,6 +1,6 @@
 # Contributing
 
-This repository contains an original mobile foundation, a playable lifecycle shell and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Production settings and practice progress persist locally. Puzzle rules, levels and complete titles remain roadmap work.
+This repository contains an original mobile foundation, a playable lifecycle shell and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Production settings and practice progress persist locally. Original development level fixtures exercise bundled loading and validation; complete puzzle rules and titles remain roadmap work.
 
 ## Start here
 
@@ -15,7 +15,7 @@ bash scripts/verify.sh
 bash scripts/test-mobile.sh
 ```
 
-The first command checks generated-project consistency and architecture/privacy boundaries, runs core and platform logic tests, and builds Debug/Release for a generic simulator plus unsigned Release for generic iOS. The second runs app-hosted model and UI tests on the two selected simulator geometries. Open `GameCore.xcworkspace` with scheme `DevelopmentTitle`. Follow the [root README](README.md) for project generation, simulator selection and exact tool requirements. Tests cover meaningful transitions, preparation, feedback lifetime and user-facing shell paths. These checks do not certify a complete game, physical performance, runtime privacy or minimum-OS execution.
+The first command checks generated-project consistency and architecture/privacy boundaries, runs core, platform and title-content tests, validates bundled fixtures, and builds Debug/Release for a generic simulator plus unsigned Release for generic iOS. The second runs app-hosted model and UI tests on the two selected simulator geometries. Open `GameCore.xcworkspace` with scheme `DevelopmentTitle`. Follow the [root README](README.md) for project generation, simulator selection and exact tool requirements. Tests cover meaningful transitions, preparation, feedback lifetime and user-facing shell paths. These checks do not certify a complete game, physical performance, runtime privacy or minimum-OS execution.
 
 The disposable experiment has its own build/test commands in its README. Its renderer integration evidence does not make the experiment a production package or title.
 
@@ -25,6 +25,7 @@ Keep changes focused and explain the behavior or decision they change. Include r
 
 - `Packages/GameCore` contains renderer-independent domain interfaces and pure logic. It must not import title or renderer implementations.
 - `Packages/GamePlatform` depends on `GameCore` and owns the reusable mobile shell/controller and Apple platform adapters. Its SwiftUI shell accepts title-provided renderer and gameplay views without importing a title.
+- `Games/DevelopmentContent` is a local title-content package with original fixtures and one shared validation implementation for its app loader and command-line tool. It depends only on `GameCore`; neither foundation package imports it.
 - `Games/<Title>` contains a title's entry point, rules, rendering and bundled content. `Games/DevelopmentTitle` exercises the shared flow with an original practice scene.
 - `experiments` contains disposable investigations outside production targets.
 
@@ -32,11 +33,13 @@ Keep each title's identity, assets, levels, bundle identifier and save namespace
 
 The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity and single-window ownership. [Local state](roadmap/decisions/ADR-005-local-save-durability.md) now makes production preferences durable; storage-free injected shell fixtures remain useful for pure lifecycle tests. Follow ADR-005 for persistence changes; the small shell registration type remains provisional until [Spike 06](roadmap/spikes/06-module-seam.md) defines the game-module contract for Epic 07 integration. Use one `LocalSaveStore` actor per title namespace, outside the renderer-independent core. Filesystem access belongs in this reviewed adapter; writes carry a generation invalidated by destructive actions. Never downgrade future saves or silently overwrite corruption. App-hosted tests may inject storage, preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
 
+Follow the [bundled content guide](docs/bundled-content.md) for stable IDs, schema/content versions, deterministic input fixtures and manually shared playtest reports. Content order must never determine saved achievement identity. Removed IDs retain historical progress; materially changed achievements get new IDs. Input traces belong in developer fixtures, never production saves.
+
 ## Privacy, dependencies and content
 
 Follow the [privacy contract](docs/privacy-contract.md). Apps work offline, with local saves/settings and no tracking, telemetry, accounts, ads or commerce. Review imports, packages, capabilities, entitlements, Info.plist and resources together; source scanning alone is insufficient.
 
-Use original content and record its [provenance](docs/asset-provenance.md). Donpa and Leaves are design references only; GateEngine is declined for the starting foundation. No candidate's code, tests, translations, assets or tooling is approved for copying. Any future third-party inclusion needs a new review and an update to the [inclusion inventory](roadmap/audits/preflight-inclusion-bom.md) in the same change.
+Use original content and record its [provenance](docs/asset-provenance.md). Donpa and Leaves are design references only; GateEngine is declined for the starting foundation. No candidate's code, tests, translations, assets or tooling is approved for copying. The inventory separately reviews the small public-domain SplitMix64 formula adaptation; its notice ships with the development resources. Any future third-party inclusion needs a new review and an update to the [inclusion inventory](roadmap/audits/preflight-inclusion-bom.md) in the same change.
 
 ## License and contribution terms
 
