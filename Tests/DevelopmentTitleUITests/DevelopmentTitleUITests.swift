@@ -43,13 +43,11 @@ final class DevelopmentTitleUITests: XCTestCase {
         XCUIDevice.shared.orientation = .landscapeLeft
         waitForOrientation(app, landscape: true)
         let ready = app.staticTexts["shell.play"]
-        reveal(app, ready)
-        waitForLayout(app, ready: ready, landscape: true)
+        verifyLayout(app, ready: ready, snapshot: reveal(app, ready), landscape: true)
         attachScreen("practice-landscape")
         XCUIDevice.shared.orientation = .portrait
         waitForOrientation(app, landscape: false)
-        reveal(app, ready)
-        waitForLayout(app, ready: ready, landscape: false)
+        verifyLayout(app, ready: ready, snapshot: reveal(app, ready), landscape: false)
         tap(app, "shell.complete")
         waitForHeading(app, "shell.result.success")
     }
@@ -165,29 +163,68 @@ final class DevelopmentTitleUITests: XCTestCase {
         let picker = app.navigationBars["FullDocumentManagerViewControllerNavigationBar"]
         XCTAssertTrue(picker.waitForExistence(timeout: 10), "Native Files exporter was not presented")
         attachScreen("native-files-export")
-        let cancellations = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", ["Cancel", "Close"]))
-        if let cancel = cancellations.allElementsBoundByIndex.first(where: { $0.isHittable }) {
-            cancel.tap()
+        let sidebar = app.navigationBars.matching(NSPredicate(format: "identifier IN %@", [
+            "com_apple_DocumentManager_Service.DOCSidebarView", "DOCSidebarView"
+        ])).firstMatch
+        let window = app.windows.firstMatch.frame
+        let beforeHierarchy = app.debugDescription
+        let before = XCTAttachment(string: "window=\(window); picker=\(picker.frame); sidebarExists=\(sidebar.exists)\n" + beforeHierarchy)
+        before.name = "native-files-before-cancellation-hierarchy"
+        before.lifetime = .keepAlways
+        add(before)
+        print("NATIVE_FILES before hierarchy:\n" + beforeHierarchy)
+        print("NATIVE_FILES window=\(window) picker=\(picker.frame) sidebarExists=\(sidebar.exists)")
+        // The presented SwiftUI overlay exposes an Other labeled Cancel at
+        // exactly the native More button's frame. Only genuine button actions
+        // can be cancellation candidates; the overlay label is misleading.
+        let cancellations = app.buttons.matching(NSPredicate(format: "label IN %@", ["Cancel", "Close"]))
+        if let cancel = cancellations.allElementsBoundByIndex.first(where: {
+            let frame = $0.frame
+            let hittable = $0.isHittable
+            print("NATIVE_FILES candidate type=\($0.elementType.rawValue) label=\($0.label) frame=\(frame) hittable=\(hittable) insideWindow=\(window.contains(frame))")
+            return frame.width > 0 && frame.height > 0 && window.contains(frame) && hittable
+        }) {
+            // A hosted Files AX tap reported a {-1,-1} hit point after its
+            // automatic scroll, leaving the exporter open. Use the validated
+            // visible control's coordinate without that automatic scroll.
+            let frame = cancel.frame
+            print("NATIVE_FILES selected candidate frame=\(frame) point=(\(frame.midX),\(frame.midY))")
+            cancel.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.5)).tap()
+        } else if sidebar.exists {
+            // iPad's observed native sidebar displays a leading X. Validate
+            // its visible bounds before tapping that close affordance.
+            let frame = sidebar.frame
+            XCTAssertTrue(frame.width > 0 && frame.height > 0 && window.contains(frame),
+                          "Native Files close bar has no visible bounds")
+            print("NATIVE_FILES selected sidebar frame=\(frame) point=(\(frame.minX + frame.width * 0.08),\(frame.minY + frame.height * 0.4))")
+            sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: 0.4)).tap()
         } else {
-            // The observed local 26.0 and hosted 26.5 runtimes expose the
-            // same sidebar with different accessibility identifier prefixes.
-            let sidebar = app.navigationBars.matching(NSPredicate(format: "identifier IN %@", [
-                "com_apple_DocumentManager_Service.DOCSidebarView", "DOCSidebarView"
-            ])).firstMatch
-            if sidebar.exists {
-                // iPad's native Files sidebar displays an X at its leading
-                // edge. iOS 26 does not expose it as an actionable AX button;
-                // tap that visible close affordance inside the observed bar.
-                sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: 0.4)).tap()
-            } else {
-                // iPhone supports native downward modal-sheet dismissal.
-                let start = picker.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
-                let end = app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.9))
-                start.press(forDuration: 0.05, thenDragTo: end)
-            }
+            // The phone exporter can start inside On My iPhone, where its
+            // leading control is Back rather than Close. The accepted local
+            // run dismisses that sheet by dragging its upper bar downward.
+            let frame = picker.frame
+            XCTAssertTrue(frame.width > 0 && frame.height > 0 && window.contains(frame),
+                          "Native Files exporter bar has no visible bounds")
+            print("NATIVE_FILES selected phone drag picker=\(frame) window=\(window)")
+            let start = picker.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
+            let end = app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.9))
+            start.press(forDuration: 0.05, thenDragTo: end)
         }
-        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: picker)
-        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 10), .completed)
+        attachScreen("native-files-after-cancellation")
+        let afterHierarchy = app.debugDescription
+        let after = XCTAttachment(string: afterHierarchy)
+        after.name = "native-files-after-cancellation-hierarchy"
+        after.lifetime = .keepAlways
+        add(after)
+        print("NATIVE_FILES after hierarchy:\n" + afterHierarchy)
+        let done = app.buttons["settings.done"]
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
+            // A native menu can hide the named exporter bar while Files is
+            // still open. Require the underlying Settings control reachable.
+            return !picker.exists && !sidebar.exists && done.exists && done.isHittable
+        }, object: app)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 10), .completed,
+                       "Files cancellation did not return to reachable Settings")
         tap(app, "settings.done")
         XCTAssertTrue(app.staticTexts["save.progress"].exists)
     }
@@ -233,7 +270,8 @@ final class DevelopmentTitleUITests: XCTestCase {
     }
 
     @MainActor
-    private func reveal(_ app: XCUIApplication, _ element: XCUIElement, scrollUpWhenMissing: Bool = false) {
+    @discardableResult
+    private func reveal(_ app: XCUIApplication, _ element: XCUIElement, scrollUpWhenMissing: Bool = false) -> (window: CGRect, element: CGRect)? {
         // A partly clipped element may be hittable. Bring the whole element
         // onscreen before tapping or checking safe layout after rotation.
         for _ in 0..<12 {
@@ -251,14 +289,15 @@ final class DevelopmentTitleUITests: XCTestCase {
             let exists = element.exists
             let frame = exists ? element.frame : .zero
             if exists && frame.width > 0 && frame.height > 0 && visible.contains(frame) {
-                if element.elementType != .button && element.elementType != .switch { return }
-                if element.isHittable { return }
+                if element.elementType != .button && element.elementType != .switch { return (window, frame) }
+                if element.isHittable { return (window, frame) }
             }
             let upwards = exists ? frame.midY > visible.midY : !scrollUpWhenMissing
             let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.7 : 0.3))
             let end = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.3 : 0.7))
             start.press(forDuration: 0.05, thenDragTo: end)
         }
+        return nil
     }
 
     @MainActor
@@ -279,15 +318,34 @@ final class DevelopmentTitleUITests: XCTestCase {
     }
 
     @MainActor
-    private func waitForLayout(_ app: XCUIApplication, ready: XCUIElement, landscape: Bool) {
-        let contained = XCTNSPredicateExpectation(predicate: NSPredicate { _, _ in
-            let window = app.windows.firstMatch.frame
-            guard window.width > 0, window.height > 0, ready.exists else { return false }
-            let oriented = landscape ? window.width > window.height : window.height > window.width
-            return oriented && ready.frame.width > 0 && ready.frame.height > 0
-                && window.contains(ready.frame)
-        }, object: app)
-        XCTAssertEqual(XCTWaiter.wait(for: [contained], timeout: 10), .completed)
+    private func verifyLayout(_ app: XCUIApplication, ready: XCUIElement,
+                              snapshot: (window: CGRect, element: CGRect)?, landscape: Bool) {
+        // reveal already obtained a contained heading snapshot after rotation.
+        // A second AX Window lookup stalled past the predicate deadline on CI;
+        // verify the same observed geometry rather than querying it again.
+        guard let snapshot else {
+            attachScreen("layout-failure")
+            let hierarchy = XCTAttachment(string: "window=\(app.windows.firstMatch.frame); "
+                + "heading=\(ready.frame); scroll=\(app.scrollViews["shell.scroll"].frame)\n"
+                + app.debugDescription)
+            hierarchy.name = "layout-failure-hierarchy"
+            hierarchy.lifetime = .keepAlways
+            add(hierarchy)
+            XCTFail("Heading could not be brought fully onscreen after rotation")
+            return
+        }
+        let geometry = "window=\(snapshot.window); heading=\(snapshot.element); landscape=\(landscape)"
+        let diagnostic = XCTAttachment(string: geometry)
+        diagnostic.name = landscape ? "landscape-layout-geometry" : "portrait-layout-geometry"
+        diagnostic.lifetime = .keepAlways
+        add(diagnostic)
+        XCTAssertGreaterThan(snapshot.window.width, 0, geometry)
+        XCTAssertGreaterThan(snapshot.window.height, 0, geometry)
+        XCTAssertGreaterThan(snapshot.element.width, 0, geometry)
+        XCTAssertGreaterThan(snapshot.element.height, 0, geometry)
+        XCTAssertTrue(landscape ? snapshot.window.width > snapshot.window.height
+                               : snapshot.window.height > snapshot.window.width, geometry)
+        XCTAssertTrue(snapshot.window.contains(snapshot.element), geometry)
     }
 
     @MainActor
