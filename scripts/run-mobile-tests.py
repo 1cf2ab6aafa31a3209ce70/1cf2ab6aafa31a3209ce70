@@ -256,11 +256,13 @@ def main():
             except RuntimeError:
                 collect_boot_diagnostics(device, model, output)
                 raise
+            # Six UI cases can each consume 120 seconds, plus app-hosted
+            # startup/install. Keep a whole-suite bound that covers that budget.
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
                          "-maximum-test-execution-time-allowance", "120", "test-without-building"],
-                log=output / f"{model}.log", timeout=600)
+                log=output / f"{model}.log", timeout=900)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
             verify_restart(xcode, device, model, output, runtime["identifier"])
         finally:

@@ -169,7 +169,11 @@ final class DevelopmentTitleUITests: XCTestCase {
         if let cancel = cancellations.allElementsBoundByIndex.first(where: { $0.isHittable }) {
             cancel.tap()
         } else {
-            let sidebar = app.navigationBars["com_apple_DocumentManager_Service.DOCSidebarView"]
+            // The observed local 26.0 and hosted 26.5 runtimes expose the
+            // same sidebar with different accessibility identifier prefixes.
+            let sidebar = app.navigationBars.matching(NSPredicate(format: "identifier IN %@", [
+                "com_apple_DocumentManager_Service.DOCSidebarView", "DOCSidebarView"
+            ])).firstMatch
             if sidebar.exists {
                 // iPad's native Files sidebar displays an X at its leading
                 // edge. iOS 26 does not expose it as an actionable AX button;
