@@ -4,10 +4,18 @@ import GameCore
 public enum BundledContent {
     /// Reads only resources installed by SwiftPM in the app bundle. No save/import path.
     public static func resourceDirectory() throws -> URL {
-        guard let root = Bundle.module.resourceURL?.appendingPathComponent("Resources", isDirectory: true) else {
-            throw ContentValidationError(message: "Bundled content resources are missing")
+        try resourceDirectory(in: Bundle.module)
+    }
+    static func resourceDirectory(in bundle: Bundle) throws -> URL {
+        // SwiftPM host bundles differ between toolchains: copied Resources may
+        // be nested below the platform resource root or be that root itself.
+        // Select an existing catalog once; a malformed selected catalog never
+        // triggers fallback to other content.
+        guard let catalog = bundle.url(forResource: "catalog", withExtension: "json", subdirectory: "Resources")
+                ?? bundle.url(forResource: "catalog", withExtension: "json") else {
+            throw ContentValidationError(message: "Bundled catalog.json is missing")
         }
-        return root
+        return catalog.deletingLastPathComponent()
     }
     public static func load() throws -> DevelopmentCatalog {
         let root = try resourceDirectory()

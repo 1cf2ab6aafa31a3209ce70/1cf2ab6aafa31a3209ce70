@@ -195,6 +195,7 @@ def check_sources():
     filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
     platform_test_root = ROOT / "Packages/GamePlatform/Tests"
     authoring_cli = ROOT / "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift"
+    content_fixture_tests = ROOT / "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift"
     title_imports = set()
     for directory in [ROOT / "Packages", ROOT / "Games"]:
         for path in sorted(directory.rglob("*.swift")):
@@ -205,7 +206,7 @@ def check_sources():
             require(not any(module in blocked_imports or module.startswith("Firebase") for module in imports),
                     f"Disallowed privacy-related import in {path.relative_to(ROOT)}")
             require(not re.search(r"\bFileManager\b", source)
-                    or path == filesystem_adapter or path == authoring_cli or path.is_relative_to(platform_test_root),
+                    or path == filesystem_adapter or path == authoring_cli or path == content_fixture_tests or path.is_relative_to(platform_test_root),
                     f"Filesystem access belongs in the reviewed save adapter or host authoring CLI: {path.relative_to(ROOT)}")
             match = blocked_apis.search(source)
             require(match is None, f"Disallowed network/cloud/commerce/storage API in {path.relative_to(ROOT)}: {match.group() if match else ''}")

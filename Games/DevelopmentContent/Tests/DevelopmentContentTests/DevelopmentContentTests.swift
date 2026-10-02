@@ -5,7 +5,7 @@ import XCTest
 
 final class DevelopmentContentTests: XCTestCase {
     private func resources() throws -> [String: Data] {
-        let root = try XCTUnwrap(Bundle.module.resourceURL).appendingPathComponent("Resources")
+        let root = try BundledContent.resourceDirectory()
         let files = ["catalog.json", "marker.svg", "Levels/block.json", "Levels/tile.json", "Levels/unscrew.json", "Levels/dig.json"]
         return try Dictionary(uniqueKeysWithValues: files.map { ($0, try Data(contentsOf: root.appendingPathComponent($0))) })
     }
@@ -22,6 +22,48 @@ final class DevelopmentContentTests: XCTestCase {
     }
     private func rejects(_ files: [String: Data], containing expected: String) {
         XCTAssertThrowsError(try load(files)) { XCTAssertTrue($0.localizedDescription.contains(expected), $0.localizedDescription) }
+    }
+
+    func testResourceLookupSupportsFlatAndContentsBundlesWithoutContentFallback() throws {
+        let temporary = FileManager.default.temporaryDirectory.appendingPathComponent("content-bundle-\(UUID().uuidString)")
+        defer { try? FileManager.default.removeItem(at: temporary) }
+        let files = try resources()
+        func bundle(_ name: String, contents: Bool, malformed: Bool = false) throws -> (Bundle, URL) {
+            let url = temporary.appendingPathComponent("\(name).bundle")
+            let base = contents ? url.appendingPathComponent("Contents") : url
+            let root = contents ? base.appendingPathComponent("Resources/Resources") : base.appendingPathComponent("Resources")
+            try FileManager.default.createDirectory(at: root, withIntermediateDirectories: true)
+            let info: [String: Any] = ["CFBundleIdentifier": "local.fixture.\(name)", "CFBundlePackageType": "BNDL", "CFBundleVersion": "1"]
+            try PropertyListSerialization.data(fromPropertyList: info, format: .xml, options: 0).write(to: base.appendingPathComponent("Info.plist"))
+            for (path, data) in files {
+                let file = root.appendingPathComponent(path)
+                try FileManager.default.createDirectory(at: file.deletingLastPathComponent(), withIntermediateDirectories: true)
+                try data.write(to: file)
+            }
+            if malformed {
+                // A valid alternate catalog must not hide corrupt selected content.
+                try files["catalog.json"]!.write(to: base.appendingPathComponent("Resources/catalog.json"))
+                try Data("{\"schemaVersion\":99}".utf8).write(to: root.appendingPathComponent("catalog.json"))
+            }
+            return (try XCTUnwrap(Bundle(url: url)), root)
+        }
+        for (name, contents) in [("flat", false), ("contents", true)] {
+            let (fixture, expected) = try bundle(name, contents: contents)
+            let selected = try BundledContent.resourceDirectory(in: fixture)
+            XCTAssertEqual(selected.standardizedFileURL.path, expected.standardizedFileURL.path)
+            let catalog = try BundledContent.load { try Data(contentsOf: selected.appendingPathComponent($0)) }
+            XCTAssertEqual(catalog.levels.count, 4)
+        }
+        let (fixture, _) = try bundle("malformed", contents: true, malformed: true)
+        let selected = try BundledContent.resourceDirectory(in: fixture)
+        XCTAssertThrowsError(try BundledContent.load { try Data(contentsOf: selected.appendingPathComponent($0)) }) {
+            XCTAssertTrue($0.localizedDescription.contains("unsupported schema version 99"))
+        }
+        let empty = temporary.appendingPathComponent("empty.bundle")
+        try FileManager.default.createDirectory(at: empty, withIntermediateDirectories: true)
+        XCTAssertThrowsError(try BundledContent.resourceDirectory(in: XCTUnwrap(Bundle(url: empty)))) {
+            XCTAssertTrue($0.localizedDescription.contains("catalog.json is missing"))
+        }
     }
 
     func testInstalledSamplesHaveEveryPlannedTypeAndIdenticalSharedDecoder() throws {
