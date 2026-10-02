@@ -76,11 +76,33 @@ def check_packages():
             and target_dependencies(platform_targets["GamePlatformTests"]) == [("target", "GamePlatform")],
             "GamePlatformTests must depend only on GamePlatform")
 
+    content = command_json(["swift", "package", "--package-path", "Games/DevelopmentContent", "dump-package"])
+    require(content["name"] == "DevelopmentContent" and len(content["dependencies"]) == 1,
+            "Title content must have one local core dependency")
+    dep = content["dependencies"][0]
+    require(set(dep) == {"fileSystem"} and Path(dep["fileSystem"][0]["path"]).resolve() == ROOT / "Packages/GameCore",
+            "Title content may depend only on local GameCore")
+    targets = {t["name"]: t for t in content["targets"]}
+    require(set(targets) == {"DevelopmentContent", "ContentValidatorCLI", "DevelopmentContentTests"},
+            "Review title content target inventory")
+    require(targets["DevelopmentContent"]["type"] == "regular" and target_dependencies(targets["DevelopmentContent"]) == [("product", "GameCore", "gamecore")],
+            "Title content library must depend only on GameCore")
+    require(targets["ContentValidatorCLI"]["type"] == "executable" and target_dependencies(targets["ContentValidatorCLI"]) == [("target", "DevelopmentContent")],
+            "Host validator must use the same title content library")
+    require(targets["DevelopmentContentTests"]["type"] == "test" and target_dependencies(targets["DevelopmentContentTests"]) == [("target", "DevelopmentContent")],
+            "Content tests must exercise the title content library")
+
+
+def targets_resources_reviewed():
+    content = command_json(["swift", "package", "--package-path", "Games/DevelopmentContent", "dump-package"])
+    target = next(t for t in content["targets"] if t["name"] == "DevelopmentContent")
+    return target.get("resources") == [{"path": "Resources", "rule": {"copy": {}}}]
+
 
 def check_project():
     project = command_json(["plutil", "-convert", "json", "-o", "-", "GameCore.xcodeproj/project.pbxproj"])
     objects = project["objects"]
-    expected = {"Packages/GameCore": "GameCore", "Packages/GamePlatform": "GamePlatform"}
+    expected = {"Packages/GameCore": "GameCore", "Packages/GamePlatform": "GamePlatform", "Games/DevelopmentContent": "DevelopmentContent"}
     local_refs = {}
     products = {}
     for identifier, item in objects.items():
@@ -92,22 +114,28 @@ def check_project():
             local_refs[identifier] = path
         if kind == "XCSwiftPackageProductDependency":
             products[identifier] = item
-    require(len(local_refs) == 2 and set(local_refs.values()) == set(expected),
-            "Project must reference exactly the two foundation packages")
-    require(len(products) == 2, "Project must declare exactly the two foundation package products")
+    require(len(local_refs) == 3 and set(local_refs.values()) == set(expected),
+            "Project must reference exactly the two foundation packages and title content package")
+    require(len(products) == 3, "Project must declare exactly the reviewed foundation and title package products")
     for product in products.values():
         require(product.get("package") in local_refs
                 and product["productName"] == expected[local_refs[product["package"]]],
                 "Package product must match its local package reference")
     project_root = objects[project["rootObject"]]
     require(set(project_root.get("packageReferences", [])) == set(local_refs),
-            "Project packageReferences must include both local packages")
+            "Project packageReferences must include all reviewed local packages")
     apps = [item for item in objects.values()
             if item["isa"] == "PBXNativeTarget" and item.get("productType") == "com.apple.product-type.application"]
     require(len(apps) == 1 and apps[0]["name"] == "DevelopmentTitle", "Expected one DevelopmentTitle app target")
     app = apps[0]
     require(set(app.get("packageProductDependencies", [])) == set(products),
-            "DevelopmentTitle must depend on both package products")
+            "DevelopmentTitle must depend on the reviewed core, platform and title content products")
+    validation = [index for index, phase_id in enumerate(app["buildPhases"])
+                  if objects[phase_id]["isa"] == "PBXShellScriptBuildPhase"
+                  and "swift run --package-path Games/DevelopmentContent" in objects[phase_id].get("shellScript", "")
+                  and "content-validator Games/DevelopmentContent/Sources/DevelopmentContent/Resources" in objects[phase_id].get("shellScript", "")]
+    require(validation == [0], "Native content validation must precede app compilation and packaging")
+    require(targets_resources_reviewed(), "Title package must copy the reviewed Resources directory")
     linked = []
     for phase_id in app["buildPhases"]:
         phase = objects[phase_id]
@@ -117,7 +145,7 @@ def check_project():
                 require(build.get("productRef") in products,
                         "Unexpected linked framework; review foundation dependency policy")
                 linked.append(build["productRef"])
-    require(len(linked) == 2 and set(linked) == set(products), "Both foundation products must be linked by the app")
+    require(len(linked) == 3 and set(linked) == set(products), "Core, platform and title content products must be linked by the app")
     allowed_info = {
         "CFBundleDisplayName", "UIApplicationSceneManifest_Generation", "UILaunchScreen_Generation",
         "UISupportedInterfaceOrientations", "UISupportedInterfaceOrientations_iPad",
@@ -166,6 +194,7 @@ def check_sources():
     # Package fixtures may use FileManager for isolated roots; core/title code cannot.
     filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
     platform_test_root = ROOT / "Packages/GamePlatform/Tests"
+    authoring_cli = ROOT / "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift"
     title_imports = set()
     for directory in [ROOT / "Packages", ROOT / "Games"]:
         for path in sorted(directory.rglob("*.swift")):
@@ -176,8 +205,8 @@ def check_sources():
             require(not any(module in blocked_imports or module.startswith("Firebase") for module in imports),
                     f"Disallowed privacy-related import in {path.relative_to(ROOT)}")
             require(not re.search(r"\bFileManager\b", source)
-                    or path == filesystem_adapter or path.is_relative_to(platform_test_root),
-                    f"Filesystem access belongs in the reviewed LocalSaveStore adapter: {path.relative_to(ROOT)}")
+                    or path == filesystem_adapter or path == authoring_cli or path.is_relative_to(platform_test_root),
+                    f"Filesystem access belongs in the reviewed save adapter or host authoring CLI: {path.relative_to(ROOT)}")
             match = blocked_apis.search(source)
             require(match is None, f"Disallowed network/cloud/commerce/storage API in {path.relative_to(ROOT)}: {match.group() if match else ''}")
             if path.is_relative_to(ROOT / "Packages/GameCore/Sources"):
