@@ -16,6 +16,14 @@ final class DeterministicInputTests: XCTestCase {
         var bounded = DeterministicRNG(seed: 0)
         XCTAssertEqual((0..<6).map { _ in bounded.next(upperBound: 100) }, [35, 0, 79, 44, 47, 90])
         XCTAssertEqual(bounded.next(upperBound: 1), 0)
+        // This bound rejects several intervening reference outputs. The fixed
+        // sequence was independently checked by a C reference/rejection harness.
+        var rejection = DeterministicRNG(seed: 0)
+        let largeBound: UInt64 = 0x8000000000000001
+        let rejectionExpected: [UInt64] = [0x6220a8397b1dcdae, 0x788bb8a8724c81eb,
+                                          0x4584133ac916ab3b, 0x73b8488c368cb0a5,
+                                          0x42d326e0055bdef5, 0x0621a03fe0bbdb7a]
+        XCTAssertEqual(rejectionExpected.map { _ in rejection.next(upperBound: largeBound) }, rejectionExpected)
     }
 
     func testClockOverflowIsExplicitAndPauseDoesNotAdvanceRules() throws {
