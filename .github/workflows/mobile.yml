@@ -10,7 +10,7 @@ concurrency:
 jobs:
   foundation:
     runs-on: macos-26
-    timeout-minutes: 35
+    timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GAMECORE_SIM_RUNTIME_VERSION: '26.5'
@@ -34,5 +34,6 @@ jobs:
             ${{ runner.temp }}/foundation-ui/*.log
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*.xcresult
+            ${{ runner.temp }}/foundation-ui/*-diagnostics/
           if-no-files-found: ignore
           retention-days: 7

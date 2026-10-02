@@ -90,6 +90,35 @@ def version(value):
     return tuple(int(part) for part in value.split("."))
 
 
+def collect_boot_diagnostics(device, model, output):
+    """Best-effort evidence for one owned device, without masking boot failure."""
+    log = output / f"{model}-diagnose.log"
+    try:
+        inventory = json.loads(run(["xcrun", "simctl", "list", "devices", "--json"], timeout=30))
+        owned = next((item for devices in inventory.get("devices", {}).values()
+                      for item in devices if item.get("udid") == device), None)
+        state = owned.get("state") if owned else None
+        if state != "Booted":
+            # Apple documents implicit --all-logs when no device is booted,
+            # which overrides --udid. Never enter that broad collection path.
+            log.write_text(f"Skipped diagnostics for owned simulator {device}: state {state or 'unknown'}\n")
+            return
+        directory = output / f"{model}-diagnostics"
+        directory.mkdir()
+        run(["xcrun", "simctl", "diagnose", "-b", "--timeout=60", f"--udid={device}",
+             f"--output={directory}"], log=log, timeout=90)
+    except Exception as error:
+        # Diagnostics are optional evidence; the caller retains the original
+        # readiness error even if collection or the state query fails.
+        message = f"Diagnostic collection failed for owned simulator {device}: {error}"
+        try:
+            with log.open("a") as stream:
+                stream.write(message + "\n")
+        except OSError:
+            pass
+        print(message, file=sys.stderr)
+
+
 def source_identity():
     # HEAD alone does not identify an uncommitted implementation. Hash the actual
     # build and verification inputs, using paths relative to the repository.
@@ -146,8 +175,12 @@ def main():
             metadata["devices"].append({"model": model, "type": device_type, "id": device})
             (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
             run(["xcrun", "simctl", "boot", device])
-            run(["xcrun", "simctl", "bootstatus", device, "-b"],
-                log=output / f"{model}-boot.log", timeout=300)
+            try:
+                run(["xcrun", "simctl", "bootstatus", device, "-b"],
+                    log=output / f"{model}-boot.log", timeout=600)
+            except RuntimeError:
+                collect_boot_diagnostics(device, model, output)
+                raise
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
