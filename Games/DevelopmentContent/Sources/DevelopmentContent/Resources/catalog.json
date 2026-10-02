@@ -1,0 +1,33 @@
+{
+  "schemaVersion": 1,
+  "titleID": "development-practice",
+  "contentVersion": 1,
+  "levels": [
+    {
+      "id": "block-sample-01",
+      "file": "Levels/block.json",
+      "gameType": "block"
+    },
+    {
+      "id": "tile-sample-01",
+      "file": "Levels/tile.json",
+      "gameType": "tile"
+    },
+    {
+      "id": "unscrew-sample-01",
+      "file": "Levels/unscrew.json",
+      "gameType": "unscrew"
+    },
+    {
+      "id": "dig-sample-01",
+      "file": "Levels/dig.json",
+      "gameType": "dig"
+    }
+  ],
+  "assets": [
+    "marker.svg"
+  ],
+  "localizationKeys": [
+    "sample.title"
+  ]
+}

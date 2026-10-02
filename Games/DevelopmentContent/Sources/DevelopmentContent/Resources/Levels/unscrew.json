@@ -1,0 +1,37 @@
+{
+  "schemaVersion": 1,
+  "id": "unscrew-sample-01",
+  "gameType": "unscrew",
+  "contentVersion": 1,
+  "seed": 102,
+  "payload": {
+    "panels": [
+      {
+        "id": "panel-a"
+      },
+      {
+        "id": "panel-b"
+      }
+    ],
+    "screws": [
+      {
+        "id": "screw-a",
+        "panelIDs": [
+          "panel-a",
+          "panel-b"
+        ]
+      },
+      {
+        "id": "screw-b",
+        "panelIDs": [
+          "panel-b"
+        ]
+      }
+    ],
+    "asset": "marker.svg",
+    "nextLevelIDs": []
+  },
+  "localizationKeys": [
+    "sample.title"
+  ]
+}
