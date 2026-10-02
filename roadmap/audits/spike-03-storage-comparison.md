@@ -1,0 +1,35 @@
+# Spike 03 storage comparison
+
+Reviewed 2026-10-01 for [Spike 03](../spikes/03-save-durability.md). This is a qualitative comparison against the planned completion, best score, unlock and settings snapshot. It is not a database performance benchmark or production implementation acceptance. The consolidated spike report and decision record own the executable results.
+
+| Requirement | Versioned Codable JSON file | System SQLite |
+| --- | --- | --- |
+| Small title snapshot | Direct immutable value encoding; inspectable export | Tables or one encoded snapshot row; transaction and statement handling |
+| Related completion/settings update | One envelope and one primary-file promotion | One transaction across affected rows |
+| Recovery | Explicit validation, previous-good slot, version handling and write ordering | Engine journal handles interrupted transactions; app still owns schema migration, validation and unsupported-version policy |
+| Query requirements | Whole snapshot read/write; adequate for current bounded records | Useful if later data requires indexed queries, relationships or substantially larger frequent updates |
+| Dependency | Foundation; no third-party package | Apple-provided SQLite C library; no ORM justified |
+| Export/reset/delete | One validated snapshot; own title directory and transient files | Logical export or consistent backup, plus correct journal/connection lifecycle |
+
+**Recommendation:** Select an original Codable envelope in Application Support for Epic 04. Keep progress and title settings together so export, reset and recovery have a single commit boundary. No current requirement justifies SQL schema, statement or journal management. Reconsider SQLite only when measured snapshot size/write cost or actual query requirements warrant it. No database experiment or measured database latency is claimed here.
+
+Use a schema version, exact title identifier and monotonic revision, with title-owned fields in a separately versioned extension. Avoid install identifiers, account identifiers and unnecessary history. Restrict registered title identifiers to a canonical path-safe grammar; reject invalid IDs rather than sanitizing two different strings to the same directory name. Check the stored title identifier on every read. Keep known migration rules explicit and fixture-tested.
+
+Serialize writes for a title, including reset/delete. A stale queued completion must not resurrect reset progress. Decode and validate the complete new snapshot before promotion. Rotate only a validated previous record into the previous-good slot. A corrupt primary must never replace a valid backup. Absent data produces defaults only when both committed slots are absent. Unsupported future versions and title mismatches preserve bytes and block overwrite; an older backup must not silently downgrade a future primary. I/O and protected-data failures need explicit errors rather than being classified as first launch or corruption.
+
+Application Support is the appropriate nonpurgeable app-owned location. Caches and temporary storage may be purged and cannot hold the only progress copy. Apple's ordinary device backup can include Application Support even without CloudKit or an app-originated network request. The current [privacy contract](../../docs/privacy-contract.md) requires local-only saves: mark the owned save directory and staged/promoted files excluded from backup, verify metadata after replacement, and document the consequence that automatic backup is not a recovery path. Export is a separate player-requested copy; a Files destination may be supplied by an external provider, and must not be represented as developer collection or guaranteed device-only storage.
+
+For a mobile lifecycle writer, `completeUntilFirstUserAuthentication` is a reasonable protection class: data remains accessible after the first unlock, unlike complete protection when locked. Failures before protected data is available remain errors, and require retry rather than destructive fallback. Simulator metadata checks do not establish physical encryption or locked-device behavior.
+
+The decision should expose local export, confirmed progress reset, confirmed deletion of progress and settings, and their differing scope. Export only a validated coherent snapshot, retain title/version metadata, and never contact the developer. Delete owned backups, staging and temporary export files too; a copy already exported to a player-selected destination is outside app ownership. Do not claim secure erasure of flash storage or previously exported copies.
+
+## Primary sources and verification limits
+
+- [Apple File System Basics](https://developer.apple.com/library/archive/documentation/FileManagement/Conceptual/FileSystemProgrammingGuide/FileSystemOverview/FileSystemOverview.html): retrieved the archived primary guidance for app-container directories and Application Support. It is architectural guidance rather than a current SDK API guarantee.
+- [Apple backup guidance](https://developer.apple.com/documentation/foundation/optimizing-your-app-s-data-for-icloud-backup): retrieved substantive text explaining purgeable directories and `isExcludedFromBackup`. Backup exclusion is an explicit decision, not inferred from absence of cloud entitlements.
+- [Apple Data Protection classes](https://support.apple.com/guide/security/data-protection-classes-secb010e978a/web): retrieved substantive protection-class guidance. Class C is protected until first user authentication; simulator-only tests cannot certify hardware behavior.
+- [Apple NSData](https://developer.apple.com/documentation/foundation/nsdata): the indexed primary documentation describes atomic writes as minimizing partial/corrupt-file risk. The dedicated [atomic write page](https://developer.apple.com/documentation/foundation/nsdata/writingoptions/atomicwrite) returned a JavaScript shell and its Markdown endpoint could not be fetched during this review. Do not infer disk flush or physical power-loss durability from this evidence.
+- [SQLite atomic commit](https://www.sqlite.org/atomiccommit.html) and [synchronous settings](https://www.sqlite.org/pragma.html#pragma_synchronous): retrieved engine durability guidance. Rollback-mode `FULL` is not an unconditional power-loss durability guarantee; SQLite documents `EXTRA` for stronger rollback durability and `FULL` for WAL durability. Filesystem/hardware assumptions still matter. A future database comparison must set journal and synchronization policy explicitly.
+- [Apple file exporter](https://developer.apple.com/documentation/swiftui/view/fileexporter(ispresented:document:contenttype:defaultfilename:oncompletion:)): reachable, but returned only a JavaScript shell. Native exporter integration and actual Files-provider behavior belong to Epic 04 verification; they were not exercised by this review.
+
+Software fault injection and process termination can demonstrate recovery of previous or new complete records. They do not reproduce every filesystem crash, device reboot, storage fault or power loss. Physical devices are unavailable; macOS app work remains deferred.

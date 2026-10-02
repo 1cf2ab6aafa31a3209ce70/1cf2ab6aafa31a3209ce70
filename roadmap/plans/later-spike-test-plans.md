@@ -1,6 +1,6 @@
 # Later spike test preparation
 
-**Status:** Preparation only. No prototypes, production contracts, technology choices, or roadmap dependency changes are established here.
+**Status:** Spike 03 executed; [decision and evidence](../audits/spike-03-save-durability.md) record its scope and results. Spike 06 and Spike 11 remain preparation only; their entry gates are unchanged.
 
 These plans make future investigations reproducible. Execute each only after its entry gate is met; the roadmap remains ordered. [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md) accepts simulator-only mobile foundation development with an iOS/iPadOS 18.0 deployment floor. Use iPhone 12 and iPad (9th generation) simulator geometry; physical hardware is unavailable and macOS is outside current scope. Retained simulator timings are diagnostic observations, not physical performance or minimum-runtime certification.
 
@@ -10,7 +10,7 @@ For each eventual run, retain the source revision, toolchain, configuration, hos
 
 **Entry:** [Epic 02](../epics/02-app-shell.md) must provide the working shell and its lifecycle transitions. **Brief:** [Spike 03](../spikes/03-save-durability.md). **Timebox:** One developer day.
 
-Inputs are synthetic completion, score, unlock and settings records for two title identifiers, one prior-schema fixture, and the shell's interruption behavior. The future comparison is a Codable file versus a local database against those actual needs; this plan selects neither.
+Inputs are synthetic completion, score, unlock and settings records for two title identifiers, one prior-schema fixture, and the shell's interruption behavior. The executed comparison selected Codable snapshots under [ADR-005](../decisions/ADR-005-local-save-durability.md). The table remains the scenario checklist; the evidence report separates tested host cases from Epic 04 mobile integration requirements.
 
 | Scenario | Observable evidence |
 | --- | --- |

@@ -1,6 +1,8 @@
 # Spike 03 — Local save durability
 
-**Decision needed:** Choose a simple, versioned on-device save format and write/recovery strategy for multiple standalone titles.
+**Status:** Complete on 2026-10-01. [ADR-005](../decisions/ADR-005-local-save-durability.md), [comparison](../audits/spike-03-storage-comparison.md), [executable fixtures](../../experiments/save-durability/README.md) and [retained results](../audits/spike-03-save-durability.md) select and test the strategy. Production persistence and iOS attributes/lifecycle integration remain Epic 04 work.
+
+**Decision:** Choose a simple, versioned on-device save format and write/recovery strategy for multiple standalone titles.
 
 **Timebox:** One developer day. **Entry:** Epic 02 shell exists. **Next:** Epic 04.
 
