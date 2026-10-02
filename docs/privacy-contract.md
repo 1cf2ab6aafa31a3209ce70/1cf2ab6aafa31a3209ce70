@@ -12,6 +12,8 @@ This contract derives from the [roadmap](../ROADMAP.md) and applies to the [mobi
 
 [ADR-005](../roadmap/decisions/ADR-005-local-save-durability.md) requires Epic 04 to exclude app-owned saves from OS backup and verify attributes after replacement. A deliberate player export creates a separate copy in the selected Files destination, which may use an external provider. The app does not sync or send that copy to the developer. Epic 04 implements these controls in the mobile practice. Its [evidence](../roadmap/audits/epic-04-local-state.md) records the simulator checks and their limits.
 
+Bundled content is read from packaged local resources and validated before loading. Deterministic input traces are developer fixtures only; production saves do not retain replay traces or playtest reports. The [content guide](bundled-content.md) defines manual report sharing without app transport.
+
 The first-party framework direction does not exempt a target from review. Entitlements, resources and indirect dependencies can change behavior even when no networking import appears in source.
 
 ## Change review checklist
