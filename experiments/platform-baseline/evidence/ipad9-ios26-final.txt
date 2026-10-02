@@ -1,0 +1,27 @@
+Final mobile integration evidence, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-ipad9-final-ax.log
+Runtime: iOS 26.0; geometry: ipad9; development Mac execution.
+Finalized result bundle and exported attachments confirmed by orchestrating agent.
+Source snapshot: final-mobile-source-sha256.txt
+Scene-update intervals/current footprint only; no physical performance acceptance.
+
+SPIKE00 ACTION: label=blocks: cell 29 removed value=Optional()
+SPIKE00 BLOCKS: Window 357 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 43.4 ms · >33.3 ms 2 · footprint 39.4 MiB
+SPIKE00 ACTION: label=panel: cell 7 removed value=Optional()
+SPIKE00 PANEL: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 16.7 ms · >33.3 ms 0 · footprint 42.0 MiB
+SPIKE00 CONTACT: Sphere contact y=-0.007 x=-0.480 z=-0.480 dug=(-0.480,-0.480) revision=2
+SPIKE00 SETTLED CURRENT: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 SETTLED: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 MESH: Revision 2 · mesh 1.39 ms · collision 14.93 ms
+SPIKE00 TERRAIN: Window 424 intervals · p50/p95/p99 16.7/16.9/18.1 ms · worst 70.8 ms · >33.3 ms 1 · footprint 66.9 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 1.00 ms · collision 14.36 ms
+SPIKE00 LANDSCAPE WINDOW: (0.0, 0.0, 1080.0, 810.0)
+SPIKE00 LANDSCAPE CONTROL: probe.pause (1017.5, 53.0, 46.5, 20.5)
+SPIKE00 LANDSCAPE CONTROL: terrain.drill (429.5, 656.0, 116.0, 20.5)
+SPIKE00 LANDSCAPE CONTROL: terrain.reset (553.5, 656.0, 97.0, 20.5)
+SPIKE00 LANDSCAPE CONTROL: terrain.surface (32.0, 165.5, 1016.0, 426.0)
+SPIKE00 RESUME: Window 358 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 33.3 ms · >33.3 ms 2 · footprint 68.5 MiB
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.315 (46.317) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.315 (46.318) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 46.315 (46.319) seconds
+** TEST EXECUTE SUCCEEDED **

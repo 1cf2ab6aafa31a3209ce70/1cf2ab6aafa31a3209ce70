@@ -1,0 +1,15 @@
+Final accessibility-source build verification, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-final-verification-ax.log
+Process exit: 0 (reported by orchestrating agent).
+Build order: macOS Debug, iOS Simulator Debug, macOS Release, iOS Simulator Release.
+App source includes explicit RealityView accessibility element/label; later test-helper iterations do not change app source.
+Snapshot: final-ax-source-sha256.txt; exact test-helper runtime compilation is recorded by subsequent UI runs.
+
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.008 (0.010) seconds
+	 Executed 8 tests, with 0 failures (0 unexpected) in 0.008 (0.017) seconds
+Static scan passed: no listed network, persistence, or telemetry APIs in sample sources.
+** BUILD SUCCEEDED **
+** BUILD SUCCEEDED **
+** BUILD SUCCEEDED **
+** BUILD SUCCEEDED **
+Verification passed. Build products: /private/tmp/gamecore-spike00-final-verification

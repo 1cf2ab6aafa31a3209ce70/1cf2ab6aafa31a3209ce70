@@ -6,6 +6,8 @@
 
 **Inherited decision:** [ADR-001](../decisions/ADR-001-first-party-foundation.md) starts with original first-party prototypes. Donpa and Leaves are references only; GateEngine was not retained, so investigation item 5 is conditional on reopening that decision for a measured unmet requirement. See the [preflight evidence](../audits/preflight-open-source-reuse.md) for build results and limitations.
 
+**Current evidence (2026-09-30):** The [disposable sample](../../experiments/platform-baseline/README.md), [provisional ADR-002](../decisions/ADR-002-platform-rendering-baseline.md), and [execution report](../audits/spike-00-platform-baseline.md) are available. Acceptance hardware is iPhone 12 and iPad (9th generation); macOS release is deferred. Host/simulator builds and eight pure tests passed. The corrected collider and sustained-settling integration test passed on both device-geometry simulators; landscape containment assertions also passed on both geometries. Final Debug/Release host/simulator builds, eight pure tests and the source privacy scan passed. macOS pointer/keyboard interaction was observed in a partial run; full macOS runtime validation remains open. Final mobile landscape captures were visually inspected on both simulator geometries. Physical performance and minimum-runtime gates remain open. This spike is not complete.
+
 ## Investigation
 
 1. Build a disposable SwiftUI shell with a SpriteKit scene on iPhone, iPad, and macOS hardware or simulators available to the team. Check resize, safe areas, pause/resume, touch, pointer, and keyboard input.
