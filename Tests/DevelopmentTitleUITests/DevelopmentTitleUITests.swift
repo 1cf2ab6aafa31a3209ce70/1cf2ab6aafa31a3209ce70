@@ -240,14 +240,11 @@ final class DevelopmentTitleUITests: XCTestCase {
     private func launch(arguments: [String] = []) -> XCUIApplication {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
-        app.launchArguments = arguments
+        // A new namespace isolates each test. Retain this identity on the same
+        // application object when a test relaunches to verify persisted state.
+        app.launchArguments = arguments + ["--ui-test-fixture", UUID().uuidString]
         app.launch()
         waitForHeading(app, "shell.menu")
-        waitForSaved(app)
-        tap(app, "shell.settings")
-        tap(app, "save.delete")
-        app.alerts.buttons["Delete local data"].tap()
-        tap(app, "settings.done")
         waitForSaved(app)
         return app
     }

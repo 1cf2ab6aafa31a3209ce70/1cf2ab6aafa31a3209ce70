@@ -14,7 +14,13 @@ final class ShellModel: ObservableObject {
         let store: LocalSaveStore?
         let storageError: String?
         do {
-            store = try LocalSaveStore(titleID: "development-practice", root: LocalSaveStore.applicationSupportRoot())
+            let defaultRoot = try LocalSaveStore.applicationSupportRoot()
+            #if DEBUG
+            let root = try ShellUITestFixture.storageRoot(defaultRoot: defaultRoot, arguments: ProcessInfo.processInfo.arguments)
+            #else
+            let root = defaultRoot
+            #endif
+            store = try LocalSaveStore(titleID: "development-practice", root: root)
             storageError = nil
         } catch {
             store = nil
