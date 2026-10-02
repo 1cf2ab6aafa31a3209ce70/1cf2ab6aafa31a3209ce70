@@ -1,0 +1,17 @@
+Partial macOS runtime evidence, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-mac-final-value-test-20260930.log
+Ad hoc signed Debug runner. Earlier source iteration, not final-source full-suite acceptance.
+Observed pointer block/panel activation, arrow/Space activation, paused input rejection, terrain contact and sustained rest.
+Full suite failed: terrain.surface accessibility element missing. Later source added an explicit marker.
+Final retry mac-final-state-test-20260930.log created a window but timed out awaiting initial click activation.
+Full macOS runtime acceptance remains open. No desktop image retained.
+
+SPIKE00 ACTION: label= value=Optional(blocks: cell 36 removed)
+SPIKE00 ACTION: label= value=Optional(blocks: cell 37 removed)
+SPIKE00 ACTION: label= value=Optional(panel: cell 6 removed)
+SPIKE00 CONTACT: Sphere contact y=-0.007 x=-0.480 z=-0.480 dug=(-0.480,-0.480) revision=2
+SPIKE00 SETTLED: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+/Users/d/.codex/worktrees/3f48/gamecore/experiments/platform-baseline/UITests/PlatformBaselineUITests.swift:61: error: -[PlatformBaselineUITests.PlatformBaselineUITests testBoardPanelTerrainAndLifecycle] : XCTAssertTrue failed
+	 Executed 1 test, with 1 failure (0 unexpected) in 36.864 (36.867) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 36.864 (36.870) seconds
+	 Executed 1 test, with 1 failure (0 unexpected) in 36.864 (36.871) seconds

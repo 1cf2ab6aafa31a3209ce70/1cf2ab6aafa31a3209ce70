@@ -1,0 +1,7 @@
+.agent-telemetry/
+.DS_Store
+**/.build/
+**/xcuserdata/
+**/*.xcresult/
+**/__pycache__/
+**/*.pyc

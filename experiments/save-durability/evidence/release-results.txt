@@ -1,0 +1,50 @@
+Building for production...
+[Planning deferred tasks]
+[16 / 21]
+[17 / 22] save-durability-fixture-product
+[28 / 57]
+[33 / 57]
+[36 / 57]
+[37 / 57]
+[41 / 57]
+[43 / 57]
+[46 / 57]
+[49 / 57]
+[51 / 57]
+[52 / 57]
+[53 / 57] save-durability-fixture-product
+[55 / 57] save-durability-fixture-product
+[56 / 57] save-durability-fixture-product
+Build complete! (7.39 secs.)
+PASS absent files mean first launch
+PASS current round trip preserves progress, score, unlocks and settings
+PASS replacement interrupted after partialTemporary
+PASS first write interrupted after partialTemporary
+PASS replacement interrupted after flushedTemporary
+PASS first write interrupted after flushedTemporary
+PASS replacement interrupted after replacedBackup
+PASS first write interrupted after replacedBackup
+PASS replacement interrupted after replacedCurrent
+PASS first write interrupted after replacedCurrent
+PASS corrupt current recovers previous good and repair preserves recovery
+PASS missing current recovers backup
+PASS corrupt primary without backup remains an explicit error
+PASS both corrupt remain an explicit error
+PASS valid current can repair corrupt backup
+PASS v1 migrates deterministically and only once
+PASS known-schema semantic corruption recovers backup
+PASS future primary preserves bytes and refuses fallback or overwrite
+PASS future backup is preserved even when current is valid
+PASS two titles with identical level IDs remain isolated
+PASS wrong-title primary refuses fallback and overwrite
+PASS wrong-title backup refuses overwrite
+PASS invalid title cannot escape its directory
+PASS unsupported old schema remains explicit
+PASS duplicate or stale revisions cannot overwrite progress
+PASS missing primary and corrupt backup is not first launch
+PASS missing primary and future backup is not first launch
+PASS oversized save blocks load and overwrite
+PASS filesystem I/O errors do not become corrupt or first launch
+PASS ordered synthetic completion, pause and background snapshots retain latest values
+PASS export is inspectable; delete-all clears recovery slots and title directory
+31 scenarios passed; temporary files removed on normal exit.

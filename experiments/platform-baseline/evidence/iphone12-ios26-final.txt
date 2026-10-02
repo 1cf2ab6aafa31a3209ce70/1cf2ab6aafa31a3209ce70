@@ -1,0 +1,27 @@
+Final mobile integration evidence, 2026-09-30
+Source log: /private/tmp/gamecore-spike00-iphone12-fresh-final.log
+Runtime: iOS 26.0; geometry: iphone12; development Mac execution.
+Finalized result bundle and exported attachments confirmed by orchestrating agent.
+Source snapshot: final-mobile-source-sha256.txt
+Scene-update intervals/current footprint only; no physical performance acceptance.
+
+SPIKE00 ACTION: label=blocks: cell 29 removed value=Optional()
+SPIKE00 BLOCKS: Window 355 intervals · p50/p95/p99 16.7/16.7/29.0 ms · worst 54.3 ms · >33.3 ms 3 · footprint 39.9 MiB
+SPIKE00 ACTION: label=panel: cell 7 removed value=Optional()
+SPIKE00 PANEL: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 30.3 ms · >33.3 ms 0 · footprint 43.2 MiB
+SPIKE00 CONTACT: Sphere contact y=-0.007 x=-0.480 z=-0.480 dug=(-0.480,-0.480) revision=2
+SPIKE00 SETTLED CURRENT: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 SETTLED: Sphere settled y=-0.007 x=-0.480 z=-0.480 revision=2
+SPIKE00 MESH: Revision 2 · mesh 1.30 ms · collision 15.12 ms
+SPIKE00 TERRAIN: Window 424 intervals · p50/p95/p99 16.7/17.0/21.0 ms · worst 63.8 ms · >33.3 ms 1 · footprint 66.4 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 1.11 ms · collision 19.34 ms
+SPIKE00 LANDSCAPE WINDOW: (0.0, 0.0, 844.0, 390.0)
+SPIKE00 LANDSCAPE CONTROL: probe.pause (742.6666666666666, 22.0, 46.33333333333337, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.drill (195.66666666666666, 304.0, 115.99999999999997, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.reset (319.66666666666663, 304.0, 97.00000000000006, 20.333333333333314)
+SPIKE00 LANDSCAPE CONTROL: terrain.surface (71.0, 106.0, 470.0, 120.0)
+SPIKE00 RESUME: Window 355 intervals · p50/p95/p99 16.7/16.7/28.3 ms · worst 41.9 ms · >33.3 ms 3 · footprint 73.0 MiB
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.351 (45.353) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.351 (45.353) seconds
+	 Executed 1 test, with 0 failures (0 unexpected) in 45.351 (45.354) seconds
+** TEST EXECUTE SUCCEEDED **

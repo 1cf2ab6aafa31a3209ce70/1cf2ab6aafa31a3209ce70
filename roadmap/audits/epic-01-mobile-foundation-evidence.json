@@ -1,0 +1,349 @@
+{
+  "date": "2026-10-01",
+  "branch": "codex/mobile-foundation",
+  "sourceState": "Validation ran against an uncommitted implementation; HEAD is historical context, not the tested implementation revision.",
+  "uiRunInventory": {
+    "xcode": "Xcode 27.0\nBuild version 27A266a",
+    "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+    "runtimeVersion": "26.0",
+    "runtimeBuild": "23A5287g",
+    "sourceRevision": "a9c296a34d3bf57897d0c9ac4b1b69a65d888a2e",
+    "worktreeDirty": true,
+    "sourceSHA256": {
+      "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+      "Packages/GameCore/Sources/GameCore/GameCore.swift": "685ecd422fef601a3e4f515f5f85bd67b27d701f718b2c90c19acfad52328bff",
+      "Packages/GameCore/Tests/GameCoreTests/ModuleBoundaryTests.swift": "b901d64e4f336756646c9db24f63436fcd31893f4535cf51a2b93aa79d56980a",
+      "Packages/GamePlatform/Package.swift": "351108035b75909d8809693bcaa9389905499d184541e93acaa126a72d035a36",
+      "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "876f735748e2e887ae1312dbc773eea2223f754f67541fd457439c00d3269be0",
+      "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "5c1f034abdbfedab58af58909fdf2c51c5bd58de7a835427ea51ff5a287a737b",
+      "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "e4f3224ca591c3793aefefc7dda6abf93ea3d4371f80f15fe9bf71281dafdcda",
+      "GameCore.xcodeproj/project.pbxproj": "2826b37872e42aec89018b5a0bf3965a0948445975a2ea739b95f7d56ba3ae56",
+      "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "cda8ce70a8d72f786f1e3e44723a4224b088e59160330c666e3afd58444e012e",
+      "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+      "scripts/check-foundation.py": "014766d49de1ff450ab091ef07b6b70e2ffd298ea878d315f26b39927d3f89a3",
+      "scripts/generate-project.py": "8de8a1c0a696b3b8811fd08d4ba9ff4d8f902257bb525ecd712eb3318f3826dc",
+      "scripts/run-mobile-tests.py": "df2ce763079d8359dd45c1d0d89416e8581570c296ae3a806a2b16db7c736b39",
+      "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+      "scripts/verify.sh": "1e65f6ef12527ab9638eb5c932fd2e5d6392a8042d66c846e07c1cd707ea1f90",
+      ".github/workflows/mobile.yml": "c7aff8cc8c4e5c560c6f477b23d7ef1b9fb9c9dfef4d2dcd80130e07f76d1f20"
+    },
+    "devices": [
+      {
+        "model": "iphone12",
+        "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-12"
+      },
+      {
+        "model": "ipad9",
+        "type": "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation"
+      }
+    ]
+  },
+  "uiResults": {
+    "iphone12": {
+      "result": "Passed",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "runtimeWarnings": [],
+      "resultBundle": "/private/tmp/gamecore-mobile-foundation-ui-20261001/iphone12.xcresult"
+    },
+    "ipad9": {
+      "result": "Passed",
+      "passedTests": 1,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "runtimeWarnings": [],
+      "resultBundle": "/private/tmp/gamecore-mobile-foundation-ui-20261001/ipad9.xcresult"
+    }
+  },
+  "cleanCopy": {
+    "sourcePath": "/private/tmp/gamecore-foundation-clean-kk0l00m6",
+    "outputPath": "/private/tmp/gamecore-foundation-clean-verification-kk0l00m6",
+    "selection": "git ls-files --cached --others --exclude-standard; no git metadata, caches or user state",
+    "sourceSHA256": {
+      ".github/workflows/mobile.yml": "c7aff8cc8c4e5c560c6f477b23d7ef1b9fb9c9dfef4d2dcd80130e07f76d1f20",
+      "GameCore.xcodeproj/project.pbxproj": "2826b37872e42aec89018b5a0bf3965a0948445975a2ea739b95f7d56ba3ae56",
+      "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "cda8ce70a8d72f786f1e3e44723a4224b088e59160330c666e3afd58444e012e",
+      "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+      "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "5c1f034abdbfedab58af58909fdf2c51c5bd58de7a835427ea51ff5a287a737b",
+      "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+      "Packages/GameCore/Sources/GameCore/GameCore.swift": "685ecd422fef601a3e4f515f5f85bd67b27d701f718b2c90c19acfad52328bff",
+      "Packages/GameCore/Tests/GameCoreTests/ModuleBoundaryTests.swift": "b901d64e4f336756646c9db24f63436fcd31893f4535cf51a2b93aa79d56980a",
+      "Packages/GamePlatform/Package.swift": "351108035b75909d8809693bcaa9389905499d184541e93acaa126a72d035a36",
+      "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "876f735748e2e887ae1312dbc773eea2223f754f67541fd457439c00d3269be0",
+      "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "e4f3224ca591c3793aefefc7dda6abf93ea3d4371f80f15fe9bf71281dafdcda",
+      "scripts/check-foundation.py": "014766d49de1ff450ab091ef07b6b70e2ffd298ea878d315f26b39927d3f89a3",
+      "scripts/generate-project.py": "8de8a1c0a696b3b8811fd08d4ba9ff4d8f902257bb525ecd712eb3318f3826dc",
+      "scripts/run-mobile-tests.py": "df2ce763079d8359dd45c1d0d89416e8581570c296ae3a806a2b16db7c736b39",
+      "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+      "scripts/verify.sh": "1e65f6ef12527ab9638eb5c932fd2e5d6392a8042d66c846e07c1cd707ea1f90"
+    },
+    "results": {
+      "generatedProject": "Passed",
+      "architecturePrivacy": "Passed",
+      "coreTestTargetCompilation": "Passed",
+      "coreRuntimeTestCount": 0,
+      "platformCompilation": "Passed",
+      "simulatorDebugBuild": "Passed",
+      "simulatorReleaseBuild": "Passed",
+      "unsignedIOSReleaseBuild": "Passed"
+    },
+    "bundleReview": "/private/tmp/gamecore-foundation-clean-verification-kk0l00m6/bundle-review.json"
+  },
+  "runnerReview": {
+    "status": "Passed",
+    "scope": "The helper changed after build/UI snapshots; app, package, project and actual build inputs remained identical.",
+    "finalSourceSHA256": "7e13fa35b630c8d957388988b0888a2e4c84e34ada63723f8a4f186e6d27781a",
+    "evidencePath": "/var/folders/b2/p6vsggfd46b7pbtjgdjxt1440000gn/T/gamecore-group-retry-review-kgeg144t/summary.txt",
+    "fixtureSummary": "Bounded process fixture validation:\nPASS output success and exit-7 error with detail.\nPASS direct-child timeout and externally delivered SIGINT cleanup.\nPASS timeout with parent exiting on SIGINT and grandchild ignoring SIGINT/SIGHUP, stdout redirected to log.\nPASS external SIGINT wrapper returns 130 with resistant grandchild removed.\nPASS worktreeDirty and SHA256 of actual build/verification inputs.\nPASS nonexistent-command Popen error surfaced after log cleanup.\nOwned fixture descendants cleaned; no simulator commands executed.\nFinal runner SHA256: 7e13fa35b630c8d957388988b0888a2e4c84e34ada63723f8a4f186e6d27781a\nFinal error-handling version rerun: PASS timeout and external SIGINT resistant-descendant fixtures.\nFinal source SHA256: 7e13fa35b630c8d957388988b0888a2e4c84e34ada63723f8a4f186e6d27781a\n"
+  },
+  "hostedCI": {
+    "result": "Passed",
+    "runner": "macos-26",
+    "xcode": "26.6",
+    "xcodeBuild": "17F113",
+    "simulatorRuntime": "26.5",
+    "runID": 36933015783,
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36933015783",
+    "headSHA": "2d7bcf925963640fb53395f47a887009941a45ef",
+    "jobs": [
+      {
+        "completedAt": "2026-10-01T22:16:59Z",
+        "conclusion": "success",
+        "databaseId": 110606666499,
+        "name": "foundation",
+        "startedAt": "2026-10-01T22:06:43Z",
+        "status": "completed",
+        "steps": [
+          {
+            "completedAt": "2026-10-01T22:06:44Z",
+            "conclusion": "success",
+            "name": "Set up job",
+            "number": 1,
+            "startedAt": "2026-10-01T22:06:43Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:06:45Z",
+            "conclusion": "success",
+            "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "number": 2,
+            "startedAt": "2026-10-01T22:06:44Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:06:46Z",
+            "conclusion": "success",
+            "name": "Check pinned toolchain",
+            "number": 3,
+            "startedAt": "2026-10-01T22:06:45Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:08:08Z",
+            "conclusion": "success",
+            "name": "Verify mobile foundation",
+            "number": 4,
+            "startedAt": "2026-10-01T22:06:46Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:16:51Z",
+            "conclusion": "success",
+            "name": "Test iPhone and iPad simulators",
+            "number": 5,
+            "startedAt": "2026-10-01T22:08:08Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:16:53Z",
+            "conclusion": "success",
+            "name": "Retain validation evidence",
+            "number": 6,
+            "startedAt": "2026-10-01T22:16:51Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:16:54Z",
+            "conclusion": "success",
+            "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+            "number": 12,
+            "startedAt": "2026-10-01T22:16:53Z",
+            "status": "completed"
+          },
+          {
+            "completedAt": "2026-10-01T22:16:56Z",
+            "conclusion": "success",
+            "name": "Complete job",
+            "number": 13,
+            "startedAt": "2026-10-01T22:16:54Z",
+            "status": "completed"
+          }
+        ],
+        "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36933015783/job/110606666499"
+      }
+    ],
+    "sourceInventory": {
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+      "runtimeVersion": "26.5",
+      "runtimeBuild": "23F77",
+      "sourceRevision": "2d7bcf925963640fb53395f47a887009941a45ef",
+      "worktreeDirty": false,
+      "sourceSHA256": {
+        "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+        "Packages/GameCore/Sources/GameCore/GameCore.swift": "685ecd422fef601a3e4f515f5f85bd67b27d701f718b2c90c19acfad52328bff",
+        "Packages/GameCore/Tests/GameCoreTests/ModuleBoundaryTests.swift": "b901d64e4f336756646c9db24f63436fcd31893f4535cf51a2b93aa79d56980a",
+        "Packages/GamePlatform/Package.swift": "351108035b75909d8809693bcaa9389905499d184541e93acaa126a72d035a36",
+        "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "876f735748e2e887ae1312dbc773eea2223f754f67541fd457439c00d3269be0",
+        "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "5c1f034abdbfedab58af58909fdf2c51c5bd58de7a835427ea51ff5a287a737b",
+        "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "e4f3224ca591c3793aefefc7dda6abf93ea3d4371f80f15fe9bf71281dafdcda",
+        "GameCore.xcodeproj/project.pbxproj": "2826b37872e42aec89018b5a0bf3965a0948445975a2ea739b95f7d56ba3ae56",
+        "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "cda8ce70a8d72f786f1e3e44723a4224b088e59160330c666e3afd58444e012e",
+        "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+        "scripts/check-foundation.py": "014766d49de1ff450ab091ef07b6b70e2ffd298ea878d315f26b39927d3f89a3",
+        "scripts/generate-project.py": "8de8a1c0a696b3b8811fd08d4ba9ff4d8f902257bb525ecd712eb3318f3826dc",
+        "scripts/run-mobile-tests.py": "7e13fa35b630c8d957388988b0888a2e4c84e34ada63723f8a4f186e6d27781a",
+        "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+        "scripts/verify.sh": "1e65f6ef12527ab9638eb5c932fd2e5d6392a8042d66c846e07c1cd707ea1f90",
+        ".github/workflows/mobile.yml": "c7aff8cc8c4e5c560c6f477b23d7ef1b9fb9c9dfef4d2dcd80130e07f76d1f20"
+      },
+      "devices": [
+        {
+          "model": "iphone12",
+          "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-12"
+        },
+        {
+          "model": "ipad9",
+          "type": "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation"
+        }
+      ]
+    },
+    "simulatorResults": {
+      "iphone12": {
+        "result": "Passed",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "totalTestCount": 1,
+        "runtimeWarnings": []
+      },
+      "ipad9": {
+        "result": "Passed",
+        "passedTests": 1,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "totalTestCount": 1,
+        "runtimeWarnings": []
+      }
+    }
+  },
+  "limits": [
+    "No iOS18 runtime execution",
+    "No physical performance or macOS application claim",
+    "Static privacy review is not runtime traffic certification",
+    "Filesystem snapshot is not a committed clean Git checkout"
+  ],
+  "publicationClosure": {
+    "branch": "codex/mobile-foundation",
+    "sourceRevision": "0edf274b5d7ba645bbc1e48dd6d80e6022b33104",
+    "changeScope": "Documentation-only acceptance record; foundation build inputs unchanged from 2d7bcf9.",
+    "hostedCI": {
+      "attempt": 2,
+      "conclusion": "success",
+      "headBranch": "codex/mobile-foundation",
+      "headSha": "0edf274b5d7ba645bbc1e48dd6d80e6022b33104",
+      "jobs": [
+        {
+          "completedAt": "2026-10-01T23:07:25Z",
+          "conclusion": "success",
+          "databaseId": 110621758894,
+          "name": "foundation",
+          "startedAt": "2026-10-01T22:53:24Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-01T22:53:26Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-01T22:53:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:53:29Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "number": 2,
+              "startedAt": "2026-10-01T22:53:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:53:29Z",
+              "conclusion": "success",
+              "name": "Check pinned toolchain",
+              "number": 3,
+              "startedAt": "2026-10-01T22:53:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:55:42Z",
+              "conclusion": "success",
+              "name": "Verify mobile foundation",
+              "number": 4,
+              "startedAt": "2026-10-01T22:53:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:37Z",
+              "conclusion": "success",
+              "name": "Test iPhone and iPad simulators",
+              "number": 5,
+              "startedAt": "2026-10-01T22:55:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:45Z",
+              "conclusion": "success",
+              "name": "Retain validation evidence",
+              "number": 6,
+              "startedAt": "2026-10-01T23:06:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:48Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "number": 12,
+              "startedAt": "2026-10-01T23:06:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:07:17Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "startedAt": "2026-10-01T23:06:48Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/job/110621758894"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581"
+    },
+    "attempt": 2,
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/attempts/2",
+    "initialAttempt": "Simulator bootstatus timed out before app tests began; build-for-testing passed. Retried once.",
+    "warnings": [
+      "iPad shutdown and delete commands each timed out after successful tests; ephemeral hosted-runner cleanup is not confirmed.",
+      "The legacy foundation artifact action emitted a Node20 warning; artifact upload passed."
+    ],
+    "artifacts": {
+      "name": "mobile-foundation-evidence",
+      "id": 11199092533,
+      "sha256": "ac92b374b3f01dfdcae69a9c85966e2a8ffae30c642727f975cdbeb22054cf28"
+    }
+  }
+}

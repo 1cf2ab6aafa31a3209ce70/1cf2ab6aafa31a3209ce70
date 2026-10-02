@@ -1,0 +1,29 @@
+#!/bin/bash
+# Mobile shell checks; no hardware or macOS application target.
+set -euo pipefail
+repository_dir="$(cd "$(dirname "$0")/.." && pwd)"
+output_dir="${1:-$(mktemp -d /tmp/gamecore-foundation-verification.XXXXXX)}"
+case "$output_dir" in /*) ;; *) echo 'Output directory must be absolute.' >&2; exit 2 ;; esac
+mkdir -p "$output_dir"
+cd "$repository_dir"
+xcodebuild -version
+python3 scripts/generate-project.py --check
+python3 scripts/check-foundation.py
+swift test --package-path Packages/GameCore --scratch-path "$output_dir/core" 2>&1 | tee "$output_dir/core-tests.log"
+swift test --package-path Packages/GamePlatform --scratch-path "$output_dir/platform" 2>&1 | tee "$output_dir/platform-tests.log"
+for configuration in Debug Release; do
+  xcodebuild -workspace GameCore.xcworkspace -scheme DevelopmentTitle \
+    -configuration "$configuration" -destination 'generic/platform=iOS Simulator' \
+    -derivedDataPath "$output_dir/simulator-$configuration" \
+    CODE_SIGNING_ALLOWED=NO build > "$output_dir/simulator-$configuration.log" 2>&1 || {
+      tail -60 "$output_dir/simulator-$configuration.log"; exit 1;
+    }
+  echo "$configuration iOS Simulator build passed"
+done
+xcodebuild -workspace GameCore.xcworkspace -scheme DevelopmentTitle \
+  -configuration Release -destination 'generic/platform=iOS' \
+  -derivedDataPath "$output_dir/ios-Release" CODE_SIGNING_ALLOWED=NO build \
+  > "$output_dir/ios-Release.log" 2>&1 || { tail -60 "$output_dir/ios-Release.log"; exit 1; }
+echo 'Release iOS SDK build passed (unsigned; no physical-device run)'
+echo "Verification passed: $output_dir"
+echo 'Package logic tests passed; app-hosted and UI tests run via scripts/test-mobile.sh.'

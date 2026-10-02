@@ -1,0 +1,537 @@
+{
+  "date": "2026-10-01",
+  "branch": "codex/mobile-app-shell",
+  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 29 remain unchanged after separately recorded package-host, workflow and bounded-startup changes. Successful hosted acceptance at clean bae1cdcb30df5eac02360684e02954ec12e95fb3 identifies all 32 current build/test inputs; the original local inventory remains historical.",
+  "uiRunInventory": {
+    "xcode": "Xcode 27.0\nBuild version 27A266a",
+    "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+    "runtimeVersion": "26.0",
+    "runtimeBuild": "23A5287g",
+    "sourceRevision": "940da810e3cf8513e0aab26d4b31577bd8a0281c",
+    "worktreeDirty": true,
+    "sourceSHA256": {
+      "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+      "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+      "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "12f12f79d9d390e0e3a7b03972311e4b07f5b43c49b318f74aed6aa1dc30f4fb",
+      "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+      "Packages/GamePlatform/Package.swift": "cea290511940e89878b90220221741bf093dbf88839638fb2d38b1eecb130646",
+      "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+      "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+      "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+      "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+      "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "302a28b70019b62a61a96c1068951d1f79be5d5017ba2df05247416f59d3875b",
+      "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "8f5b32e13539f00541c84e54d94176e38f9edcc05e138f45f037ef88b218195a",
+      "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+      "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+      "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+      "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+      "Games/DevelopmentTitle/CONTENT.md": "6d3894ea2829ac6259c4048ade53420a389c9447ec069762e323ce7b91e361b9",
+      "Games/DevelopmentTitle/DevelopmentScene.swift": "3a952f54bfc9083f3eb20c96f097468b2c7d4c0f9ebc48f83e43aa9c6c590401",
+      "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "c6b133a365f5fbdc7cecc51c7d65aa87e61b8548c37308693bbb49778508c615",
+      "Games/DevelopmentTitle/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+      "Games/DevelopmentTitle/ShellModel.swift": "8e2bc7b55925eed3cb070c4dc181b83fabcb17dda4e4fd4a3680bee2d0795dd7",
+      "Games/DevelopmentTitle/ShellView.swift": "a44c1d322dbce0b6e24948b0c98a47a3a893bfda38910e7678653795366bd790",
+      "Tests/DevelopmentTitleTests/ShellModelTests.swift": "e471765a17daf80a747d0f3c07a05526eb02d07194b8e081ed3fc860fce96ccf",
+      "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "c81ce9cf470f306545653e130be8212d55e49ef63c89ce31aaa4250dbcdcebb7",
+      "GameCore.xcodeproj/project.pbxproj": "49e5844905d123e689fd35b2023a3c450e6c869f5c73ae5590fb28ddee5a7a67",
+      "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "af56683799ff6dc0831b373002b096df08c6b6b0000e992cbf9a7276ac30c80e",
+      "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+      "scripts/check-foundation.py": "b4eee4dfaefa6bbdeec69302ff179a568095d02a888bcdeaa5810936901a5826",
+      "scripts/generate-project.py": "a64c6e7009c187b5abaddcc633eef66863bfd542e1a0a19d453e319adf430be2",
+      "scripts/run-mobile-tests.py": "3a94259d28259a77fe7f099d9d27137603cfb7231822e97315e260407924077b",
+      "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+      "scripts/verify.sh": "1e64e1c16f791f2e65a301d6b9f25ff3b3c6777a43ec462c0a0e32844d6bb809",
+      ".github/workflows/mobile.yml": "e29de127b9b46667a755e2be8c003713954e90b7daf37b86c2526a9eac99977f"
+    },
+    "devices": [
+      {
+        "model": "iphone12",
+        "type": "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+        "id": "C2A16EB3-EE7C-4830-94F0-0589E33F85DE"
+      },
+      {
+        "model": "ipad9",
+        "type": "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation",
+        "id": "22663FAC-AD63-44DE-ACD7-C7745F8CD339"
+      }
+    ]
+  },
+  "sourceHashesMatchFinalWorkingTree": false,
+  "localVerification": {
+    "command": "bash scripts/verify.sh /private/tmp/gamecore-epic02-accessible-verification-20261001",
+    "result": "Passed",
+    "coreTests": 21,
+    "platformTests": 14,
+    "simulatorDebug": "Passed",
+    "simulatorRelease": "Passed",
+    "unsignedIOSRelease": "Passed",
+    "output": "/private/tmp/gamecore-epic02-accessible-verification-20261001"
+  },
+  "uiResults": {
+    "iphone12": {
+      "result": "Passed",
+      "passedTests": 13,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "totalTestCount": 13,
+      "runtimeWarnings": [],
+      "appHostedTests": 9,
+      "uiPaths": 4,
+      "resultBundle": "/private/tmp/gamecore-epic02-accessible-ui-20261001/iphone12.xcresult"
+    },
+    "ipad9": {
+      "result": "Passed",
+      "passedTests": 13,
+      "failedTests": 0,
+      "skippedTests": 0,
+      "totalTestCount": 13,
+      "runtimeWarnings": [],
+      "appHostedTests": 9,
+      "uiPaths": 4,
+      "resultBundle": "/private/tmp/gamecore-epic02-accessible-ui-20261001/ipad9.xcresult"
+    }
+  },
+  "cleanup": {
+    "ownedUUIDs": [
+      "C2A16EB3-EE7C-4830-94F0-0589E33F85DE",
+      "22663FAC-AD63-44DE-ACD7-C7745F8CD339"
+    ],
+    "absentFromPostRunInventory": true,
+    "operationLogs": "/private/tmp/gamecore-epic02-accessible-ui-20261001",
+    "scope": "Only UUIDs returned by this invocation were shutdown/deleted."
+  },
+  "bundleReview": {
+    "configurations": [
+      {
+        "binarySHA256": "fbfce29c7ff63cbcbd35c11f15235b0f3ff7007f828679a25675cda711a90f3d",
+        "bundlePath": "/private/tmp/gamecore-epic02-accessible-verification-20261001/simulator-Release/Build/Products/Release-iphonesimulator/DevelopmentTitle.app",
+        "configuration": "simulator-Release",
+        "deviceFamily": [
+          1,
+          2
+        ],
+        "files": [
+          "DevelopmentTitle",
+          "Info.plist",
+          "PkgInfo"
+        ],
+        "linkedSystemLibraries": [
+          "/System/Library/Frameworks/AVFAudio.framework/AVFAudio",
+          "/System/Library/Frameworks/Combine.framework/Combine",
+          "/System/Library/Frameworks/CoreHaptics.framework/CoreHaptics",
+          "/System/Library/Frameworks/Foundation.framework/Foundation",
+          "/System/Library/Frameworks/SpriteKit.framework/SpriteKit",
+          "/System/Library/Frameworks/SwiftUI.framework/SwiftUI",
+          "/System/Library/Frameworks/UIKit.framework/UIKit",
+          "/System/Library/Frameworks/_SpriteKit_SwiftUI.framework/_SpriteKit_SwiftUI",
+          "/usr/lib/libSystem.B.dylib",
+          "/usr/lib/libobjc.A.dylib",
+          "/usr/lib/swift/libswiftCore.dylib",
+          "/usr/lib/swift/libswiftCoreAudio.dylib",
+          "/usr/lib/swift/libswiftCoreFoundation.dylib",
+          "/usr/lib/swift/libswiftCoreImage.dylib",
+          "/usr/lib/swift/libswiftCoreLocation.dylib",
+          "/usr/lib/swift/libswiftCoreMIDI.dylib",
+          "/usr/lib/swift/libswiftDispatch.dylib",
+          "/usr/lib/swift/libswiftGLKit.dylib",
+          "/usr/lib/swift/libswiftMetal.dylib",
+          "/usr/lib/swift/libswiftModelIO.dylib",
+          "/usr/lib/swift/libswiftOSLog.dylib",
+          "/usr/lib/swift/libswiftObjectiveC.dylib",
+          "/usr/lib/swift/libswiftQuartzCore.dylib",
+          "/usr/lib/swift/libswiftSpatial.dylib",
+          "/usr/lib/swift/libswiftSpriteKit.dylib",
+          "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+          "/usr/lib/swift/libswiftXPC.dylib",
+          "/usr/lib/swift/libswift_Builtin_float.dylib",
+          "/usr/lib/swift/libswift_Concurrency.dylib",
+          "/usr/lib/swift/libswiftos.dylib",
+          "/usr/lib/swift/libswiftsimd.dylib"
+        ],
+        "minimumOS": "18.0",
+        "permissionBackgroundURLATSKeys": [],
+        "releaseDebugHookStrings": [],
+        "requiredCapabilities": [],
+        "sceneConfigurations": {},
+        "supportsMultipleScenes": false
+      },
+      {
+        "binarySHA256": "9560b3026448a6aee625cd984aa0d23a7b391404b50e6fdd3e0c7e9de9268a23",
+        "bundlePath": "/private/tmp/gamecore-epic02-accessible-verification-20261001/ios-Release/Build/Products/Release-iphoneos/DevelopmentTitle.app",
+        "configuration": "ios-Release",
+        "deviceFamily": [
+          1,
+          2
+        ],
+        "files": [
+          "DevelopmentTitle",
+          "Info.plist",
+          "PkgInfo"
+        ],
+        "linkedSystemLibraries": [
+          "/System/Library/Frameworks/AVFAudio.framework/AVFAudio",
+          "/System/Library/Frameworks/Combine.framework/Combine",
+          "/System/Library/Frameworks/CoreHaptics.framework/CoreHaptics",
+          "/System/Library/Frameworks/Foundation.framework/Foundation",
+          "/System/Library/Frameworks/SpriteKit.framework/SpriteKit",
+          "/System/Library/Frameworks/SwiftUI.framework/SwiftUI",
+          "/System/Library/Frameworks/UIKit.framework/UIKit",
+          "/System/Library/Frameworks/_SpriteKit_SwiftUI.framework/_SpriteKit_SwiftUI",
+          "/usr/lib/libSystem.B.dylib",
+          "/usr/lib/libobjc.A.dylib",
+          "/usr/lib/swift/libswiftCore.dylib",
+          "/usr/lib/swift/libswiftCoreAudio.dylib",
+          "/usr/lib/swift/libswiftCoreFoundation.dylib",
+          "/usr/lib/swift/libswiftCoreImage.dylib",
+          "/usr/lib/swift/libswiftCoreLocation.dylib",
+          "/usr/lib/swift/libswiftCoreMIDI.dylib",
+          "/usr/lib/swift/libswiftDispatch.dylib",
+          "/usr/lib/swift/libswiftGLKit.dylib",
+          "/usr/lib/swift/libswiftMetal.dylib",
+          "/usr/lib/swift/libswiftModelIO.dylib",
+          "/usr/lib/swift/libswiftOSLog.dylib",
+          "/usr/lib/swift/libswiftObjectiveC.dylib",
+          "/usr/lib/swift/libswiftQuartzCore.dylib",
+          "/usr/lib/swift/libswiftSpatial.dylib",
+          "/usr/lib/swift/libswiftSpriteKit.dylib",
+          "/usr/lib/swift/libswiftUniformTypeIdentifiers.dylib",
+          "/usr/lib/swift/libswiftXPC.dylib",
+          "/usr/lib/swift/libswift_Builtin_float.dylib",
+          "/usr/lib/swift/libswift_Concurrency.dylib",
+          "/usr/lib/swift/libswiftos.dylib",
+          "/usr/lib/swift/libswiftsimd.dylib"
+        ],
+        "minimumOS": "18.0",
+        "permissionBackgroundURLATSKeys": [],
+        "releaseDebugHookStrings": [],
+        "requiredCapabilities": [
+          "arm64"
+        ],
+        "sceneConfigurations": {},
+        "supportsMultipleScenes": false
+      }
+    ],
+    "content": {
+      "origin": "Project-authored sample text, generated circle geometry/system colors, system fonts, deterministic PCM generated in RAM",
+      "projectLicense": "MIT",
+      "record": "Games/DevelopmentTitle/CONTENT.md",
+      "vendoredArtAudioFontFiles": []
+    },
+    "limitations": [
+      "Unsigned compile products do not certify eventual distribution entitlements.",
+      "Source/inventory checks do not establish runtime network traffic or all-path absence of permission prompts.",
+      "Simulator products do not certify physical audio/haptic fidelity or iOS18 minimum-runtime behavior."
+    ],
+    "packageGraph": {
+      "GameCore": [],
+      "GamePlatform": [
+        "local Packages/GameCore"
+      ],
+      "externalPackages": []
+    },
+    "productionSourceServiceAPIHits": {},
+    "reviewDate": "2026-10-01",
+    "scope": "Read-only Release bundle, production-source boundary and privacy/content inventory; not runtime network or physical hardware certification",
+    "sharedBoundary": {
+      "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": {
+        "imports": [
+          "GameCore",
+          "SwiftUI"
+        ],
+        "rendererOrTitleReferences": [],
+        "sourceSHA256": "302a28b70019b62a61a96c1068951d1f79be5d5017ba2df05247416f59d3875b"
+      },
+      "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": {
+        "imports": [
+          "Combine",
+          "GameCore"
+        ],
+        "rendererOrTitleReferences": [],
+        "sourceSHA256": "8f5b32e13539f00541c84e54d94176e38f9edcc05e138f45f037ef88b218195a"
+      }
+    }
+  },
+  "foundationPublication": {
+    "branch": "codex/mobile-foundation",
+    "head": "0edf274b5d7ba645bbc1e48dd6d80e6022b33104",
+    "conclusion": "success",
+    "run": 36936690581,
+    "attempt": 2,
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/attempts/2",
+    "detail": "See separate Epic01 evidence, including startup retry and hosted cleanup warnings."
+  },
+  "shellHostedCI": {
+    "initialRun": {
+      "run": 36941455713,
+      "attempt": 1,
+      "head": "a781051c0cf3672a1b0d169c8e6f4ede2c6817e8",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36941455713",
+      "conclusion": "failure",
+      "structuralChecks": "Passed",
+      "coreTests": 21,
+      "platformTests": "Not executed: package compilation failed",
+      "mobileBuilds": "Not executed",
+      "mobileTests": "Skipped",
+      "diagnostic": "MainActor and assumeIsolated require macOS 10.15; implicit SwiftPM host floor was lower.",
+      "toolchainCheck": "Step reported success despite xcodebuild -version | head -1 causing a broken-pipe exception."
+    },
+    "postFixHostedVerification": "Package compilation, all 35 package tests, three mobile builds and exact pinned toolchain checks passed in run 36942196658 attempt 1. Full mobile acceptance subsequently passed in run 36945855755; all failed attempts remain recorded.",
+    "followUpRun": {
+      "run": 36942196658,
+      "head": "a4f2343c4362b9a48b3c6eca75359dd3ba9ce5dd",
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "runtimeVersion": "26.5",
+      "runtimeBuild": "23F77",
+      "attempts": [
+        {
+          "attempt": 1,
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36942196658/attempts/1",
+          "conclusion": "failure",
+          "inventory": {
+            "path": "/private/tmp/gamecore-shell-hosted-artifact-36942196658/foundation-ui/inventory.json",
+            "SHA256": "45661c3b3ed0ace60d22c02c27a5326320672dd4fb3154b6481fe050e6c9d60b",
+            "sourceInputCount": 32,
+            "worktreeDirty": false
+          },
+          "coreTests": 21,
+          "platformTests": 14,
+          "mobileBuildsPassed": 3,
+          "iphone12": {
+            "bootSeconds": 197,
+            "appHostedTestsPassed": 9,
+            "uiPathsPassed": 3,
+            "uiPathsFailed": 1,
+            "failure": "Navigation awaited shell.play after the first native Start tap; correct fully visible button tapped, menu remained. Input delivery cause is unproven.",
+            "testSeconds": 73.49,
+            "setupSeconds": 51.83
+          },
+          "ipad9": "Not started"
+        },
+        {
+          "attempt": 2,
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36942196658/attempts/2",
+          "conclusion": "failure",
+          "inventory": {
+            "path": "/private/tmp/gamecore-shell-hosted-artifact-36942196658-attempt2/foundation-ui/inventory.json",
+            "SHA256": "e9b55a013246f75bf9749abfd596daabfb50135605b320eaf09ad14351262d50",
+            "sourceInputCount": 32,
+            "worktreeDirty": false
+          },
+          "sourceAndPins": "Unchanged from attempt 1",
+          "failureBoundary": "Before test execution: 300-second bootstatus command budget expired",
+          "ownedUUID": "605245F8-0AD8-4245-8FD0-BD147CD35D31",
+          "lastBootStatus": {
+            "status": 2,
+            "isTerminal": false,
+            "elapsed": "05:07",
+            "migrationElapsed": "04:52",
+            "plugin": "com.apple.locationd.migrator (CoreLocationMigrator.migrator)"
+          },
+          "diagnostic": "Earlier migration plugins completed; no crash or service-error message shown. Elapsed timestamps alone do not establish plugin progress.",
+          "mobileTestProcessLaunched": false,
+          "testResultBundleProduced": false,
+          "firstStartAssertionRepeated": false,
+          "ipad9": "Not started"
+        }
+      ]
+    },
+    "successfulAcceptance": {
+      "run": 36945855755,
+      "attempt": 1,
+      "head": "bae1cdcb30df5eac02360684e02954ec12e95fb3",
+      "worktreeDirty": false,
+      "conclusion": "success",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36945855755",
+      "jobURL": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36945855755/job/110647706435",
+      "jobSeconds": 1344,
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "runtimeVersion": "26.5",
+      "runtimeBuild": "23F77",
+      "inventory": {
+        "path": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/inventory.json",
+        "SHA256": "b236bc8cece3dff3454569ba4470ecf08b7a179a1e158ce5509f2d5c511a92cc",
+        "sourceInputCount": 32,
+        "allHashesMatchTestedGitRevision": true,
+        "allHashesMatchCurrentBuildTestInputs": true,
+        "unchangedInputsFromA4f2343": 30,
+        "changedInputsFromA4f2343": [
+          "scripts/run-mobile-tests.py",
+          ".github/workflows/mobile.yml"
+        ]
+      },
+      "coreTests": 21,
+      "platformTests": 14,
+      "mobileBuildsPassed": 3,
+      "devices": {
+        "iphone12": {
+          "totalTestCount": 13,
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "expectedFailures": 0,
+          "runtimeWarnings": [],
+          "result": "Passed",
+          "durationSeconds": 222.98,
+          "appHostedCases": 9,
+          "uiCases": 4,
+          "bootSeconds": 239,
+          "bootFinished": true,
+          "extendedBootBudgetExercised": false,
+          "navigation": {
+            "nodeIdentifier": "DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart()",
+            "result": "Passed",
+            "durationInSeconds": 36.117908000946045
+          },
+          "resultBundle": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/iphone12.xcresult",
+          "ownedUUID": "09D582C2-B4D9-451B-864D-37D30BC9DC0E",
+          "shutdown": "Passed",
+          "delete": "Passed",
+          "diagnosticsInvoked": false
+        },
+        "ipad9": {
+          "totalTestCount": 13,
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "expectedFailures": 0,
+          "runtimeWarnings": [],
+          "result": "Passed",
+          "durationSeconds": 339.303,
+          "appHostedCases": 9,
+          "uiCases": 4,
+          "bootSeconds": 122,
+          "bootFinished": true,
+          "extendedBootBudgetExercised": false,
+          "navigation": {
+            "nodeIdentifier": "DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart()",
+            "result": "Passed",
+            "durationInSeconds": 36.36551094055176
+          },
+          "resultBundle": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/ipad9.xcresult",
+          "ownedUUID": "02551F50-9D1A-4BEF-A43C-286CDC3DEE2B",
+          "shutdown": "Passed",
+          "delete": "Passed",
+          "diagnosticsInvoked": false
+        }
+      },
+      "cleanupWarnings": 0,
+      "diagnosticsInvoked": false,
+      "artifact": {
+        "id": 11202173975,
+        "sizeBytes": 1912233,
+        "sha256": "ccdb9e3affed703af6572372403ff26d0b0d293b523b04c0201fbb4d5e87327b"
+      },
+      "verificationRecord": "/private/tmp/gamecore-shell-hosted-verification-36945855755.json",
+      "causalLimits": "Both boots finished below the former 300-second bound, so the extended allowance was not exercised and does not establish a migration fix. The earlier first-Start failure did not recur; its cause remains unproven.",
+      "closureScope": "Hosted acceptance closed for exact tested inputs. This audit-only update changes no build/test input; failed attempts and original local evidence remain preserved."
+    }
+  },
+  "reviewFindings": {
+    "ids": [
+      "E02-01",
+      "E02-02",
+      "E02-03",
+      "E02-04",
+      "E02-05",
+      "E02-06",
+      "E02-07",
+      "E02-08",
+      "E02-09",
+      "E02-10",
+      "E02-11",
+      "E02-12",
+      "E02-13"
+    ],
+    "sourceDisposition": "E02-01 through E02-13 addressed within documented scope; hosted acceptance passed; historical migration/input-delivery causes remain unproven",
+    "unresolvedMaterialFindings": 0,
+    "hostedVerificationPending": []
+  },
+  "limits": [
+    "No iOS18 runtime execution",
+    "No physical audio/haptic fidelity or sustained performance claim",
+    "Large-text/reduced-motion tests override DEBUG presentation traits, not system preferences",
+    "Screenshots/source review do not establish full VoiceOver or dark-mode accessibility coverage",
+    "Static privacy inspection is not runtime traffic certification",
+    "Unsigned iOS SDK build is not distribution-signing evidence",
+    "No macOS application target built"
+  ],
+  "visualReview": {
+    "geometries": [
+      "iphone12",
+      "ipad9"
+    ],
+    "captures": [
+      "practice-playing",
+      "practice-landscape",
+      "large-text-result"
+    ],
+    "result": "Passed, no unresolved material layout/contrast finding",
+    "labelStyle": "Explicit adaptive Color.primary",
+    "sampledLightModeContrast": {
+      "tealFill": 16.43,
+      "blueFill": 15.31
+    },
+    "method": "Dominant solid text/fill RGB samples from retained light-mode PNGs and relative luminance calculation; excludes dark mode, VoiceOver and actual system preferences.",
+    "exports": [
+      "/private/tmp/gamecore-epic02-accessible-iphone-screens",
+      "/private/tmp/gamecore-epic02-accessible-ipad-screens"
+    ]
+  },
+  "sourceHashesMatchedPrePublicationWorkingTree": true,
+  "postPublicationSourceChanges": {
+    "recordedInputCount": 32,
+    "unchangedInputCount": 29,
+    "changedInputs": {
+      "Packages/GamePlatform/Package.swift": {
+        "historicalSHA256": "cea290511940e89878b90220221741bf093dbf88839638fb2d38b1eecb130646",
+        "currentSHA256": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467"
+      },
+      "scripts/run-mobile-tests.py": {
+        "historicalSHA256": "3a94259d28259a77fe7f099d9d27137603cfb7231822e97315e260407924077b",
+        "currentSHA256": "132dea260f4a3c788d1702582a3facca7d444c93cdc154ea3a89c900be3afe97"
+      },
+      ".github/workflows/mobile.yml": {
+        "historicalSHA256": "e29de127b9b46667a755e2be8c003713954e90b7daf37b86c2526a9eac99977f",
+        "currentSHA256": "5e263eb5999eb8740f23ab009a017c4e2efa488523fa3d476524227a1a008319"
+      }
+    },
+    "commits": {
+      "E02-11": "901dc3a",
+      "E02-12": "9322e37"
+    },
+    "scope": "Package CLI test-host minimum, workflow version/job-budget checks and bounded simulator startup/diagnostics only; no mobile production source or app target changed."
+  },
+  "postPublicationLocalVerification": {
+    "command": "bash scripts/verify.sh /private/tmp/gamecore-epic02-host-floor-verification-20261001",
+    "result": "Passed",
+    "coreTests": 21,
+    "platformTests": 14,
+    "simulatorDebug": "Passed",
+    "simulatorRelease": "Passed",
+    "unsignedIOSRelease": "Passed",
+    "output": "/private/tmp/gamecore-epic02-host-floor-verification-20261001",
+    "toolchainCheck": "Full captured output accepted the matching local Xcode expectation and rejected the different pinned hosted expectation; no early-closing pipe.",
+    "mobileSimulatorExecution": "Not repeated locally for host manifest/workflow-only changes; pre-publication results are preserved above."
+  },
+  "controlledStartupExperiment": {
+    "finding": "E02-13",
+    "hypothesis": "Variable first-boot data migration may outlast the old 300-second budget; a stalled plugin is not excluded.",
+    "bootStatusBudgetSeconds": 600,
+    "jobBudgetMinutes": 45,
+    "readiness": "Retain authoritative simctl bootstatus completion on the owned UUID; no fixed sleep or global daemon/device reset.",
+    "failureDiagnostics": "Confirm the owned UUID is Booted with a query bounded to 30 seconds; only then run simctl diagnose -b --timeout=60 --udid=<owned> --output=<model>-diagnostics under an outer 90-second bound. Otherwise retain skip/failure logs. No all-logs or data-container fallback; original boot exception survives and owned cleanup follows.",
+    "toolchainAndRuntimePins": "Unchanged",
+    "appAssertions": "Unchanged",
+    "verification": "Hosted acceptance passed in run 36945855755. Boots finished in 239/122 seconds, below the former 300-second bound; the extended allowance was not exercised and does not establish a migration fix. The earlier first-Start anomaly did not recur but its cause remains unproven.",
+    "localHarnessChecks": {
+      "result": "Passed",
+      "semanticMockCases": 5,
+      "pythonSyntax": "Passed",
+      "diffWhitespace": "Passed",
+      "mockScript": "/private/tmp/gamecore-shell-startup-diagnostic-mocks-20261001.py",
+      "realSimulatorExecution": "Not performed"
+    },
+    "extendedBootBudgetExercised": false,
+    "firstStartAnomalyRecurred": false
+  }
+}

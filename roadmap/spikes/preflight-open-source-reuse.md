@@ -4,6 +4,8 @@
 
 **Timebox:** Two developer days. **Entry:** Roadmap approved; no game code exists. **Next:** Spike 00 platform and rendering baseline. This is the first ordered work item.
 
+**Completed 2026-09-30:** [Candidate matrix and findings](../audits/preflight-open-source-reuse.md), [inclusion bill of materials](../audits/preflight-inclusion-bom.md), and [foundation decision](../decisions/ADR-001-first-party-foundation.md). Donpa and Leaves are design references only; GateEngine is declined for the starting foundation. No external code or assets are approved for inclusion. Donpa app builds have a recorded XcodeGen prerequisite blocker; package tests passed. Spike 00 retains responsibility for platform and hardware validation.
+
 ## Candidates and intended fit
 
 | Repository | Examine for | Later work informed |
