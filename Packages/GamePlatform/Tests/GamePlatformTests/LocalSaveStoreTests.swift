@@ -309,7 +309,7 @@ final class LocalSaveStoreTests: XCTestCase {
         let writer = try store()
         let first = try await seed(writer)
         _ = try await writer.save(settings: settings, progress: progress, generation: first.generation)
-        for url in [writer.directory, file("save.json"), file("save.previous.json")] {
+        for url in [root!, writer.directory, file("save.json"), file("save.previous.json")] {
             XCTAssertEqual(try url.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup, true)
             let attrs = try FileManager.default.attributesOfItem(atPath: url.path)
             let protectionValue = attrs[.protectionKey]

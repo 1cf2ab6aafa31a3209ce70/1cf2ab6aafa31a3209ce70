@@ -266,6 +266,13 @@ public actor LocalSaveStore {
 
     private func prepareDirectory() throws {
         do {
+            let root = directory.deletingLastPathComponent()
+            try manager.createDirectory(at: root, withIntermediateDirectories: true)
+            let rootAttributes = try manager.attributesOfItem(atPath: root.path)
+            guard rootAttributes[.type] as? FileAttributeType == .typeDirectory else {
+                throw LocalSaveError.io("Invalid save root directory")
+            }
+            try applyAttributes(root)
             try manager.createDirectory(at: directory, withIntermediateDirectories: true)
             let attributes = try manager.attributesOfItem(atPath: directory.path)
             guard attributes[.type] as? FileAttributeType == .typeDirectory else { throw LocalSaveError.io("Invalid save directory") }
