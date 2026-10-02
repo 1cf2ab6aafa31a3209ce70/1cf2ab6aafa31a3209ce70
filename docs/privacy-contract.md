@@ -10,6 +10,8 @@ This contract derives from the [roadmap](../ROADMAP.md) and applies to the [mobi
 - No transport or persistent production collection of diagnostic counters. The experiment's in-memory HUD is a disposable testing aid.
 - Privacy manifests and eventual store disclosures must describe the actual shipped bundle and behavior. Apple-operated distribution services sit outside the app contract and must not be confused with app data flows.
 
+[ADR-005](../roadmap/decisions/ADR-005-local-save-durability.md) requires Epic 04 to exclude app-owned saves from OS backup and verify attributes after replacement. A deliberate player export creates a separate copy in the selected Files destination, which may use an external provider. The app does not sync or send that copy to the developer. These controls are planned implementation requirements, not current shell behavior.
+
 The first-party framework direction does not exempt a target from review. Entitlements, resources and indirect dependencies can change behavior even when no networking import appears in source.
 
 ## Change review checklist
