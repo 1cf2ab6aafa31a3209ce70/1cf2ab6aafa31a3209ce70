@@ -143,6 +143,17 @@
       "failure": "iPad native exporter cancellation assertion failed; full iPad command then exceeded 600 seconds.",
       "sourceRevision": "daa53de16113a191b5d981967c0a9dcd7e1d9a10",
       "sourceInputsMatchRecordedRevision": true
+    },
+    {
+      "status": "failed",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36973904033",
+      "attempt": 1,
+      "sourceRevision": "17190d66d692a6fbd5832387fae97f62e730ddaf",
+      "failure": "iPad testSettingsAndProgressPersistOnRelaunch completed all assertions in 129.949 seconds but exceeded the 120-second per-case allowance; Xcode recorded timeout/restart and listed it failed.",
+      "assertionSequenceLoggedPassed": true,
+      "caseDurationSeconds": 129.949,
+      "caseAllowanceSeconds": 120,
+      "sourceInputScope": "Documentation-only tip after historical implementation; unchanged inputs rerun once before guard correction. No updated-guard acceptance is inferred."
     }
   ],
   "hosted": {
@@ -223,5 +234,28 @@
         "passed": true
       }
     ]
+  },
+  "hostedGuardFollowUp": {
+    "status": "pending",
+    "baseRevision": "17190d66d692a6fbd5832387fae97f62e730ddaf",
+    "revision": null,
+    "revisionStatus": "Awaiting reviewed guard commit; script digest identifies the pending change.",
+    "sourceSHA256": {
+      "scripts/run-mobile-tests.py": "b63deda73710e03c4e5060dabc508722f779e2db4f3571c18f8640b20c5d983e"
+    },
+    "changedFromHistoricalImplementation": [
+      "scripts/run-mobile-tests.py"
+    ],
+    "unchangedHistoricalInputCount": 36,
+    "caseAllowanceSeconds": 180,
+    "geometryCommandTimeoutSeconds": 900,
+    "selectedRestartCommandTimeoutSeconds": 600,
+    "hostedJobTimeoutMinutes": 45,
+    "hostedRunURL": null,
+    "verification": [
+      "Runner AST parses; selected case allowances and unchanged overall caps checked."
+    ],
+    "localNativeTestsRepeated": false,
+    "limit": "Hosted updated-guard acceptance remains pending; original successful run and hashes remain historical."
   }
 }
