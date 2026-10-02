@@ -1,5 +1,6 @@
 #if os(iOS)
 import Combine
+import Foundation
 import GameCore
 
 /// Reusable coordination for one mobile shell session. A title supplies
@@ -11,6 +12,21 @@ public final class ShellController: ObservableObject {
 
     @Published public private(set) var flow: ShellFlow
     @Published public private(set) var resumeMessage: String?
+
+    @Published public private(set) var progress = SaveProgress()
+    @Published public private(set) var persistenceReady = true
+    @Published public private(set) var persistenceMessage: String?
+    @Published public private(set) var recoveryRequired = false
+    @Published public private(set) var isSaving = false
+    public var hasPersistence: Bool { store != nil || initialPersistenceError != nil }
+    private let initialPersistenceError: String?
+    private let store: LocalSaveStore?
+    private let recordSuccess: (@MainActor (inout SaveProgress) -> Void)?
+    private var generation: UUID?
+    private var persistenceEpoch = UUID()
+    private var persistenceTask: Task<Void, Never>?
+    private var dirty = false
+    private var latestStorageOperation = UUID()
 
     private let feedback: ShellFeedbackController?
     private let preparation: Preparation
@@ -24,7 +40,18 @@ public final class ShellController: ObservableObject {
                 preparation: @escaping Preparation, preparationFailureMessage: String,
                 prepareSession: @escaping @MainActor () -> Void,
                 setPlaying: @escaping @MainActor (Bool) -> Void,
-                setReducedMotion: @escaping @MainActor (Bool) -> Void) {
+                setReducedMotion: @escaping @MainActor (Bool) -> Void,
+                store: LocalSaveStore? = nil,
+                initialPersistenceError: String? = nil,
+                recordSuccess: (@MainActor (inout SaveProgress) -> Void)? = nil) {
+        let configurationError = store.map { $0.titleID != title.id } == true
+            ? "Local data belongs to another title. This title cannot read or change it."
+            : initialPersistenceError
+        self.store = configurationError == nil ? store : nil
+        self.initialPersistenceError = configurationError
+        persistenceMessage = configurationError
+        self.recordSuccess = recordSuccess
+        persistenceReady = store == nil && configurationError == nil
         self.feedback = feedback
         self.preparation = preparation
         self.preparationFailureMessage = preparationFailureMessage
@@ -41,12 +68,13 @@ public final class ShellController: ObservableObject {
     deinit { loadTask?.cancel() }
 
     public func finishSplash() {
+        if store != nil && generation == nil && persistenceTask == nil { retryPersistence() }
         _ = flow.finishSplash()
         synchronizeSession()
     }
 
     public func start() {
-        guard let request = flow.start() else { return }
+        guard persistenceReady, !recoveryRequired, let request = flow.start() else { return }
         beginLoading(request)
     }
 
@@ -72,7 +100,7 @@ public final class ShellController: ObservableObject {
     }
 
     public func restart() {
-        guard let request = flow.restart() else { return }
+        guard persistenceReady, !recoveryRequired, let request = flow.restart() else { return }
         beginLoading(request)
     }
 
@@ -84,13 +112,26 @@ public final class ShellController: ObservableObject {
         synchronizeSession()
     }
 
+    /// Synchronous UI actions can finish the currently visible session.
     public func finish(_ outcome: ShellOutcome) {
-        guard let request = flow.currentRequest, flow.finish(request, outcome: outcome) else { return }
+        guard let request = flow.currentRequest else { return }
+        finish(outcome, for: request)
+    }
+
+    /// Asynchronous title callbacks must retain their request token so a reset,
+    /// deletion or restart cannot award progress to a newer session.
+    public func finish(_ outcome: ShellOutcome, for request: LoadRequest) {
+        guard flow.currentRequest == request, flow.finish(request, outcome: outcome) else { return }
+        if outcome == .success {
+            recordSuccess?(&progress)
+            persistCurrentState()
+        }
         synchronizeSession()
         feedback?.playCue(outcome == .success ? .success : .failure)
     }
 
     public func setApplicationActive(_ active: Bool) {
+        if !active { persistCurrentState() }
         feedback?.setForeground(active)
         flow.setApplicationActive(active)
         synchronizeSession()
@@ -112,6 +153,7 @@ public final class ShellController: ObservableObject {
     @discardableResult
     public func updateSettings(sound: Bool? = nil, music: Bool? = nil,
                                haptics: Bool? = nil, language: String? = nil) -> Bool {
+        guard persistenceReady, !recoveryRequired else { return false }
         let old = flow.settings
         guard flow.updateSettings(ShellSettings(
             soundEnabled: sound ?? old.soundEnabled,
@@ -120,10 +162,118 @@ public final class ShellController: ObservableObject {
             language: language ?? old.language
         )) else { return false }
         synchronizeSession()
+        persistCurrentState()
         return true
     }
 
     public func setReducedMotion(_ enabled: Bool) { applyReducedMotion(enabled) }
+
+    /// Waits for all meaningful updates queued before this call, including a retry.
+    public func flushPersistence() async { await persistenceTask?.value }
+
+    public func retryPersistence() {
+        guard let store else { return }
+        if generation != nil && dirty { persistCurrentState(); return }
+        enqueueStorage { controller, epoch in
+            let result = try await store.load()
+            guard controller.persistenceEpoch == epoch else { return }
+            try controller.accept(result)
+        }
+    }
+
+    public func acknowledgeRecovery() {
+        guard let store, let generation else { return }
+        enqueueStorage { controller, epoch in
+            let result = try await store.acknowledgeRecovery(generation: generation)
+            guard controller.persistenceEpoch == epoch else { return }
+            try controller.accept(result)
+        }
+    }
+
+    public func resetProgress() { destructiveChange(deleteAll: false) }
+    public func deleteLocalData() { destructiveChange(deleteAll: true) }
+
+    public func exportLocalData() async throws -> Data {
+        await flushPersistence()
+        guard let store else { throw LocalSaveError.invalidSnapshot }
+        return try await store.exportData()
+    }
+
+    public func reportExportFailure(_ error: Error) {
+        persistenceMessage = "Export could not finish: \(error.localizedDescription)"
+    }
+
+    private func destructiveChange(deleteAll: Bool) {
+        guard let store else { return }
+        let resetSettings = persistenceReady && !recoveryRequired ? flow.settings : nil
+        // Stop renderer/loading before the storage actor invalidates pending writes.
+        returnToMenu()
+        persistenceEpoch = UUID()
+        generation = nil
+        dirty = false
+        recoveryRequired = false
+        persistenceReady = false
+        enqueueStorage { controller, epoch in
+            let result = try await (deleteAll ? store.deleteLocalData() : store.resetProgress(settings: resetSettings))
+            guard controller.persistenceEpoch == epoch else { return }
+            try controller.accept(result)
+        }
+    }
+
+    private func persistCurrentState() {
+        guard let store, let generation, persistenceReady, !recoveryRequired else { return }
+        dirty = true
+        let settings = flow.settings
+        let progress = progress
+        enqueueStorage { controller, epoch in
+            let result = try await store.save(settings: settings, progress: progress, generation: generation)
+            // A queued newer snapshot remains authoritative in the controller.
+            guard controller.persistenceEpoch == epoch else { return }
+            controller.generation = result.generation
+        }
+    }
+
+    private func accept(_ result: SaveLoadResult) throws {
+        guard flow.title.supportedLanguages.contains(result.snapshot.settings.language) else {
+            persistenceReady = false
+            throw LocalSaveError.invalidSnapshot
+        }
+        generation = result.generation
+        progress = result.snapshot.progress
+        _ = flow.updateSettings(result.snapshot.settings)
+        recoveryRequired = result.recovered
+        persistenceReady = true
+        persistenceMessage = result.recovered
+            ? "A previous good save was recovered. Review it and choose Use recovered save before continuing."
+            : nil
+        dirty = false
+        synchronizeSession()
+    }
+
+    private func enqueueStorage(_ operation: @escaping @MainActor (ShellController, UUID) async throws -> Void) {
+        let previous = persistenceTask
+        let epoch = persistenceEpoch
+        let operationID = UUID()
+        latestStorageOperation = operationID
+        isSaving = true
+        persistenceTask = Task { [weak self] in
+            await previous?.value
+            guard let self, self.persistenceEpoch == epoch else { return }
+            do {
+                try await operation(self, epoch)
+                guard self.persistenceEpoch == epoch else { return }
+                if !self.recoveryRequired { self.persistenceMessage = nil }
+            } catch {
+                guard self.persistenceEpoch == epoch else { return }
+                self.persistenceMessage = "Local data is unavailable: \(error.localizedDescription). Retry, reset progress or delete local data. A failed deletion may have removed some files; unreadable or unsupported data is never replaced automatically."
+            }
+            // Yielding serial work is complete; later tasks may still be queued.
+            if self.latestStorageOperation == operationID {
+                self.isSaving = false
+                if self.persistenceMessage == nil { self.dirty = false }
+            }
+        }
+    }
 
     private func beginLoading(_ request: LoadRequest) {
         loadTask?.cancel()

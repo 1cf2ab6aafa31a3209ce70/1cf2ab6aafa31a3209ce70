@@ -161,7 +161,11 @@ def check_sources():
     }
     blocked_apis = re.compile(r"\b(?:URLSession|URLRequest|NSURLConnection|NWConnection|NWListener|"
                               r"CFNetwork|CKContainer|GKLocalPlayer|SKPaymentQueue|ASIdentifierManager|"
-                              r"ATTrackingManager|UserDefaults|FileManager|NSUbiquitousKeyValueStore)\b")
+                              r"ATTrackingManager|UserDefaults|NSUbiquitousKeyValueStore)\b")
+    # Epic 04 owns local filesystem access in a single reviewed adapter.
+    # Package fixtures may use FileManager for isolated roots; core/title code cannot.
+    filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
+    platform_test_root = ROOT / "Packages/GamePlatform/Tests"
     title_imports = set()
     for directory in [ROOT / "Packages", ROOT / "Games"]:
         for path in sorted(directory.rglob("*.swift")):
@@ -171,6 +175,9 @@ def check_sources():
             imports = set(re.findall(r"\bimport\s+(?:(?:class|struct|enum|protocol|func|var|let)\s+)?([A-Za-z_][A-Za-z_0-9]*)", source))
             require(not any(module in blocked_imports or module.startswith("Firebase") for module in imports),
                     f"Disallowed privacy-related import in {path.relative_to(ROOT)}")
+            require(not re.search(r"\bFileManager\b", source)
+                    or path == filesystem_adapter or path.is_relative_to(platform_test_root),
+                    f"Filesystem access belongs in the reviewed LocalSaveStore adapter: {path.relative_to(ROOT)}")
             match = blocked_apis.search(source)
             require(match is None, f"Disallowed network/cloud/commerce/storage API in {path.relative_to(ROOT)}: {match.group() if match else ''}")
             if path.is_relative_to(ROOT / "Packages/GameCore/Sources"):

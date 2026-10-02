@@ -1,6 +1,7 @@
 #if os(iOS)
 import GameCore
 import SwiftUI
+import UniformTypeIdentifiers
 
 /// Title-authored presentation copy for the shared flow. It contains no game rules.
 public struct ShellPresentation: Sendable {
@@ -78,6 +79,21 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
                 if showsGameplayHost {
                     gameplayHost()
                 }
+                if controller.hasPersistence {
+                    Text(controller.isSaving ? "Saving local data…" : (controller.persistenceMessage == nil && controller.persistenceReady ? "Local data saved" : "Local data needs attention"))
+                        .accessibilityIdentifier("save.status")
+                    if let message = controller.persistenceMessage {
+                        Text(message).accessibilityIdentifier("save.message")
+                        if controller.recoveryRequired {
+                            ShellActionButton("Use recovered save", id: "save.recover", action: controller.acknowledgeRecovery)
+                        } else {
+                            ShellActionButton("Retry local data", id: "save.retry", action: controller.retryPersistence)
+                        }
+                    }
+                    if !controller.progress.completedLevels.isEmpty {
+                        Text("Completed levels: \(controller.progress.completedLevels.count)").accessibilityIdentifier("save.progress")
+                    }
+                }
                 content
             }
             .frame(maxWidth: 640, alignment: .leading)
@@ -112,6 +128,7 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
                 ShellHeading(presentation.menuHeading, id: "shell.menu")
                 Text(presentation.menuMessage)
                 ShellActionButton(presentation.startLabel, id: "shell.start", prominent: true, action: controller.start)
+                    .disabled(!controller.persistenceReady || controller.recoveryRequired)
                 ShellActionButton("Settings", id: "shell.settings") { showingSettings = true }
             }
         case .loading:
@@ -201,6 +218,9 @@ private struct SharedShellSettingsView: View {
     @ObservedObject var controller: ShellController
     let presentation: ShellPresentation
     @Environment(\.dismiss) private var dismiss
+    @State private var confirmation: LocalDataAction?
+    @State private var exportDocument: SaveExportDocument?
+    @State private var showingExporter = false
 
     var body: some View {
         NavigationStack {
@@ -216,16 +236,52 @@ private struct SharedShellSettingsView: View {
                         set: { controller.updateSettings(haptics: $0) }))
                         .accessibilityIdentifier("settings.haptics")
                 }
+                .disabled(!controller.persistenceReady || controller.recoveryRequired)
                 Section("Language") {
                     LabeledContent("Language", value: presentation.languageName)
                     Text(presentation.languageMessage).foregroundStyle(.secondary)
                 }
                 Section {
-                    Text("Settings apply to this session and reset when the app closes.")
+                    Text(controller.hasPersistence ? "Settings and progress are saved on this device. Automatic backup and sync are disabled. Uninstalling the app or losing the device can erase them." : "Settings apply to this session and reset when the app closes.")
                         .foregroundStyle(.secondary)
                 }
+                if controller.hasPersistence {
+                    Section("Local data") {
+                        if let message = controller.persistenceMessage {
+                            Text(message).accessibilityIdentifier("settings.save-message")
+                        }
+                        Text("Export creates a JSON copy using Files. A provider you choose may transfer that copy. The developer receives nothing. Exported copies remain under your control after reset or deletion.")
+                        Button("Export local data") {
+                            Task {
+                                do {
+                                    exportDocument = SaveExportDocument(data: try await controller.exportLocalData())
+                                    showingExporter = true
+                                } catch { controller.reportExportFailure(error) }
+                            }
+                        }.accessibilityIdentifier("save.export")
+                            .disabled(!controller.persistenceReady || controller.recoveryRequired || controller.isSaving)
+                        Button("Reset progress", role: .destructive) { confirmation = .reset }
+                            .accessibilityIdentifier("save.reset")
+                        Button("Delete local data", role: .destructive) { confirmation = .delete }
+                            .accessibilityIdentifier("save.delete")
+                    }
+                }
             }
+            .accessibilityIdentifier("settings.form")
             .navigationTitle("Settings")
+            .alert(confirmation == .delete ? "Delete local data?" : "Reset progress?", isPresented: Binding(get: { confirmation != nil }, set: { if !$0 { confirmation = nil } })) {
+                Button("Cancel", role: .cancel) { confirmation = nil }
+                Button(confirmation == .delete ? "Delete local data" : "Reset progress", role: .destructive) {
+                    if confirmation == .delete { controller.deleteLocalData() } else { controller.resetProgress() }
+                    confirmation = nil
+                }
+            } message: {
+                Text(confirmation == .delete ? "Remove this title’s progress, preferences and recovery files from this device. Other titles and exported copies are unchanged." : "Remove this title’s progress and close the current session. Keep sound, music, haptics and language preferences. This cannot be undone.")
+            }
+            .fileExporter(isPresented: $showingExporter, document: exportDocument, contentType: .json, defaultFilename: "\(controller.flow.title.id)-save") { result in
+                if case .failure(let error) = result { controller.reportExportFailure(error) }
+                exportDocument = nil
+            }
             .toolbar {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
@@ -233,6 +289,20 @@ private struct SharedShellSettingsView: View {
                 }
             }
         }
+    }
+}
+private enum LocalDataAction { case reset, delete }
+
+private struct SaveExportDocument: FileDocument {
+    static var readableContentTypes: [UTType] { [.json] }
+    let data: Data
+    init(data: Data) { self.data = data }
+    init(configuration: ReadConfiguration) throws {
+        guard let data = configuration.file.regularFileContents else { throw CocoaError(.fileReadCorruptFile) }
+        self.data = data
+    }
+    func fileWrapper(configuration: WriteConfiguration) throws -> FileWrapper {
+        FileWrapper(regularFileWithContents: data)
     }
 }
 #endif

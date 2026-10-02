@@ -135,10 +135,88 @@ def source_identity():
             "sourceSHA256": sources}
 
 
+def verify_restart(xcode, device, model, output, runtime_identifier):
+    """Validate test-reported paths; never delete an inferred sandbox location."""
+    restart_test = "DevelopmentTitleTests/SavePersistenceTests/testSimulatorRestartPersistence"
+    receipt_prefix = "GAMECORE_RESTART_RECEIPT "
+
+    def invoke(label):
+        log = output / f"{model}-restart-{label}.log"
+        run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
+                     "-only-testing:" + restart_test,
+                     "-resultBundlePath", str(output / f"{model}-restart-{label}.xcresult"),
+                     "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
+                     "-maximum-test-execution-time-allowance", "180", "test-without-building"],
+            log=log, timeout=600)
+        lines = log.read_text().splitlines()
+        if not any("testSimulatorRestartPersistence" in line and "passed" in line for line in lines):
+            raise RuntimeError(f"Restart {label} invocation did not pass the selected test")
+        receipts = [json.loads(line.split(receipt_prefix, 1)[1])
+                    for line in lines if receipt_prefix in line]
+        if len(receipts) != 1:
+            raise RuntimeError(f"Restart {label} must emit exactly one fixture receipt")
+        receipt = receipts[0]
+        try:
+            uuid.UUID(receipt["token"])
+        except (ValueError, KeyError, TypeError) as error:
+            raise RuntimeError("Restart receipt lacks a valid fixture token") from error
+        # xcodebuild can refresh a data container. Discover it after the test,
+        # then validate the exact Foundation path emitted by that known test.
+        container = Path(run(["xcrun", "simctl", "get_app_container", device,
+                              "local.gamecore.DevelopmentTitle", "data"])).resolve()
+        root = Path(receipt["root"])
+        sandbox = Path(receipt["sandboxRoot"])
+        if (not root.is_absolute() or not sandbox.is_absolute()
+                or sandbox.resolve() != container
+                or not root.resolve().is_relative_to(container)
+                or root.name != "epic04-restart-proof" or root.parent.name != "GameCoreSaves"
+                or receipt["phase"] not in {"prepared", "restored"}):
+            raise RuntimeError(f"Restart {label} receipt is outside its owned fixture sandbox: {receipt}")
+        return receipt, root.resolve()
+
+    receipt, restart_root = invoke("prepare")
+    initial_phase = receipt["phase"]
+    if initial_phase == "restored":
+        # The full suite may have seeded the marker. Consume it safely in the
+        # known test, then make one bounded invocation to prepare fresh state.
+        receipt, restart_root = invoke("prepare-fresh")
+    if receipt["phase"] != "prepared":
+        raise RuntimeError("Restart preparation did not report a prepared fixture")
+    snapshot = restart_root / "restart-proof/save.json"
+    marker = restart_root / "prepared.marker"
+    if not snapshot.is_file() or not marker.is_file():
+        raise RuntimeError("Restart preparation did not retain its reported fixture")
+    if marker.read_text() != receipt["token"]:
+        raise RuntimeError("Restart marker does not identify the prepared fixture")
+    before = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+    run(["xcrun", "simctl", "shutdown", device], timeout=90)
+    run(["xcrun", "simctl", "boot", device])
+    run(["xcrun", "simctl", "bootstatus", device, "-b"],
+        log=output / f"{model}-restart-boot.log", timeout=600)
+    if hashlib.sha256(snapshot.read_bytes()).hexdigest() != before:
+        raise RuntimeError("Save bytes changed during simulator restart")
+    restored, restored_root = invoke("restore")
+    if (restored["phase"] != "restored" or restored["token"] != receipt["token"]
+            or restored_root.exists()):
+        raise RuntimeError("Restart restore did not validate and remove the prepared fixture")
+    (output / f"{model}-restart.json").write_text(json.dumps({
+        "fixtureSHA256": before, "saveBytesPreserved": True,
+        "device": device, "runtime": runtime_identifier,
+        "preparedRoot": str(restart_root), "restoredRoot": str(restored_root),
+        "fixtureToken": receipt["token"], "initialPhase": initial_phase,
+        "restoredPhase": restored["phase"], "fixtureRemoved": True,
+        "scope": "Simulator shutdown/boot; restore test reads settings and progress"
+    }, indent=2) + "\n")
+    print(f"PASS {model}: settings/progress restored after simulator restart", flush=True)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", nargs="?", help="New absolute output directory (default: temporary)")
+    parser.add_argument("--model", choices=[model for model, _ in MODELS],
+                        help="Run only this simulator geometry (default: both)")
     args = parser.parse_args()
+    selected_models = tuple(item for item in MODELS if args.model is None or item[0] == args.model)
     if args.output:
         output = Path(args.output)
         if not output.is_absolute():
@@ -160,6 +238,7 @@ def main():
     print(f"Selected iOS {runtime['version']} ({runtime['identifier']}); minimum-OS coverage is separate", flush=True)
     metadata = {"xcode": run(["xcodebuild", "-version"]), "runtime": runtime["identifier"],
                 "runtimeVersion": runtime["version"], "runtimeBuild": runtime.get("buildversion"),
+                "selectedModels": [model for model, _ in selected_models],
                 **source_identity(), "devices": []}
     (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
     run(["python3", "scripts/generate-project.py", "--check"])
@@ -167,7 +246,7 @@ def main():
              "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
     run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
                  "build-for-testing"], log=output / "build.log", timeout=600)
-    for model, device_type in MODELS:
+    for model, device_type in selected_models:
         device = None
         try:
             device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
@@ -181,12 +260,16 @@ def main():
             except RuntimeError:
                 collect_boot_diagnostics(device, model, output)
                 raise
+            # Hosted accessibility queries can exceed 120 seconds for a passing
+            # multi-step UI case. Each case gets 180 seconds; the separate
+            # 900-second whole-suite cap remains the aggregate failure bound.
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                         "-maximum-test-execution-time-allowance", "90", "test-without-building"],
-                log=output / f"{model}.log", timeout=600)
+                         "-maximum-test-execution-time-allowance", "180", "test-without-building"],
+                log=output / f"{model}.log", timeout=900)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
+            verify_restart(xcode, device, model, output, runtime["identifier"])
         finally:
             if device:
                 # Only UUIDs returned by create in this invocation are cleaned up.

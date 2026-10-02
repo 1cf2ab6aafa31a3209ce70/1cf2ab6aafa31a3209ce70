@@ -1,6 +1,6 @@
 # Contributing
 
-This repository contains an original mobile foundation, a playable lifecycle shell and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Puzzle rules, levels, durable saves and complete titles remain roadmap work.
+This repository contains an original mobile foundation, a playable lifecycle shell and a separate [disposable platform experiment](experiments/platform-baseline/README.md). Production settings and practice progress persist locally. Puzzle rules, levels and complete titles remain roadmap work.
 
 ## Start here
 
@@ -28,9 +28,9 @@ Keep changes focused and explain the behavior or decision they change. Include r
 - `Games/<Title>` contains a title's entry point, rules, rendering and bundled content. `Games/DevelopmentTitle` exercises the shared flow with an original practice scene.
 - `experiments` contains disposable investigations outside production targets.
 
-Keep each title's identity, assets, levels, bundle identifier and future save namespace separate. Add tests for observable domain invariants and meaningful adapter behavior as features arrive; avoid tests that only repeat trivial implementation details. Inspect generated files in the same change as their generator inputs.
+Keep each title's identity, assets, levels, bundle identifier and save namespace separate. Add tests for observable domain invariants and meaningful adapter behavior as features arrive; avoid tests that only repeat trivial implementation details. Inspect generated files in the same change as their generator inputs.
 
-The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity, single-window ownership and session-only settings. Implement persistence only within Epic 04 under [ADR-005](roadmap/decisions/ADR-005-local-save-durability.md). Do not treat the practice registration type as the final game-module contract before [Spike 06](roadmap/spikes/06-module-seam.md). App-hosted tests may inject preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
+The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity and single-window ownership. [Local state](roadmap/decisions/ADR-005-local-save-durability.md) now makes production preferences durable; storage-free injected shell fixtures remain useful for pure lifecycle tests. Follow ADR-005 for persistence changes; the small shell registration type remains provisional until [Spike 06](roadmap/spikes/06-module-seam.md) defines the game-module contract for Epic 07 integration. Use one `LocalSaveStore` actor per title namespace, outside the renderer-independent core. Filesystem access belongs in this reviewed adapter; writes carry a generation invalidated by destructive actions. Never downgrade future saves or silently overwrite corruption. App-hosted tests may inject storage, preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
 
 ## Privacy, dependencies and content
 

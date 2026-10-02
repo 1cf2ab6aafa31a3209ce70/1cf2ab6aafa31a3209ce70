@@ -19,8 +19,12 @@ public struct TitleRegistration: Equatable, Sendable {
     }
 }
 
-/// Temporary local preferences. There is deliberately no persistence here.
-public struct ShellSettings: Equatable, Sendable {
+/// Preferences stored with title-scoped progress in the local save envelope.
+public struct ShellSettings: Codable, Equatable, Sendable {
+    enum CodingKeys: String, CodingKey {
+        case soundEnabled = "effectsEnabled"
+        case musicEnabled, hapticsEnabled, language
+    }
     public let soundEnabled: Bool
     public let musicEnabled: Bool
     public let hapticsEnabled: Bool
