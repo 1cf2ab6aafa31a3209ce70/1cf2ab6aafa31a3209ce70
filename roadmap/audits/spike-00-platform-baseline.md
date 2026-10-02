@@ -4,6 +4,8 @@
 **Branch:** `codex/spike-00-platform-baseline`, started from `integration/first-party-foundation` at `0c98977`.  
 **Status:** Experiment implemented; strengthened terrain collision/settling integration tests passed on both device-geometry simulators; final source builds and pure tests passed; macOS pointer/keyboard and terrain were observed in a partial run, but full macOS runtime validation remains open, and physical acceptance and minimum-runtime checks remain open. This report does not close Spike 00 or unblock Epic 01 implementation.
 
+**Policy update (2026-10-01):** [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md) accepts Spike 00 for mobile foundation development using this simulator evidence. Physical devices are unavailable; macOS work is deferred. The September 30 observations and limitations below are historical and remain unchanged. Minimum-runtime coverage is a distribution-readiness check, not a foundation entry gate.
+
 ## Scope and platform choice
 
 The [checked-in experiment](../../experiments/platform-baseline/README.md) hosts original SpriteKit blocks/panel scenes and a small RealityKit heightfield in SwiftUI. Code uses generated geometry/colors and Apple SDKs with no external package, resource or entitlement dependency. Its Foundation-only models have their own pure test package. Neither that package nor the Xcode app is the production `GameCore` skeleton.
