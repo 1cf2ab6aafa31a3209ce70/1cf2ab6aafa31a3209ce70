@@ -8,7 +8,7 @@
 
 **Status:** Complete. Final mobile builds, 21 core tests, 14 platform tests and all 13 app/UI tests on each acceptance geometry passed. Independent integration, bundle and screenshot review found no unresolved material issue. [ADR-004](../decisions/ADR-004-mobile-shell-lifecycle.md) records explicit resume, preparation identity, scene ownership and session-only settings. The [evidence report](../audits/epic-02-app-shell.md) maps the implementation and checks to acceptance. Spike 03's entry gate is satisfied.
 
-The development practice uses shared SwiftUI menus and results around a title-owned SpriteKit scene. `GameCore` owns legal transitions and independent lifecycle/audio pause reasons; `GamePlatform` owns the shared controller/UI, authored audio, optional haptics and one interruption observer. Settings currently apply in memory, and English is the practice's supported language. No durable save or title-specific puzzle rule is introduced.
+The development practice uses shared SwiftUI menus and results around a title-owned SpriteKit scene. `GameCore` owns legal transitions and independent lifecycle/audio pause reasons; `GamePlatform` owns the shared controller/UI, authored audio, optional haptics and one interruption observer. At the Epic 02 baseline, settings applied in memory, and English was the practice's supported language. This epic introduced no durable save or title-specific puzzle rule; [Epic 04](04-local-state.md) subsequently adds durable preferences and practice progress.
 
 ## Scope and tasks
 
