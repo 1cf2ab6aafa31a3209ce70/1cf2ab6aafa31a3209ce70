@@ -154,6 +154,14 @@
       "caseDurationSeconds": 129.949,
       "caseAllowanceSeconds": 120,
       "sourceInputScope": "Documentation-only tip after historical implementation; unchanged inputs rerun once before guard correction. No updated-guard acceptance is inferred."
+    },
+    {
+      "status": "cancelled",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36973904033",
+      "attempt": 2,
+      "sourceRevision": "17190d66d692a6fbd5832387fae97f62e730ddaf",
+      "jobDuration": "35m7s",
+      "reason": "Guard push superseded unchanged docs-tip rerun through workflow concurrency; no acceptance result."
     }
   ],
   "hosted": {
@@ -236,12 +244,47 @@
     ]
   },
   "hostedGuardFollowUp": {
-    "status": "pending",
+    "status": "success",
     "baseRevision": "17190d66d692a6fbd5832387fae97f62e730ddaf",
-    "revision": null,
-    "revisionStatus": "Awaiting reviewed guard commit; script digest identifies the pending change.",
+    "revision": "1c0945b9d9ea953bc7b8352368181115a5d4666a",
     "sourceSHA256": {
-      "scripts/run-mobile-tests.py": "b63deda73710e03c4e5060dabc508722f779e2db4f3571c18f8640b20c5d983e"
+      "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+      "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+      "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+      "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+      "Packages/GameCore/Tests/GameCoreTests/SaveSnapshotTests.swift": "3d396b2ceeb625d7307fee7889163a53c985e0c011f19541edd75bd223f4b87b",
+      "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+      "Packages/GamePlatform/Package.swift": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467",
+      "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+      "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+      "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+      "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+      "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+      "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "a233ac0b8477304c87a91d3fb8e3e74c2243492ce4221c6c8daa0b0697d2f2d8",
+      "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "8211f966d55510493217bd6a95f74ceaa6ef84d6b1578e23479afe09c4b56f73",
+      "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+      "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+      "Packages/GamePlatform/Tests/GamePlatformTests/LocalSaveStoreTests.swift": "582be8621810ef3ab516cf191405cf712ae38a428ec8e73a53395f6fc508f5da",
+      "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+      "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+      "Games/DevelopmentTitle/CONTENT.md": "5e1ca4fcd6ce9f3a238e723817e702dd931d7897e8c249199eca9a5eca663be7",
+      "Games/DevelopmentTitle/DevelopmentScene.swift": "3a952f54bfc9083f3eb20c96f097468b2c7d4c0f9ebc48f83e43aa9c6c590401",
+      "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "c6b133a365f5fbdc7cecc51c7d65aa87e61b8548c37308693bbb49778508c615",
+      "Games/DevelopmentTitle/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+      "Games/DevelopmentTitle/ShellModel.swift": "3d23d1b93e64b58a99e791c8f0593476eee911d480541a323f0fa0a8471aca0b",
+      "Games/DevelopmentTitle/ShellView.swift": "a44c1d322dbce0b6e24948b0c98a47a3a893bfda38910e7678653795366bd790",
+      "Tests/DevelopmentTitleTests/SavePersistenceTests.swift": "3e6133d5e4ebbe68e833488451e93abc3e27435d7efac958b1b824d41b39b0c4",
+      "Tests/DevelopmentTitleTests/ShellModelTests.swift": "e471765a17daf80a747d0f3c07a05526eb02d07194b8e081ed3fc860fce96ccf",
+      "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "6e4f4e74e2a56d99e7c278e7becdc12306f1cd42069818be85d3e5706c9ebf41",
+      "GameCore.xcodeproj/project.pbxproj": "86b896770a8a2a63fde8bb6d4b88f9360c47fc789544b655c47d5e8fb00aa22e",
+      "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "af56683799ff6dc0831b373002b096df08c6b6b0000e992cbf9a7276ac30c80e",
+      "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+      "scripts/check-foundation.py": "545419328174dc12e6ba91756a0b73eb2ce33c30712d84a01bbe2dc2af173f23",
+      "scripts/generate-project.py": "a64c6e7009c187b5abaddcc633eef66863bfd542e1a0a19d453e319adf430be2",
+      "scripts/run-mobile-tests.py": "b63deda73710e03c4e5060dabc508722f779e2db4f3571c18f8640b20c5d983e",
+      "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+      "scripts/verify.sh": "1e64e1c16f791f2e65a301d6b9f25ff3b3c6777a43ec462c0a0e32844d6bb809",
+      ".github/workflows/mobile.yml": "d8c95b5fc21477b3d2687bc142b25a8a76f2063bc2cad0f0ca131666693b7788"
     },
     "changedFromHistoricalImplementation": [
       "scripts/run-mobile-tests.py"
@@ -251,11 +294,86 @@
     "geometryCommandTimeoutSeconds": 900,
     "selectedRestartCommandTimeoutSeconds": 600,
     "hostedJobTimeoutMinutes": 45,
-    "hostedRunURL": null,
     "verification": [
-      "Runner AST parses; selected case allowances and unchanged overall caps checked."
+      "Runner AST parses; selected case allowances and unchanged overall caps checked.",
+      "Clean hosted guard run passed; all 37 input hashes match 1c0945b9; 54 package tests, 21 app/UI tests per geometry and six selected restart invocations passed."
     ],
     "localNativeTestsRepeated": false,
-    "limit": "Hosted updated-guard acceptance remains pending; original successful run and hashes remain historical."
+    "limit": "Hosted updated-guard acceptance remains pending; original successful run and hashes remain historical.",
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36982386371",
+    "runAttempt": 1,
+    "jobDuration": "37m40s",
+    "xcode": "Xcode 26.6\nBuild version 17F113",
+    "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-5",
+    "runtimeVersion": "26.5",
+    "runtimeBuild": "23F77",
+    "worktreeDirty": false,
+    "sourceInputsMatchRecordedRevision": true,
+    "checkedInputCount": 37,
+    "historicalImplementationRevision": "86529b9f29b5a3eb0f5f07ac832b39d70d47b145",
+    "productionAndUIAssertionsUnchanged": true,
+    "packageTests": {
+      "GameCore": 23,
+      "GamePlatform": 31
+    },
+    "builds": [
+      "Debug generic iOS Simulator",
+      "Release generic iOS Simulator",
+      "Unsigned Release generic iOS"
+    ],
+    "geometries": {
+      "iphone12": {
+        "passedTests": 21,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "runtimeWarnings": [],
+        "selectedRestartTestsPassed": 3,
+        "ownedSimulatorCleanupSucceeded": true,
+        "restart": {
+          "phases": {
+            "prepare": "restored",
+            "prepare-fresh": "prepared",
+            "restore": "restored"
+          },
+          "preparedTokenMatchesRestored": true,
+          "saveBytesPreserved": true,
+          "fixtureRemoved": true,
+          "scope": "Executed driver verifies identical snapshot bytes across simulator shutdown/boot; selected restore validates settings/progress and removes fixture. Restart JSON digest is not included in workflow artifact globs."
+        }
+      },
+      "ipad9": {
+        "passedTests": 21,
+        "failedTests": 0,
+        "skippedTests": 0,
+        "runtimeWarnings": [],
+        "selectedRestartTestsPassed": 3,
+        "ownedSimulatorCleanupSucceeded": true,
+        "restart": {
+          "phases": {
+            "prepare": "restored",
+            "prepare-fresh": "prepared",
+            "restore": "restored"
+          },
+          "preparedTokenMatchesRestored": true,
+          "saveBytesPreserved": true,
+          "fixtureRemoved": true,
+          "scope": "Executed driver verifies identical snapshot bytes across simulator shutdown/boot; selected restore validates settings/progress and removes fixture. Restart JSON digest is not included in workflow artifact globs."
+        }
+      }
+    },
+    "observedIPadCaseDurationSeconds": {
+      "foregroundResumeRotation": 148.403,
+      "resetDeleteCancellation": 121.176,
+      "settingsProgressRelaunch": 77.559
+    },
+    "supersededDocsTipAttempt": {
+      "run": 36973904033,
+      "attempt": 2,
+      "status": "cancelled",
+      "jobDuration": "35m7s",
+      "reason": "New guard push superseded the unchanged docs-tip rerun through workflow concurrency. No acceptance result is inferred."
+    },
+    "artifactDirectory": "/private/tmp/gamecore-epic04-guard-artifact",
+    "hostedLog": "/private/tmp/gamecore-epic04-guard-hosted.log"
   }
 }
