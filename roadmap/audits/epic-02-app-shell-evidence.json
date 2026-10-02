@@ -1,7 +1,7 @@
 {
   "date": "2026-10-01",
   "branch": "codex/mobile-app-shell",
-  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 30 remain unchanged after the two separately recorded host manifest/workflow fixes.",
+  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 29 remain unchanged after separately recorded package-host, workflow and bounded-startup changes.",
   "uiRunInventory": {
     "xcode": "Xcode 27.0\nBuild version 27A266a",
     "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
@@ -275,7 +275,66 @@
       "diagnostic": "MainActor and assumeIsolated require macOS 10.15; implicit SwiftPM host floor was lower.",
       "toolchainCheck": "Step reported success despite xcodebuild -version | head -1 causing a broken-pipe exception."
     },
-    "postFixHostedVerification": "Pending; a new clean run must confirm the pinned toolchain and mobile paths."
+    "postFixHostedVerification": "Package compilation, all 35 package tests, three mobile builds and exact pinned toolchain checks passed in run 36942196658 attempt 1. Full mobile acceptance remains pending after the two distinct failures recorded below.",
+    "followUpRun": {
+      "run": 36942196658,
+      "head": "a4f2343c4362b9a48b3c6eca75359dd3ba9ce5dd",
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "runtimeVersion": "26.5",
+      "runtimeBuild": "23F77",
+      "attempts": [
+        {
+          "attempt": 1,
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36942196658/attempts/1",
+          "conclusion": "failure",
+          "inventory": {
+            "path": "/private/tmp/gamecore-shell-hosted-artifact-36942196658/foundation-ui/inventory.json",
+            "SHA256": "45661c3b3ed0ace60d22c02c27a5326320672dd4fb3154b6481fe050e6c9d60b",
+            "sourceInputCount": 32,
+            "worktreeDirty": false
+          },
+          "coreTests": 21,
+          "platformTests": 14,
+          "mobileBuildsPassed": 3,
+          "iphone12": {
+            "bootSeconds": 197,
+            "appHostedTestsPassed": 9,
+            "uiPathsPassed": 3,
+            "uiPathsFailed": 1,
+            "failure": "Navigation awaited shell.play after the first native Start tap; correct fully visible button tapped, menu remained. Input delivery cause is unproven.",
+            "testSeconds": 73.49,
+            "setupSeconds": 51.83
+          },
+          "ipad9": "Not started"
+        },
+        {
+          "attempt": 2,
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36942196658/attempts/2",
+          "conclusion": "failure",
+          "inventory": {
+            "path": "/private/tmp/gamecore-shell-hosted-artifact-36942196658-attempt2/foundation-ui/inventory.json",
+            "SHA256": "e9b55a013246f75bf9749abfd596daabfb50135605b320eaf09ad14351262d50",
+            "sourceInputCount": 32,
+            "worktreeDirty": false
+          },
+          "sourceAndPins": "Unchanged from attempt 1",
+          "failureBoundary": "Before test execution: 300-second bootstatus command budget expired",
+          "ownedUUID": "605245F8-0AD8-4245-8FD0-BD147CD35D31",
+          "lastBootStatus": {
+            "status": 2,
+            "isTerminal": false,
+            "elapsed": "05:07",
+            "migrationElapsed": "04:52",
+            "plugin": "com.apple.locationd.migrator (CoreLocationMigrator.migrator)"
+          },
+          "diagnostic": "Earlier migration plugins completed; no crash or service-error message shown. Elapsed timestamps alone do not establish plugin progress.",
+          "mobileTestProcessLaunched": false,
+          "testResultBundleProduced": false,
+          "firstStartAssertionRepeated": false,
+          "ipad9": "Not started"
+        }
+      ]
+    }
   },
   "reviewFindings": {
     "ids": [
@@ -290,13 +349,13 @@
       "E02-09",
       "E02-10",
       "E02-11",
-      "E02-12"
+      "E02-12",
+      "E02-13"
     ],
-    "sourceDisposition": "Addressed",
-    "unresolvedMaterialFindings": 0,
+    "sourceDisposition": "E02-01 through E02-12 addressed; E02-13 controlled experiment pending verification",
+    "unresolvedMaterialFindings": 1,
     "hostedVerificationPending": [
-      "E02-11",
-      "E02-12"
+      "E02-13"
     ]
   },
   "limits": [
@@ -333,22 +392,26 @@
   "sourceHashesMatchedPrePublicationWorkingTree": true,
   "postPublicationSourceChanges": {
     "recordedInputCount": 32,
-    "unchangedInputCount": 30,
+    "unchangedInputCount": 29,
     "changedInputs": {
       "Packages/GamePlatform/Package.swift": {
         "historicalSHA256": "cea290511940e89878b90220221741bf093dbf88839638fb2d38b1eecb130646",
         "currentSHA256": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467"
       },
+      "scripts/run-mobile-tests.py": {
+        "historicalSHA256": "3a94259d28259a77fe7f099d9d27137603cfb7231822e97315e260407924077b",
+        "currentSHA256": "132dea260f4a3c788d1702582a3facca7d444c93cdc154ea3a89c900be3afe97"
+      },
       ".github/workflows/mobile.yml": {
         "historicalSHA256": "e29de127b9b46667a755e2be8c003713954e90b7daf37b86c2526a9eac99977f",
-        "currentSHA256": "dcf5f113784f5331a5c4543b0cea4310ad72d4c0cced96110b830cdc32ef2e9c"
+        "currentSHA256": "5e263eb5999eb8740f23ab009a017c4e2efa488523fa3d476524227a1a008319"
       }
     },
     "commits": {
       "E02-11": "901dc3a",
       "E02-12": "9322e37"
     },
-    "scope": "Package CLI test-host minimum and workflow version check only; no mobile production source or app target changed."
+    "scope": "Package CLI test-host minimum, workflow version/job-budget checks and bounded simulator startup/diagnostics only; no mobile production source or app target changed."
   },
   "postPublicationLocalVerification": {
     "command": "bash scripts/verify.sh /private/tmp/gamecore-epic02-host-floor-verification-20261001",
@@ -361,5 +424,24 @@
     "output": "/private/tmp/gamecore-epic02-host-floor-verification-20261001",
     "toolchainCheck": "Full captured output accepted the matching local Xcode expectation and rejected the different pinned hosted expectation; no early-closing pipe.",
     "mobileSimulatorExecution": "Not repeated locally for host manifest/workflow-only changes; pre-publication results are preserved above."
+  },
+  "controlledStartupExperiment": {
+    "finding": "E02-13",
+    "hypothesis": "Variable first-boot data migration may outlast the old 300-second budget; a stalled plugin is not excluded.",
+    "bootStatusBudgetSeconds": 600,
+    "jobBudgetMinutes": 45,
+    "readiness": "Retain authoritative simctl bootstatus completion on the owned UUID; no fixed sleep or global daemon/device reset.",
+    "failureDiagnostics": "Confirm the owned UUID is Booted with a query bounded to 30 seconds; only then run simctl diagnose -b --timeout=60 --udid=<owned> --output=<model>-diagnostics under an outer 90-second bound. Otherwise retain skip/failure logs. No all-logs or data-container fallback; original boot exception survives and owned cleanup follows.",
+    "toolchainAndRuntimePins": "Unchanged",
+    "appAssertions": "Unchanged",
+    "verification": "Pending; not a proven startup fix or explanation for the separate first-Start failure.",
+    "localHarnessChecks": {
+      "result": "Passed",
+      "semanticMockCases": 5,
+      "pythonSyntax": "Passed",
+      "diffWhitespace": "Passed",
+      "mockScript": "/private/tmp/gamecore-shell-startup-diagnostic-mocks-20261001.py",
+      "realSimulatorExecution": "Not performed"
+    }
   }
 }
