@@ -2,6 +2,7 @@
 """Run mobile app and UI tests on owned disposable simulators; never touch other devices."""
 import argparse
 import hashlib
+import shutil
 import json
 import os
 from pathlib import Path
@@ -184,9 +185,48 @@ def main():
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                         "-maximum-test-execution-time-allowance", "90", "test-without-building"],
+                         "-maximum-test-execution-time-allowance", "120", "test-without-building"],
                 log=output / f"{model}.log", timeout=600)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
+            # Exercise a test-owned save across simulator shutdown/boot. This
+            # proves simulator persistence only, not physical reboot durability.
+            container = Path(run(["xcrun", "simctl", "get_app_container", device,
+                                  "local.gamecore.DevelopmentTitle", "data"]))
+            restart_root = container / "Library/Application Support/GameCoreSaves/epic04-restart-proof"
+            if restart_root.exists():
+                shutil.rmtree(restart_root)  # Exact fixture path in our owned simulator.
+            restart_test = "DevelopmentTitleTests/SavePersistenceTests/testSimulatorRestartPersistence"
+            for phase in ("prepare", "restore"):
+                if phase == "restore":
+                    snapshot = restart_root / "restart-proof/save.json"
+                    marker = restart_root / "prepared.marker"
+                    if not snapshot.is_file() or not marker.is_file():
+                        raise RuntimeError("Restart preparation did not retain the expected fixture")
+                    before = hashlib.sha256(snapshot.read_bytes()).hexdigest()
+                    run(["xcrun", "simctl", "shutdown", device], timeout=90)
+                    run(["xcrun", "simctl", "boot", device])
+                    run(["xcrun", "simctl", "bootstatus", device, "-b"],
+                        log=output / f"{model}-restart-boot.log", timeout=600)
+                    if hashlib.sha256(snapshot.read_bytes()).hexdigest() != before:
+                        raise RuntimeError("Save bytes changed during simulator restart")
+                    (output / f"{model}-restart.json").write_text(json.dumps({
+                        "fixtureSHA256": before, "saveBytesPreserved": True,
+                        "device": device, "runtime": runtime["identifier"],
+                        "scope": "Simulator shutdown/boot; restore test reads settings and progress"
+                    }, indent=2) + "\n")
+                run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
+                             "-only-testing:" + restart_test,
+                             "-resultBundlePath", str(output / f"{model}-restart-{phase}.xcresult"),
+                             "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
+                             "-maximum-test-execution-time-allowance", "120", "test-without-building"],
+                    log=output / f"{model}-restart-{phase}.log", timeout=600)
+                phase_log = (output / f"{model}-restart-{phase}.log").read_text()
+                if not any("testSimulatorRestartPersistence" in line and "passed" in line
+                           for line in phase_log.splitlines()):
+                    raise RuntimeError(f"Restart {phase} invocation did not pass the selected test")
+            if restart_root.exists():
+                raise RuntimeError("Restart restore test did not consume and remove its fixture")
+            print(f"PASS {model}: settings/progress restored after simulator restart", flush=True)
         finally:
             if device:
                 # Only UUIDs returned by create in this invocation are cleaned up.

@@ -33,6 +33,7 @@ jobs:
             ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-ui/*.log
             ${{ runner.temp }}/foundation-ui/inventory.json
+            ${{ runner.temp }}/foundation-ui/*-restart.json
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
           if-no-files-found: ignore
