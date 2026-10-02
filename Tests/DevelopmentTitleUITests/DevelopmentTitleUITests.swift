@@ -1,6 +1,25 @@
 import XCTest
 
 final class DevelopmentTitleUITests: XCTestCase {
+    override func tearDown() async throws {
+        if (testRun?.failureCount ?? 0) > 0 {
+            // Failure-only capture survives continueAfterFailure = false. Read
+            // action state directly as well as retaining the complete hierarchy.
+            await MainActor.run {
+                let app = XCUIApplication()
+                let scroll = app.scrollViews["shell.scroll"]
+                let valueDescription = scroll.exists ? String(describing: scroll.value)
+                    : "unavailable (shell.scroll absent)"
+                let attachment = XCTAttachment(string:
+                    "shell.scroll.value: \(valueDescription)\n\n\(app.debugDescription)")
+                attachment.name = "failed-shell-action-state-and-hierarchy"
+                attachment.lifetime = .keepAlways
+                add(attachment)
+            }
+        }
+        try await super.tearDown()
+    }
+
     @MainActor
     func testNavigationSuccessFailureResumeAndRestart() {
         continueAfterFailure = false
@@ -108,7 +127,9 @@ final class DevelopmentTitleUITests: XCTestCase {
     private func launch(arguments: [String] = []) -> XCUIApplication {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
-        app.launchArguments = arguments
+        // DEBUG-only app-side action trace is exposed in the existing scroll
+        // accessibility value for failed snapshots; no extra per-tap query.
+        app.launchArguments = arguments + ["--shell-action-diagnostics"]
         app.launch()
         waitForHeading(app, "shell.menu")
         return app

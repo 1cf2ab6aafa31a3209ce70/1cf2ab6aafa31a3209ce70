@@ -51,6 +51,10 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showingSettings = false
+#if DEBUG
+    @State private var actionDiagnostic = ShellActionDiagnosticRecord()
+    private let actionDiagnosticsEnabled = ProcessInfo.processInfo.arguments.contains("--shell-action-diagnostics")
+#endif
     private let presentation: ShellPresentation
     private let forceReducedMotion: Bool
     private let gameplayHost: () -> GameplayHost
@@ -85,6 +89,11 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
             .frame(maxWidth: .infinity)
         }
         .accessibilityIdentifier("shell.scroll")
+#if DEBUG
+        .modifier(ShellActionDiagnosticModifier(
+            value: actionDiagnosticsEnabled ? actionDiagnosticValue : nil,
+            action: recordAction))
+#endif
         .background(Color(.systemGroupedBackground))
         .sheet(isPresented: $showingSettings) {
             SharedShellSettingsView(controller: controller, presentation: presentation)
@@ -145,6 +154,38 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
         }
     }
 
+#if DEBUG
+    private var actionDiagnosticValue: String {
+        "v=1;entered=\(actionDiagnostic.entered);completed=\(actionDiagnostic.completed);last=\(actionDiagnostic.lastID);before=\(actionDiagnostic.before);after=\(actionDiagnostic.after);current=\(diagnosticState)"
+    }
+
+    private var diagnosticState: String {
+        let phase: String
+        switch controller.flow.state {
+        case .splash: phase = "splash"
+        case .menu: phase = "menu"
+        case .loading: phase = "loading"
+        case .playing: phase = "playing"
+        case .paused: phase = "paused"
+        case .result(_, let outcome): phase = outcome == .success ? "result-success" : "result-failure"
+        case .loadFailed: phase = "load-failed"
+        }
+        return "phase:\(phase),settings:\(showingSettings)"
+    }
+
+    private func recordAction(_ identifier: String, action: () -> Void) {
+        // Only synchronous app-side action entry/completion is recorded. An
+        // asynchronous preparation transition is visible in current state.
+        actionDiagnostic.entered += 1
+        actionDiagnostic.lastID = identifier
+        actionDiagnostic.before = diagnosticState
+        actionDiagnostic.after = "pending"
+        action()
+        actionDiagnostic.after = diagnosticState
+        actionDiagnostic.completed = actionDiagnostic.entered
+    }
+#endif
+
     private var showsGameplayHost: Bool {
         switch controller.flow.state {
         case .playing, .paused: return true
@@ -159,6 +200,9 @@ public struct ShellActionButton: View {
     private let identifier: String
     private let prominent: Bool
     private let action: () -> Void
+#if DEBUG
+    @Environment(\.shellActionDiagnostic) private var actionDiagnostic
+#endif
 
     public init(_ title: String, id: String, prominent: Bool = false, action: @escaping () -> Void) {
         self.title = title
@@ -168,7 +212,7 @@ public struct ShellActionButton: View {
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button(action: performAction) {
             Text(title)
                 .font(.headline)
                 .foregroundStyle(Color.primary)
@@ -180,7 +224,53 @@ public struct ShellActionButton: View {
         .tint(prominent ? .teal : .accentColor)
         .accessibilityIdentifier(identifier)
     }
+
+    private func performAction() {
+#if DEBUG
+        if let actionDiagnostic {
+            actionDiagnostic(identifier, action)
+            return
+        }
+#endif
+        action()
+    }
 }
+
+#if DEBUG
+private struct ShellActionDiagnosticRecord {
+    var entered = 0
+    var completed = 0
+    var lastID = "none"
+    var before = "none"
+    var after = "none"
+}
+
+private struct ShellActionDiagnosticKey: EnvironmentKey {
+    static let defaultValue: ((String, () -> Void) -> Void)? = nil
+}
+
+private extension EnvironmentValues {
+    var shellActionDiagnostic: ((String, () -> Void) -> Void)? {
+        get { self[ShellActionDiagnosticKey.self] }
+        set { self[ShellActionDiagnosticKey.self] = newValue }
+    }
+}
+
+private struct ShellActionDiagnosticModifier: ViewModifier {
+    let value: String?
+    let action: (String, () -> Void) -> Void
+
+    @ViewBuilder
+    func body(content: Content) -> some View {
+        if let value {
+            content.accessibilityValue(value)
+                .environment(\.shellActionDiagnostic, action)
+        } else {
+            content
+        }
+    }
+}
+#endif
 
 public struct ShellHeading: View {
     private let title: String
