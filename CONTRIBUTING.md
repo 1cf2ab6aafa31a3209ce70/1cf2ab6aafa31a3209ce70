@@ -30,7 +30,7 @@ Keep changes focused and explain the behavior or decision they change. Include r
 
 Keep each title's identity, assets, levels, bundle identifier and future save namespace separate. Add tests for observable domain invariants and meaningful adapter behavior as features arrive; avoid tests that only repeat trivial implementation details. Inspect generated files in the same change as their generator inputs.
 
-The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity, single-window ownership and session-only settings. Implement persistence only within Epic 04 under [ADR-005](roadmap/decisions/ADR-005-local-save-durability.md) or treat this small registration type as the final game-module contract. App-hosted tests may inject preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
+The [shell lifecycle decision](roadmap/decisions/ADR-004-mobile-shell-lifecycle.md) defines explicit resume, request identity, single-window ownership and session-only settings. Implement persistence only within Epic 04 under [ADR-005](roadmap/decisions/ADR-005-local-save-durability.md). Do not treat the practice registration type as the final game-module contract before [Spike 06](roadmap/spikes/06-module-seam.md). App-hosted tests may inject preparation and feedback; DEBUG-only UI launch arguments override large-text and reduced-motion presentation traits without replacing the production flow.
 
 ## Privacy, dependencies and content
 
