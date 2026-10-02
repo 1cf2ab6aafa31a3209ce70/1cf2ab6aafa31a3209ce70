@@ -247,6 +247,9 @@ private struct SharedShellSettingsView: View {
                 }
                 if controller.hasPersistence {
                     Section("Local data") {
+                        if let message = controller.persistenceMessage {
+                            Text(message).accessibilityIdentifier("settings.save-message")
+                        }
                         Text("Export creates a JSON copy using Files. A provider you choose may transfer that copy. The developer receives nothing. Exported copies remain under your control after reset or deletion.")
                         Button("Export local data") {
                             Task {

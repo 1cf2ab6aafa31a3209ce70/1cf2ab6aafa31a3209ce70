@@ -150,7 +150,7 @@ final class SavePersistenceTests: XCTestCase {
         let loaded = try await store.load()
         let first = try await store.save(settings: loaded.snapshot.settings, progress: loaded.snapshot.progress, generation: loaded.generation)
         _ = try await store.save(settings: first.snapshot.settings, progress: first.snapshot.progress, generation: first.generation)
-        for url in [store.directory, store.directory.appendingPathComponent("save.json"), store.directory.appendingPathComponent("save.previous.json")] {
+        for url in [root, store.directory, store.directory.appendingPathComponent("save.json"), store.directory.appendingPathComponent("save.previous.json")] {
             XCTAssertEqual(try url.resourceValues(forKeys: [.isExcludedFromBackupKey]).isExcludedFromBackup, true)
             let attributes = try FileManager.default.attributesOfItem(atPath: url.path)
             let rawProtection = (attributes[.protectionKey] as? FileProtectionType)?.rawValue
@@ -176,17 +176,29 @@ final class SavePersistenceTests: XCTestCase {
         let root = try LocalSaveStore.applicationSupportRoot().appendingPathComponent("epic04-restart-proof", isDirectory: true)
         let marker = root.appendingPathComponent("prepared.marker")
         let store = try LocalSaveStore(titleID: "restart-proof", root: root)
+        let phase: String
+        let token: String
         if FileManager.default.fileExists(atPath: marker.path) {
+            phase = "restored"
+            token = String(decoding: try Data(contentsOf: marker), as: UTF8.self)
+            XCTAssertNotNil(UUID(uuidString: token), "Restart marker must identify its prepared fixture")
             let saved = try await store.load()
             XCTAssertFalse(saved.snapshot.settings.soundEnabled)
             XCTAssertEqual(saved.snapshot.progress.completedLevels, ["practice"])
             XCTAssertEqual(saved.snapshot.progress.bestScores["practice"], 7)
             try FileManager.default.removeItem(at: root)
         } else {
+            phase = "prepared"
+            token = UUID().uuidString
             let initial = try await store.load()
             _ = try await store.save(settings: ShellSettings(soundEnabled: false), progress: SaveProgress(completedLevels: ["practice"], bestScores: ["practice": 7]), generation: initial.generation)
-            try Data("prepared".utf8).write(to: marker)
+            try Data(token.utf8).write(to: marker)
         }
+        // Synthetic validation receipt; no production telemetry or user data.
+        let receipt = try JSONSerialization.data(withJSONObject: [
+            "root": root.path, "sandboxRoot": NSHomeDirectory(), "phase": phase, "token": token
+        ], options: [.sortedKeys, .withoutEscapingSlashes])
+        print("GAMECORE_RESTART_RECEIPT " + String(decoding: receipt, as: UTF8.self))
     }
 
     @MainActor

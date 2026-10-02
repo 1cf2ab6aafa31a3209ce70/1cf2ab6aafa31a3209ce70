@@ -162,9 +162,28 @@ final class DevelopmentTitleUITests: XCTestCase {
         tap(app, "shell.result.menu")
         tap(app, "shell.settings")
         tap(app, "save.export")
-        let cancel = app.buttons["Cancel"]
-        XCTAssertTrue(cancel.waitForExistence(timeout: 10), "Files exporter was not presented")
-        cancel.tap()
+        let picker = app.navigationBars["FullDocumentManagerViewControllerNavigationBar"]
+        XCTAssertTrue(picker.waitForExistence(timeout: 10), "Native Files exporter was not presented")
+        attachScreen("native-files-export")
+        let cancellations = app.descendants(matching: .any).matching(NSPredicate(format: "label IN %@", ["Cancel", "Close"]))
+        if let cancel = cancellations.allElementsBoundByIndex.first(where: { $0.isHittable }) {
+            cancel.tap()
+        } else {
+            let sidebar = app.navigationBars["com_apple_DocumentManager_Service.DOCSidebarView"]
+            if sidebar.exists {
+                // iPad's native Files sidebar displays an X at its leading
+                // edge. iOS 26 does not expose it as an actionable AX button;
+                // tap that visible close affordance inside the observed bar.
+                sidebar.coordinate(withNormalizedOffset: CGVector(dx: 0.08, dy: 0.4)).tap()
+            } else {
+                // iPhone supports native downward modal-sheet dismissal.
+                let start = picker.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.05))
+                let end = app.windows.firstMatch.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: 0.9))
+                start.press(forDuration: 0.05, thenDragTo: end)
+            }
+        }
+        let dismissed = XCTNSPredicateExpectation(predicate: NSPredicate(format: "exists == false"), object: picker)
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 10), .completed)
         tap(app, "settings.done")
         XCTAssertTrue(app.staticTexts["save.progress"].exists)
     }
@@ -215,19 +234,25 @@ final class DevelopmentTitleUITests: XCTestCase {
         // onscreen before tapping or checking safe layout after rotation.
         for _ in 0..<12 {
             let window = app.windows.firstMatch.frame
-            let frame = element.exists ? element.frame : .zero
-            // Static headings need visible geometry, not a tappable hit point.
-            // Button actionability is asserted separately by tap().
-            if element.exists && frame.width > 0 && frame.height > 0 && window.contains(frame) { return }
             let shellScroll = app.scrollViews["shell.scroll"]
             let formCollection = app.collectionViews["settings.form"]
             let formScroll = app.scrollViews["settings.form"]
+            let hasForm = formCollection.exists || formScroll.exists
             let scroll = formCollection.exists ? formCollection : (formScroll.exists ? formScroll : shellScroll)
             XCTAssertTrue(scroll.exists)
-            let upwards = element.exists ? frame.midY > window.midY : !scrollUpWhenMissing
+            // iPad Settings occupies a smaller modal sheet. An offscreen Form
+            // row can still have a frame inside the app window, so use the
+            // actual scrolling surface's visible bounds as the clipping region.
+            let visible = hasForm ? scroll.frame.intersection(window) : window
+            let exists = element.exists
+            let frame = exists ? element.frame : .zero
+            if exists && frame.width > 0 && frame.height > 0 && visible.contains(frame) {
+                if element.elementType != .button && element.elementType != .switch { return }
+                if element.isHittable { return }
+            }
+            let upwards = exists ? frame.midY > visible.midY : !scrollUpWhenMissing
             let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.7 : 0.3))
             let end = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.3 : 0.7))
-            // Stay inside the content rather than invoking a system edge gesture.
             start.press(forDuration: 0.05, thenDragTo: end)
         }
     }
