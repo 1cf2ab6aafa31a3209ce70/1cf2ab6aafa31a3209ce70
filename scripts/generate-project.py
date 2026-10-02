@@ -63,6 +63,7 @@ def configs(name, extra):
 
 app_ref = add("app-product", "isa = PBXFileReference; explicitFileType = wrapper.application; path = DevelopmentTitle.app; sourceTree = BUILT_PRODUCTS_DIR;")
 test_ref = add("test-product", "isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DevelopmentTitleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
+unit_ref = add("unit-product", "isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DevelopmentTitleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
 package_refs = []
 package_products = []
 package_builds = []
@@ -75,7 +76,7 @@ for name in ["GameCore", "GamePlatform"]:
 
 refs = []
 phases = {}
-for name, directory in [("app", "Games/DevelopmentTitle"), ("ui", "Tests/DevelopmentTitleUITests")]:
+for name, directory in [("app", "Games/DevelopmentTitle"), ("ui", "Tests/DevelopmentTitleUITests"), ("unit", "Tests/DevelopmentTitleTests")]:
     builds = []
     for file in sorted((ROOT / directory).rglob("*.swift")):
         path = str(file.relative_to(ROOT))
@@ -84,17 +85,21 @@ for name, directory in [("app", "Games/DevelopmentTitle"), ("ui", "Tests/Develop
         builds.append(add(f"build-{path}", f"isa = PBXBuildFile; fileRef = {ref};"))
     phases[name] = add(f"{name}-sources", f"isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = {array(builds)}; runOnlyForDeploymentPostprocessing = 0;")
     framework_builds = package_builds if name == "app" else []
+    if name == "unit":
+        framework_builds = [add(f"unit-link-{index}", f"isa = PBXBuildFile; productRef = {product};")
+                            for index, product in enumerate(package_products)]
     phases[f"{name}-frameworks"] = add(f"{name}-frameworks", f"isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = {array(framework_builds)}; runOnlyForDeploymentPostprocessing = 0;")
     phases[f"{name}-resources"] = add(f"{name}-resources", "isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;")
 
-products = add("products", f"isa = PBXGroup; name = Products; sourceTree = {quoted('<group>')}; children = {array([app_ref, test_ref])};")
+refs.append(add("app-info", f"isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = {quoted('Games/DevelopmentTitle/Info.plist')}; sourceTree = SOURCE_ROOT;"))
+products = add("products", f"isa = PBXGroup; name = Products; sourceTree = {quoted('<group>')}; children = {array([app_ref, test_ref, unit_ref])};")
 group = add("main-group", f"isa = PBXGroup; sourceTree = {quoted('<group>')}; children = {array(refs + [products])};")
 app_config = configs("app", {
     "PRODUCT_NAME": "$(TARGET_NAME)",
     "PRODUCT_BUNDLE_IDENTIFIER": "local.gamecore.DevelopmentTitle",
     "GENERATE_INFOPLIST_FILE": "YES",
+    "INFOPLIST_FILE": "Games/DevelopmentTitle/Info.plist",
     "INFOPLIST_KEY_CFBundleDisplayName": "Development Title",
-    "INFOPLIST_KEY_UIApplicationSceneManifest_Generation": "YES",
     "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
     "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
     "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
@@ -112,8 +117,16 @@ ui_config = configs("ui", {
     "TEST_TARGET_NAME": "DevelopmentTitle",
 })
 ui = add("ui-target", f"isa = PBXNativeTarget; name = DevelopmentTitleUITests; productName = DevelopmentTitleUITests; productReference = {test_ref}; productType = {quoted('com.apple.product-type.bundle.ui-testing')}; buildConfigurationList = {ui_config}; buildPhases = {array([phases['ui'], phases['ui-frameworks'], phases['ui-resources']])}; buildRules = (); dependencies = {array([dependency])};")
+unit_config = configs("unit", {
+    "PRODUCT_NAME": "$(TARGET_NAME)",
+    "PRODUCT_BUNDLE_IDENTIFIER": "local.gamecore.DevelopmentTitleTests",
+    "GENERATE_INFOPLIST_FILE": "YES",
+    "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/DevelopmentTitle.app/DevelopmentTitle",
+    "BUNDLE_LOADER": "$(TEST_HOST)",
+})
+unit = add("unit-target", f"isa = PBXNativeTarget; name = DevelopmentTitleTests; productName = DevelopmentTitleTests; productReference = {unit_ref}; productType = {quoted('com.apple.product-type.bundle.unit-test')}; buildConfigurationList = {unit_config}; buildPhases = {array([phases['unit'], phases['unit-frameworks'], phases['unit-resources']])}; buildRules = (); dependencies = {array([dependency])}; packageProductDependencies = {array(package_products)};")
 project_config = configs("project", {})
-add("project", f"isa = PBXProject; attributes = {{ BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700; TargetAttributes = {{ {ui} = {{ TestTargetID = {app}; }}; }}; }}; buildConfigurationList = {project_config}; compatibilityVersion = {quoted('Xcode 14.0')}; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = {group}; productRefGroup = {products}; projectDirPath = {quoted('')}; projectRoot = {quoted('')}; packageReferences = {array(package_refs)}; targets = {array([app, ui])};")
+add("project", f"isa = PBXProject; attributes = {{ BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700; TargetAttributes = {{ {ui} = {{ TestTargetID = {app}; }}; {unit} = {{ TestTargetID = {app}; }}; }}; }}; buildConfigurationList = {project_config}; compatibilityVersion = {quoted('Xcode 14.0')}; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = {group}; productRefGroup = {products}; projectDirPath = {quoted('')}; projectRoot = {quoted('')}; packageReferences = {array(package_refs)}; targets = {array([app, ui, unit])};")
 body = "// !$*UTF8*$!\n{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {\n"
 body += "\n".join(f"{key} = {{ {value} }};" for key, value in sorted(objects.items()))
 body += f"\n}}; rootObject = {project_id}; }}\n"
@@ -127,13 +140,15 @@ def buildable(target, name, product):
 
 app_xml = buildable(app, "DevelopmentTitle", "DevelopmentTitle.app")
 ui_xml = buildable(ui, "DevelopmentTitleUITests", "DevelopmentTitleUITests.xctest")
+unit_xml = buildable(unit, "DevelopmentTitleTests", "DevelopmentTitleTests.xctest")
 outputs[scheme_dir / "DevelopmentTitle.xcscheme"] = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Scheme LastUpgradeVersion="2700" version="1.3">
   <BuildAction parallelizeBuildables="YES" buildImplicitDependencies="YES"><BuildActionEntries>
     <BuildActionEntry buildForTesting="YES" buildForRunning="YES" buildForProfiling="YES" buildForArchiving="YES" buildForAnalyzing="YES">{app_xml}</BuildActionEntry>
     <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="NO">{ui_xml}</BuildActionEntry>
+    <BuildActionEntry buildForTesting="YES" buildForRunning="NO" buildForProfiling="NO" buildForArchiving="NO" buildForAnalyzing="NO">{unit_xml}</BuildActionEntry>
   </BuildActionEntries></BuildAction>
-  <TestAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv="YES"><Testables><TestableReference skipped="NO">{ui_xml}</TestableReference></Testables></TestAction>
+  <TestAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" shouldUseLaunchSchemeArgsEnv="YES"><Testables><TestableReference skipped="NO">{unit_xml}</TestableReference><TestableReference skipped="NO">{ui_xml}</TestableReference></Testables></TestAction>
   <LaunchAction buildConfiguration="Debug" selectedDebuggerIdentifier="Xcode.DebuggerFoundation.Debugger.LLDB" selectedLauncherIdentifier="Xcode.IDEFoundation.Launcher.LLDB" launchStyle="0" useCustomWorkingDirectory="NO" ignoresPersistentStateOnLaunch="NO" debugDocumentVersioning="YES" debugServiceExtension="internal" allowLocationSimulation="YES"><BuildableProductRunnable runnableDebuggingMode="0">{app_xml}</BuildableProductRunnable></LaunchAction>
   <ProfileAction buildConfiguration="Release" shouldUseLaunchSchemeArgsEnv="YES" savedToolIdentifier="" useCustomWorkingDirectory="NO" debugDocumentVersioning="YES"><BuildableProductRunnable runnableDebuggingMode="0">{app_xml}</BuildableProductRunnable></ProfileAction>
   <AnalyzeAction buildConfiguration="Debug"/><ArchiveAction buildConfiguration="Release" revealArchiveInOrganizer="YES"/>

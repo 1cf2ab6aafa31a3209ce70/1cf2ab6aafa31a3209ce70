@@ -1,5 +1,5 @@
 #!/bin/bash
-# Mobile foundation only; no hardware or macOS application checks.
+# Mobile shell checks; no hardware or macOS application target.
 set -euo pipefail
 repository_dir="$(cd "$(dirname "$0")/.." && pwd)"
 output_dir="${1:-$(mktemp -d /tmp/gamecore-foundation-verification.XXXXXX)}"
@@ -9,8 +9,8 @@ cd "$repository_dir"
 xcodebuild -version
 python3 scripts/generate-project.py --check
 python3 scripts/check-foundation.py
-swift build --package-path Packages/GameCore --scratch-path "$output_dir/core" --build-tests
-swift build --package-path Packages/GamePlatform --scratch-path "$output_dir/platform"
+swift test --package-path Packages/GameCore --scratch-path "$output_dir/core" 2>&1 | tee "$output_dir/core-tests.log"
+swift test --package-path Packages/GamePlatform --scratch-path "$output_dir/platform" 2>&1 | tee "$output_dir/platform-tests.log"
 for configuration in Debug Release; do
   xcodebuild -workspace GameCore.xcworkspace -scheme DevelopmentTitle \
     -configuration "$configuration" -destination 'generic/platform=iOS Simulator' \
@@ -26,4 +26,4 @@ xcodebuild -workspace GameCore.xcworkspace -scheme DevelopmentTitle \
   > "$output_dir/ios-Release.log" 2>&1 || { tail -60 "$output_dir/ios-Release.log"; exit 1; }
 echo 'Release iOS SDK build passed (unsigned; no physical-device run)'
 echo "Verification passed: $output_dir"
-echo 'Core is empty: test-target compilation is verified; no runtime core tests exist yet.'
+echo 'Package logic tests passed; app-hosted and UI tests run via scripts/test-mobile.sh.'

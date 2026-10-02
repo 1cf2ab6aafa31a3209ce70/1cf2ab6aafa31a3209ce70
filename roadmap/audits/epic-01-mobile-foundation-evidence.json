@@ -243,5 +243,107 @@
     "No physical performance or macOS application claim",
     "Static privacy review is not runtime traffic certification",
     "Filesystem snapshot is not a committed clean Git checkout"
-  ]
+  ],
+  "publicationClosure": {
+    "branch": "codex/mobile-foundation",
+    "sourceRevision": "0edf274b5d7ba645bbc1e48dd6d80e6022b33104",
+    "changeScope": "Documentation-only acceptance record; foundation build inputs unchanged from 2d7bcf9.",
+    "hostedCI": {
+      "attempt": 2,
+      "conclusion": "success",
+      "headBranch": "codex/mobile-foundation",
+      "headSha": "0edf274b5d7ba645bbc1e48dd6d80e6022b33104",
+      "jobs": [
+        {
+          "completedAt": "2026-10-01T23:07:25Z",
+          "conclusion": "success",
+          "databaseId": 110621758894,
+          "name": "foundation",
+          "startedAt": "2026-10-01T22:53:24Z",
+          "status": "completed",
+          "steps": [
+            {
+              "completedAt": "2026-10-01T22:53:26Z",
+              "conclusion": "success",
+              "name": "Set up job",
+              "number": 1,
+              "startedAt": "2026-10-01T22:53:25Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:53:29Z",
+              "conclusion": "success",
+              "name": "Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "number": 2,
+              "startedAt": "2026-10-01T22:53:26Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:53:29Z",
+              "conclusion": "success",
+              "name": "Check pinned toolchain",
+              "number": 3,
+              "startedAt": "2026-10-01T22:53:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T22:55:42Z",
+              "conclusion": "success",
+              "name": "Verify mobile foundation",
+              "number": 4,
+              "startedAt": "2026-10-01T22:53:29Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:37Z",
+              "conclusion": "success",
+              "name": "Test iPhone and iPad simulators",
+              "number": 5,
+              "startedAt": "2026-10-01T22:55:42Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:45Z",
+              "conclusion": "success",
+              "name": "Retain validation evidence",
+              "number": 6,
+              "startedAt": "2026-10-01T23:06:37Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:06:48Z",
+              "conclusion": "success",
+              "name": "Post Run actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09",
+              "number": 12,
+              "startedAt": "2026-10-01T23:06:45Z",
+              "status": "completed"
+            },
+            {
+              "completedAt": "2026-10-01T23:07:17Z",
+              "conclusion": "success",
+              "name": "Complete job",
+              "number": 13,
+              "startedAt": "2026-10-01T23:06:48Z",
+              "status": "completed"
+            }
+          ],
+          "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/job/110621758894"
+        }
+      ],
+      "status": "completed",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581"
+    },
+    "attempt": 2,
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36936690581/attempts/2",
+    "initialAttempt": "Simulator bootstatus timed out before app tests began; build-for-testing passed. Retried once.",
+    "warnings": [
+      "iPad shutdown and delete commands each timed out after successful tests; ephemeral hosted-runner cleanup is not confirmed.",
+      "The legacy foundation artifact action emitted a Node20 warning; artifact upload passed."
+    ],
+    "artifacts": {
+      "name": "mobile-foundation-evidence",
+      "id": 11199092533,
+      "sha256": "ac92b374b3f01dfdcae69a9c85966e2a8ffae30c642727f975cdbeb22054cf28"
+    }
+  }
 }

@@ -1,6 +1,6 @@
 # App privacy contract
 
-This contract derives from the [roadmap](../ROADMAP.md) and prepares [Epic 01](../roadmap/epics/01-foundation.md). It states required behavior, not a runtime certification. The disposable experiment has build, simulator-test and source-scan evidence in the [Spike 00 report](../roadmap/audits/spike-00-platform-baseline.md). [ADR-003](../roadmap/decisions/ADR-003-simulator-mobile-foundation.md) adopts simulator acceptance for mobile development; runtime privacy coverage must be recorded by environment and is not inferred from a build. macOS is deferred.
+This contract derives from the [roadmap](../ROADMAP.md) and applies to the [mobile foundation](../roadmap/epics/01-foundation.md), [shared shell](../roadmap/epics/02-app-shell.md) and later titles. It states required behavior, not a runtime certification. The disposable experiment has build, simulator-test and source-scan evidence in the [Spike 00 report](../roadmap/audits/spike-00-platform-baseline.md). [ADR-003](../roadmap/decisions/ADR-003-simulator-mobile-foundation.md) adopts simulator acceptance for mobile development; runtime privacy coverage must be recorded by environment and is not inferred from a build. macOS is deferred.
 
 ## Required app behavior
 

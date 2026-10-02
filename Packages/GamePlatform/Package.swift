@@ -3,7 +3,8 @@ import PackageDescription
 
 let package = Package(
     name: "GamePlatform",
-    platforms: [.iOS("18.0")],
+    // macOS is the command-line test host; the application remains mobile-only.
+    platforms: [.iOS("18.0"), .macOS(.v10_15)],
     products: [.library(name: "GamePlatform", targets: ["GamePlatform"])],
     dependencies: [.package(path: "../GameCore")],
     targets: [
@@ -11,6 +12,7 @@ let package = Package(
             name: "GamePlatform",
             dependencies: [.product(name: "GameCore", package: "GameCore")]
         ),
+        .testTarget(name: "GamePlatformTests", dependencies: ["GamePlatform"]),
     ],
     swiftLanguageVersions: [.v5]
 )

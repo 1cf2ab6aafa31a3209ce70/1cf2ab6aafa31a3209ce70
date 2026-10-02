@@ -1,4 +1,4 @@
-name: Mobile foundation
+name: Mobile validation
 on:
   push:
   pull_request:
@@ -10,7 +10,7 @@ concurrency:
 jobs:
   foundation:
     runs-on: macos-26
-    timeout-minutes: 25
+    timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GAMECORE_SIM_RUNTIME_VERSION: '26.5'
@@ -18,21 +18,22 @@ jobs:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Check pinned toolchain
         run: |
-          test "$(xcodebuild -version | head -1)" = 'Xcode 26.6'
-          test "$(xcodebuild -version | tail -1)" = 'Build version 17F113'
-      - name: Verify mobile foundation
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Verify packages and mobile builds
         run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
       - name: Test iPhone and iPad simulators
         run: bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui"
       - name: Retain validation evidence
         if: always()
-        uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-foundation-evidence
+          name: mobile-validation-evidence
           path: |
             ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-ui/*.log
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*.xcresult
+            ${{ runner.temp }}/foundation-ui/*-diagnostics/
           if-no-files-found: ignore
           retention-days: 7

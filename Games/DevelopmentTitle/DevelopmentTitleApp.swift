@@ -1,27 +1,30 @@
-import GameCore
-import GamePlatform
 import SwiftUI
 
 @main
 struct DevelopmentTitleApp: App {
+    @StateObject private var model = ShellModel()
+
     var body: some Scene {
         WindowGroup {
-            FoundationView()
+            #if DEBUG
+            ShellView(model: model, forceReducedMotion: ProcessInfo.processInfo.arguments.contains("--shell-reduced-motion"))
+                .modifier(ShellTestTextSize())
+            #else
+            ShellView(model: model)
+            #endif
         }
     }
 }
 
-private struct FoundationView: View {
-    var body: some View {
-        VStack(spacing: 16) {
-            Text("Foundation ready")
-                .font(.title)
-                .accessibilityIdentifier("foundation.ready")
-            Text("iPhone and iPad development title")
-                .font(.body)
+#if DEBUG
+/// Overrides presentation traits only; the production flow and controls stay unchanged.
+private struct ShellTestTextSize: ViewModifier {
+    func body(content: Content) -> some View {
+        if ProcessInfo.processInfo.arguments.contains("--shell-large-text") {
+            content.dynamicTypeSize(.accessibility3)
+        } else {
+            content
         }
-        .multilineTextAlignment(.center)
-        .padding()
-        .frame(maxWidth: .infinity, maxHeight: .infinity)
     }
 }
+#endif
