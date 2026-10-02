@@ -213,7 +213,10 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", nargs="?", help="New absolute output directory (default: temporary)")
+    parser.add_argument("--model", choices=[model for model, _ in MODELS],
+                        help="Run only this simulator geometry (default: both)")
     args = parser.parse_args()
+    selected_models = tuple(item for item in MODELS if args.model is None or item[0] == args.model)
     if args.output:
         output = Path(args.output)
         if not output.is_absolute():
@@ -235,6 +238,7 @@ def main():
     print(f"Selected iOS {runtime['version']} ({runtime['identifier']}); minimum-OS coverage is separate", flush=True)
     metadata = {"xcode": run(["xcodebuild", "-version"]), "runtime": runtime["identifier"],
                 "runtimeVersion": runtime["version"], "runtimeBuild": runtime.get("buildversion"),
+                "selectedModels": [model for model, _ in selected_models],
                 **source_identity(), "devices": []}
     (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
     run(["python3", "scripts/generate-project.py", "--check"])
@@ -242,7 +246,7 @@ def main():
              "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
     run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
                  "build-for-testing"], log=output / "build.log", timeout=600)
-    for model, device_type in MODELS:
+    for model, device_type in selected_models:
         device = None
         try:
             device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",

@@ -9,6 +9,10 @@ concurrency:
   cancel-in-progress: true
 jobs:
   foundation:
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [iphone12, ipad9]
     runs-on: macos-26
     timeout-minutes: 45
     env:
@@ -22,13 +26,13 @@ jobs:
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
       - name: Verify packages and mobile builds
         run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
-      - name: Test iPhone and iPad simulators
-        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui"
+      - name: Test ${{ matrix.model }} simulator
+        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" --model "${{ matrix.model }}"
       - name: Retain validation evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-validation-evidence
+          name: mobile-validation-evidence-${{ matrix.model }}
           path: |
             ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-ui/*.log
