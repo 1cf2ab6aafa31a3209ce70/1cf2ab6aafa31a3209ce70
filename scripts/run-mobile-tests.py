@@ -146,7 +146,7 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
                      "-only-testing:" + restart_test,
                      "-resultBundlePath", str(output / f"{model}-restart-{label}.xcresult"),
                      "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                     "-maximum-test-execution-time-allowance", "120", "test-without-building"],
+                     "-maximum-test-execution-time-allowance", "180", "test-without-building"],
             log=log, timeout=600)
         lines = log.read_text().splitlines()
         if not any("testSimulatorRestartPersistence" in line and "passed" in line for line in lines):
@@ -256,12 +256,13 @@ def main():
             except RuntimeError:
                 collect_boot_diagnostics(device, model, output)
                 raise
-            # Six UI cases can each consume 120 seconds, plus app-hosted
-            # startup/install. Keep a whole-suite bound that covers that budget.
+            # Hosted accessibility queries can exceed 120 seconds for a passing
+            # multi-step UI case. Each case gets 180 seconds; the separate
+            # 900-second whole-suite cap remains the aggregate failure bound.
             run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                          "-resultBundlePath", str(output / f"{model}.xcresult"),
                          "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                         "-maximum-test-execution-time-allowance", "120", "test-without-building"],
+                         "-maximum-test-execution-time-allowance", "180", "test-without-building"],
                 log=output / f"{model}.log", timeout=900)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
             verify_restart(xcode, device, model, output, runtime["identifier"])
