@@ -1,0 +1,24 @@
+{
+  "date": "2026-10-01",
+  "baseRevision": "6e413a81d5e399bc219c3e0a50407ee73d9d3fb2",
+  "configuration": "Release",
+  "command": "swift run --configuration release --package-path experiments/save-durability --scratch-path /private/tmp/gamecore-save-durability-release-build save-durability-fixture",
+  "host": "macOS 27.2 (26B5091g), arm64",
+  "xcode": "27.0 (27A266a)",
+  "swift": "6.4 (swiftlang-6.4.0.34.1)",
+  "runtimeGeometry": "Host command-line filesystem fixture; no simulator/device run",
+  "exitCode": 0,
+  "passedScenarios": 31,
+  "sha256": {
+    "Package.swift": "499c91e08ef79b934665176961dbe0c42563629215777fa60ec86eeb3ca241dc",
+    "Sources/SaveDurabilityFixture/main.swift": "57c3bb357ab1ac29c540021b66430154e75e17ee63eb92638316c9a5b48d3487",
+    "example-save-v2.json": "3c8793acda1926a9972e027f4c70c9d41c28cac8c68c700f3addad172a1b4eed"
+  },
+  "resultSHA256": "504bdf350a06aa690b670106dbb2e03b797e4124404b8a8491a59e0983bb4432",
+  "limits": [
+    "Injected exceptions, not process kill/reboot/power loss",
+    "No directory fsync or iOS protection/backup attributes",
+    "Sequential synthetic events, not live shell integration",
+    "No settings-preserving progress reset or native export UI"
+  ]
+}

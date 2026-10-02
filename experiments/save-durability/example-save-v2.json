@@ -1,0 +1,23 @@
+{
+  "progress" : {
+    "bestScores" : {
+      "level-1" : 120
+    },
+    "completedLevels" : [
+      "level-1"
+    ],
+    "unlockedLevels" : [
+      "level-1",
+      "level-2"
+    ]
+  },
+  "revision" : 1,
+  "schemaVersion" : 2,
+  "settings" : {
+    "effectsEnabled" : false,
+    "hapticsEnabled" : true,
+    "language" : "en",
+    "musicEnabled" : true
+  },
+  "titleID" : "practice"
+}
