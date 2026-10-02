@@ -1,7 +1,7 @@
 {
   "date": "2026-10-01",
   "branch": "codex/mobile-app-shell",
-  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 29 remain unchanged after separately recorded package-host, workflow and bounded-startup changes.",
+  "sourceState": "Local pre-publication validation used uncommitted title/tooling/contrast changes. Inventory HEAD is historical context; actual hashes identify the original tested inputs. All 32 matched before publication; 29 remain unchanged after separately recorded package-host, workflow and bounded-startup changes. Successful hosted acceptance at clean bae1cdcb30df5eac02360684e02954ec12e95fb3 identifies all 32 current build/test inputs; the original local inventory remains historical.",
   "uiRunInventory": {
     "xcode": "Xcode 27.0\nBuild version 27A266a",
     "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
@@ -275,7 +275,7 @@
       "diagnostic": "MainActor and assumeIsolated require macOS 10.15; implicit SwiftPM host floor was lower.",
       "toolchainCheck": "Step reported success despite xcodebuild -version | head -1 causing a broken-pipe exception."
     },
-    "postFixHostedVerification": "Package compilation, all 35 package tests, three mobile builds and exact pinned toolchain checks passed in run 36942196658 attempt 1. Full mobile acceptance remains pending after the two distinct failures recorded below.",
+    "postFixHostedVerification": "Package compilation, all 35 package tests, three mobile builds and exact pinned toolchain checks passed in run 36942196658 attempt 1. Full mobile acceptance subsequently passed in run 36945855755; all failed attempts remain recorded.",
     "followUpRun": {
       "run": 36942196658,
       "head": "a4f2343c4362b9a48b3c6eca75359dd3ba9ce5dd",
@@ -334,6 +334,96 @@
           "ipad9": "Not started"
         }
       ]
+    },
+    "successfulAcceptance": {
+      "run": 36945855755,
+      "attempt": 1,
+      "head": "bae1cdcb30df5eac02360684e02954ec12e95fb3",
+      "worktreeDirty": false,
+      "conclusion": "success",
+      "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36945855755",
+      "jobURL": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36945855755/job/110647706435",
+      "jobSeconds": 1344,
+      "xcode": "Xcode 26.6\nBuild version 17F113",
+      "runtimeVersion": "26.5",
+      "runtimeBuild": "23F77",
+      "inventory": {
+        "path": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/inventory.json",
+        "SHA256": "b236bc8cece3dff3454569ba4470ecf08b7a179a1e158ce5509f2d5c511a92cc",
+        "sourceInputCount": 32,
+        "allHashesMatchTestedGitRevision": true,
+        "allHashesMatchCurrentBuildTestInputs": true,
+        "unchangedInputsFromA4f2343": 30,
+        "changedInputsFromA4f2343": [
+          "scripts/run-mobile-tests.py",
+          ".github/workflows/mobile.yml"
+        ]
+      },
+      "coreTests": 21,
+      "platformTests": 14,
+      "mobileBuildsPassed": 3,
+      "devices": {
+        "iphone12": {
+          "totalTestCount": 13,
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "expectedFailures": 0,
+          "runtimeWarnings": [],
+          "result": "Passed",
+          "durationSeconds": 222.98,
+          "appHostedCases": 9,
+          "uiCases": 4,
+          "bootSeconds": 239,
+          "bootFinished": true,
+          "extendedBootBudgetExercised": false,
+          "navigation": {
+            "nodeIdentifier": "DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart()",
+            "result": "Passed",
+            "durationInSeconds": 36.117908000946045
+          },
+          "resultBundle": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/iphone12.xcresult",
+          "ownedUUID": "09D582C2-B4D9-451B-864D-37D30BC9DC0E",
+          "shutdown": "Passed",
+          "delete": "Passed",
+          "diagnosticsInvoked": false
+        },
+        "ipad9": {
+          "totalTestCount": 13,
+          "passedTests": 13,
+          "failedTests": 0,
+          "skippedTests": 0,
+          "expectedFailures": 0,
+          "runtimeWarnings": [],
+          "result": "Passed",
+          "durationSeconds": 339.303,
+          "appHostedCases": 9,
+          "uiCases": 4,
+          "bootSeconds": 122,
+          "bootFinished": true,
+          "extendedBootBudgetExercised": false,
+          "navigation": {
+            "nodeIdentifier": "DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart()",
+            "result": "Passed",
+            "durationInSeconds": 36.36551094055176
+          },
+          "resultBundle": "/private/tmp/gamecore-shell-hosted-artifact-36945855755/foundation-ui/ipad9.xcresult",
+          "ownedUUID": "02551F50-9D1A-4BEF-A43C-286CDC3DEE2B",
+          "shutdown": "Passed",
+          "delete": "Passed",
+          "diagnosticsInvoked": false
+        }
+      },
+      "cleanupWarnings": 0,
+      "diagnosticsInvoked": false,
+      "artifact": {
+        "id": 11202173975,
+        "sizeBytes": 1912233,
+        "sha256": "ccdb9e3affed703af6572372403ff26d0b0d293b523b04c0201fbb4d5e87327b"
+      },
+      "verificationRecord": "/private/tmp/gamecore-shell-hosted-verification-36945855755.json",
+      "causalLimits": "Both boots finished below the former 300-second bound, so the extended allowance was not exercised and does not establish a migration fix. The earlier first-Start failure did not recur; its cause remains unproven.",
+      "closureScope": "Hosted acceptance closed for exact tested inputs. This audit-only update changes no build/test input; failed attempts and original local evidence remain preserved."
     }
   },
   "reviewFindings": {
@@ -352,11 +442,9 @@
       "E02-12",
       "E02-13"
     ],
-    "sourceDisposition": "E02-01 through E02-12 addressed; E02-13 controlled experiment pending verification",
-    "unresolvedMaterialFindings": 1,
-    "hostedVerificationPending": [
-      "E02-13"
-    ]
+    "sourceDisposition": "E02-01 through E02-13 addressed within documented scope; hosted acceptance passed; historical migration/input-delivery causes remain unproven",
+    "unresolvedMaterialFindings": 0,
+    "hostedVerificationPending": []
   },
   "limits": [
     "No iOS18 runtime execution",
@@ -434,7 +522,7 @@
     "failureDiagnostics": "Confirm the owned UUID is Booted with a query bounded to 30 seconds; only then run simctl diagnose -b --timeout=60 --udid=<owned> --output=<model>-diagnostics under an outer 90-second bound. Otherwise retain skip/failure logs. No all-logs or data-container fallback; original boot exception survives and owned cleanup follows.",
     "toolchainAndRuntimePins": "Unchanged",
     "appAssertions": "Unchanged",
-    "verification": "Pending; not a proven startup fix or explanation for the separate first-Start failure.",
+    "verification": "Hosted acceptance passed in run 36945855755. Boots finished in 239/122 seconds, below the former 300-second bound; the extended allowance was not exercised and does not establish a migration fix. The earlier first-Start anomaly did not recur but its cause remains unproven.",
     "localHarnessChecks": {
       "result": "Passed",
       "semanticMockCases": 5,
@@ -442,6 +530,8 @@
       "diffWhitespace": "Passed",
       "mockScript": "/private/tmp/gamecore-shell-startup-diagnostic-mocks-20261001.py",
       "realSimulatorExecution": "Not performed"
-    }
+    },
+    "extendedBootBudgetExercised": false,
+    "firstStartAnomalyRecurred": false
   }
 }
