@@ -91,3 +91,7 @@ All entries are material because they affect implementation guidance or acceptan
 | H03: Changed guard inputs must not inherit the historical green result | Addressed | Original revisions/hashes and the successful run are retained; a separate exact guard revision, 37 matching input hashes and successful hosted result identify the new change |
 
 **Follow-up documentation readiness:** Ready for review and commit. H01–H03 are closed by the verified hosted guard result and its separate input identity. The original F01–F09 ledger remains historical; all stated platform limits remain unchanged. All 3 local links in this changed document resolve, with no fragment targets; JSON parsing, retained input identity and whitespace checks pass. The new guard-run reference was verified through GitHub records/logs/artifacts; historical external references were not re-fetched for this follow-up.
+
+## Current branch stabilization follow-up
+
+The later documentation tip failed a shared UI assertion despite earlier successful acceptance. [The stabilization record](mobile-ui-stabilization.md) retains that failure, the evidence-backed helper corrections and eight passing focused executions. Independent per-geometry hosted checks are pending on the updated branch; historical hashes/results above remain unchanged.
