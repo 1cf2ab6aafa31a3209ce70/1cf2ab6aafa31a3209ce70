@@ -55,7 +55,7 @@ final class DevelopmentTitleUITests: XCTestCase {
     }
 
     @MainActor
-    func testSettingsPersistWithinSessionAndResetOnRelaunch() {
+    func testSettingsAndProgressPersistOnRelaunch() {
         continueAfterFailure = false
         let app = launch()
         tap(app, "shell.settings")
@@ -79,12 +79,17 @@ final class DevelopmentTitleUITests: XCTestCase {
             waitForSwitchValue(app.switches[id], "0")
         }
         tap(app, "settings.done")
+        tap(app, "shell.resume")
+        tap(app, "shell.complete")
+        waitForHeading(app, "shell.result.success")
+        waitForSaved(app)
         app.terminate()
         app.launch()
         waitForHeading(app, "shell.menu")
+        XCTAssertTrue(app.staticTexts["save.progress"].waitForExistence(timeout: 10))
         tap(app, "shell.settings")
         for id in ["settings.sound", "settings.music", "settings.haptics"] {
-            waitForSwitchValue(app.switches[id], "1")
+            waitForSwitchValue(app.switches[id], "0")
         }
     }
 
@@ -105,12 +110,85 @@ final class DevelopmentTitleUITests: XCTestCase {
     }
 
     @MainActor
+    func testResetDeleteAndDestructiveCancellation() {
+        continueAfterFailure = false
+        let app = launch()
+        tap(app, "shell.start")
+        waitForHeading(app, "shell.play")
+        tap(app, "shell.complete")
+        waitForHeading(app, "shell.result.success")
+        waitForSaved(app)
+        tap(app, "shell.result.menu")
+        tap(app, "shell.settings")
+        let sound = app.switches["settings.sound"]
+        let trailingTrack = max(0.5, 1 - 25 / max(sound.frame.width, 1))
+        sound.coordinate(withNormalizedOffset: CGVector(dx: trailingTrack, dy: 0.5)).tap()
+        reveal(app, sound, scrollUpWhenMissing: true)
+        waitForSwitchValue(sound, "0")
+        tap(app, "save.reset")
+        app.alerts.buttons["Cancel"].tap()
+        tap(app, "settings.done")
+        XCTAssertTrue(app.staticTexts["save.progress"].exists)
+        tap(app, "shell.settings")
+        tap(app, "save.reset")
+        app.alerts.buttons["Reset progress"].tap()
+        reveal(app, sound, scrollUpWhenMissing: true)
+        waitForSwitchValue(sound, "0")
+        tap(app, "settings.done")
+        waitForSaved(app)
+        XCTAssertFalse(app.staticTexts["save.progress"].exists)
+        tap(app, "shell.settings")
+        tap(app, "save.delete")
+        app.alerts.buttons["Cancel"].tap()
+        reveal(app, sound, scrollUpWhenMissing: true)
+        waitForSwitchValue(sound, "0")
+        tap(app, "save.delete")
+        app.alerts.buttons["Delete local data"].tap()
+        reveal(app, sound, scrollUpWhenMissing: true)
+        waitForSwitchValue(sound, "1")
+        tap(app, "settings.done")
+        waitForSaved(app)
+    }
+
+    @MainActor
+    func testPlayerExportPresentsFilesAndCancellationKeepsProgress() {
+        continueAfterFailure = false
+        let app = launch()
+        tap(app, "shell.start")
+        waitForHeading(app, "shell.play")
+        tap(app, "shell.complete")
+        waitForHeading(app, "shell.result.success")
+        waitForSaved(app)
+        tap(app, "shell.result.menu")
+        tap(app, "shell.settings")
+        tap(app, "save.export")
+        let cancel = app.buttons["Cancel"]
+        XCTAssertTrue(cancel.waitForExistence(timeout: 10), "Files exporter was not presented")
+        cancel.tap()
+        tap(app, "settings.done")
+        XCTAssertTrue(app.staticTexts["save.progress"].exists)
+    }
+
+    @MainActor
+    private func waitForSaved(_ app: XCUIApplication) {
+        let saved = app.staticTexts["save.status"]
+        let expected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Local data saved"), object: saved)
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 10), .completed)
+    }
+
+    @MainActor
     private func launch(arguments: [String] = []) -> XCUIApplication {
         XCUIDevice.shared.orientation = .portrait
         let app = XCUIApplication()
         app.launchArguments = arguments
         app.launch()
         waitForHeading(app, "shell.menu")
+        waitForSaved(app)
+        tap(app, "shell.settings")
+        tap(app, "save.delete")
+        app.alerts.buttons["Delete local data"].tap()
+        tap(app, "settings.done")
+        waitForSaved(app)
         return app
     }
 
@@ -123,6 +201,8 @@ final class DevelopmentTitleUITests: XCTestCase {
     @MainActor
     private func tap(_ app: XCUIApplication, _ id: String) {
         let button = app.buttons[id]
+        // Form rows are virtualized; discover them by scrolling before waiting.
+        if id.hasPrefix("save.") { reveal(app, button) }
         XCTAssertTrue(button.waitForExistence(timeout: 10), "Missing control \(id)")
         reveal(app, button)
         XCTAssertTrue(button.isHittable, "Unreachable control \(id)")
@@ -130,22 +210,21 @@ final class DevelopmentTitleUITests: XCTestCase {
     }
 
     @MainActor
-    private func reveal(_ app: XCUIApplication, _ element: XCUIElement) {
+    private func reveal(_ app: XCUIApplication, _ element: XCUIElement, scrollUpWhenMissing: Bool = false) {
         // A partly clipped element may be hittable. Bring the whole element
         // onscreen before tapping or checking safe layout after rotation.
         for _ in 0..<12 {
-            guard element.exists else {
-                XCTFail("Element disappeared while revealing it: \(element.identifier)")
-                return
-            }
             let window = app.windows.firstMatch.frame
-            let frame = element.frame
+            let frame = element.exists ? element.frame : .zero
             // Static headings need visible geometry, not a tappable hit point.
             // Button actionability is asserted separately by tap().
-            if frame.width > 0 && frame.height > 0 && window.contains(frame) { return }
-            let scroll = app.scrollViews["shell.scroll"]
+            if element.exists && frame.width > 0 && frame.height > 0 && window.contains(frame) { return }
+            let shellScroll = app.scrollViews["shell.scroll"]
+            let formCollection = app.collectionViews["settings.form"]
+            let formScroll = app.scrollViews["settings.form"]
+            let scroll = formCollection.exists ? formCollection : (formScroll.exists ? formScroll : shellScroll)
             XCTAssertTrue(scroll.exists)
-            let upwards = frame.midY > window.midY
+            let upwards = element.exists ? frame.midY > window.midY : !scrollUpWhenMissing
             let start = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.7 : 0.3))
             let end = scroll.coordinate(withNormalizedOffset: CGVector(dx: 0.5, dy: upwards ? 0.3 : 0.7))
             // Stay inside the content rather than invoking a system edge gesture.
