@@ -1,6 +1,6 @@
 # Epic 04 — Local state and progression evidence
 
-**Date:** 2026-10-02. **Status:** Implementation accepted for mobile simulator development at `86529b9`; updated hosted CI guard verification pending.
+**Date:** 2026-10-02. **Status:** Complete for mobile simulator acceptance; updated hosted CI guard verified at `1c0945b9`.
 
 ## Implementation scope
 
@@ -10,7 +10,7 @@ The development practice exercises durable preferences and an original synthetic
 
 ## Verification
 
-The full local acceptance run uses `daa53de16113a191b5d981967c0a9dcd7e1d9a10` with documentation-only changes; all 37 recorded inputs were independently checked byte-for-byte against that published revision. Subsequent test-only commit `86529b9f29b5a3eb0f5f07ac832b39d70d47b145` recognizes the hosted picker identifier and increases the full-suite time budget; it changes no production source. Focused native export cancellation passed on both local geometries at that commit; all 37 focused-run inputs match it. Historical hosted acceptance passed at that revision. The subsequent documentation closure did not change build/test inputs. The CI guard update below changes only the runner script; its hosted result is pending.
+The full local acceptance run uses `daa53de16113a191b5d981967c0a9dcd7e1d9a10` with documentation-only changes; all 37 recorded inputs were independently checked byte-for-byte against that published revision. Subsequent test-only commit `86529b9f29b5a3eb0f5f07ac832b39d70d47b145` recognizes the hosted picker identifier and increases the full-suite time budget; it changes no production source. Focused native export cancellation passed on both local geometries at that commit; all 37 focused-run inputs match it. Historical hosted acceptance passed at that revision. The subsequent documentation closure did not change build/test inputs. The CI guard update below changes only the runner script; its successful hosted result is recorded separately below.
 
 Local `bash scripts/verify.sh /private/tmp/gamecore-epic04-verification` passed 23 core tests and 31 platform tests, Debug/Release generic iOS Simulator builds and unsigned generic iOS Release compilation. Local Xcode is 27.0 (`27A266a`), Swift 6.4; the mobile runner uses iOS Simulator 26.0 (`23A5287g`). Generic iOS compilation is not a device run.
 
@@ -28,11 +28,17 @@ The [historical successful hosted run](https://github.com/1cf2ab6aafa31a3209ce70
 
 ## Hosted CI guard follow-up — 2026-10-02
 
-The [documentation-tip run](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36973904033), attempt 1 at `17190d66d692a6fbd5832387fae97f62e730ddaf`, failed the iPad case allowance. `testSettingsAndProgressPersistOnRelaunch` completed all assertions and was logged as passed after **129.949 seconds**, but Xcode's **120-second** per-case guard recorded a timeout/restart and listed the test as failed. This failed job is not successful hosted acceptance. Its iPhone suite and shutdown/boot proof passed before the iPad failure. One rerun of the unchanged inputs was started before this guard correction; its result is not used to prove the updated guard.
+The [documentation-tip run](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36973904033), attempt 1 at `17190d66d692a6fbd5832387fae97f62e730ddaf`, failed the iPad case allowance. `testSettingsAndProgressPersistOnRelaunch` completed all assertions and was logged as passed after **129.949 seconds**, but Xcode's **120-second** per-case guard recorded a timeout/restart and listed the test as failed. This failed job is not successful hosted acceptance. Its iPhone suite and shutdown/boot proof passed before the iPad failure. One rerun of the unchanged inputs was started before this guard correction. Attempt 2 was cancelled after 35m7s when the new guard push superseded it through workflow concurrency; it supplies no acceptance result.
 
-The narrow correction raises Xcode's per-case allowance to **180 seconds**, including selected restart invocations. It changes no production code or UI assertion. The full suite retains its **900-second** per-geometry cap, selected restart commands retain their 600-second caps, and the hosted job retains its **45-minute** cap. The aggregate suite bound does not promise that all cases can simultaneously consume their individual maximum. A new commit and clean hosted run must identify and verify this guard before its hosted status can be closed.
+The narrow correction raises Xcode's per-case allowance to **180 seconds**, including selected restart invocations. It changes no production code or UI assertion. The full suite retains its **900-second** per-geometry cap, selected restart commands retain their 600-second caps, and the hosted job retains its **45-minute** cap. The aggregate suite bound does not promise that all cases can simultaneously consume their individual maximum. The separate guard commit and clean hosted run below identify and verify this update.
 
-The original 37-input hash map remains historical evidence for `86529b9`. The guard changes `scripts/run-mobile-tests.py`; the other 36 recorded inputs remain unchanged. The manifest has a separate pending guard record with its script SHA-256 and base revision. It does not claim the changed script matches the historical successful run. No native test run was repeated for this syntax/guard-only correction; hosted verification remains pending.
+The original 37-input hash map remains historical evidence for `86529b9`. The guard changes `scripts/run-mobile-tests.py`; the other 36 recorded inputs remain unchanged. The manifest has a separate successful guard record with its exact revision, all 37 input hashes and base revision. It does not claim the changed script matches the historical successful run. No local native test run was repeated for this guard-only correction; the clean hosted guard run below supplies executed validation.
+
+The updated [hosted CI guard run](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/36982386371) passed at `1c0945b9d9ea953bc7b8352368181115a5d4666a` in 37m40s. All 37 retained input hashes match that exact committed revision; only `scripts/run-mobile-tests.py` differs from the historical `86529b9` input map. Production code and UI assertions are unchanged. Xcode 26.6 (`17F113`) with iOS Simulator 26.5 (`23F77`) passed 54 package tests, all three mobile build configurations, 21 app/UI tests on each geometry and all six selected restart invocations. Both shutdown/boot proofs validated settings/progress, unchanged save bytes and fixture removal. Both owned simulators were shut down/deleted without cleanup warnings; both result summaries record zero failed/skipped tests or runtime warnings.
+
+The iPad foreground/rotation case took 148.403 seconds and reset/delete took 121.176 seconds, demonstrating why the earlier 120-second case limit was insufficient. The updated 180-second allowance passed while the 900-second per-geometry, 600-second selected-restart and 45-minute job bounds remained unchanged. The original failing settings/progress case passed in 77.559 seconds on this run.
+
+H01–H03 are closed by the separate exact guard revision/input map, executed bounded hosted success and retained historical evidence. Simulator and minimum-runtime/device limits remain unchanged.
 
 ## Acceptance coverage
 
@@ -80,8 +86,8 @@ All entries are material because they affect implementation guidance or acceptan
 
 | Finding | Disposition | Evidence and verification |
 | --- | --- | --- |
-| H01: A passed assertion sequence exceeded the hosted case guard | Addressed in the runner; hosted verification pending | Attempt 1 logs record 129.949 seconds versus 120; the allowance is now 180 without changing UI assertions |
+| H01: A passed assertion sequence exceeded the hosted case guard | Addressed | Attempt 1 logs record 129.949 seconds versus 120; the allowance is now 180 without changing UI assertions |
 | H02: Individual allowances do not define the aggregate suite budget | Addressed | Runner comments and this follow-up retain 900 seconds per geometry and 45 minutes per job without claiming every case can use its maximum |
-| H03: Changed guard inputs must not inherit the historical green result | Addressed | Original revisions/hashes and the successful run are retained; a separate script digest, pending guard commit and pending hosted result identify the new change |
+| H03: Changed guard inputs must not inherit the historical green result | Addressed | Original revisions/hashes and the successful run are retained; a separate exact guard revision, 37 matching input hashes and successful hosted result identify the new change |
 
-**Follow-up documentation readiness:** Ready for review and commit; hosted guard acceptance pending. The original F01–F09 ledger remains historical. This follow-up does not mark an unexecuted guard run as successful.
+**Follow-up documentation readiness:** Ready for review and commit. H01–H03 are closed by the verified hosted guard result and its separate input identity. The original F01–F09 ledger remains historical; all stated platform limits remain unchanged. All 3 local links in this changed document resolve, with no fragment targets; JSON parsing, retained input identity and whitespace checks pass. The new guard-run reference was verified through GitHub records/logs/artifacts; historical external references were not re-fetched for this follow-up.
