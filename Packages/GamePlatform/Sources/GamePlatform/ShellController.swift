@@ -19,6 +19,10 @@ public final class ShellController: ObservableObject {
     @Published public private(set) var recoveryRequired = false
     @Published public private(set) var isSaving = false
     public var hasPersistence: Bool { store != nil || initialPersistenceError != nil }
+    #if DEBUG
+    /// Optional fixture-only observation; never changes an action or its result.
+    public var diagnosticEvent: ((String, ShellFlow) -> Void)?
+    #endif
     private let initialPersistenceError: String?
     private let store: LocalSaveStore?
     private let recordSuccess: (@MainActor (inout SaveProgress) -> Void)?
@@ -74,28 +78,69 @@ public final class ShellController: ObservableObject {
     }
 
     public func start() {
-        guard persistenceReady, !recoveryRequired, let request = flow.start() else { return }
+        #if DEBUG
+        diagnosticEvent?("start.entered", flow)
+        defer { diagnosticEvent?("start.returned", flow) }
+        #endif
+        guard persistenceReady, !recoveryRequired, let request = flow.start() else {
+            #if DEBUG
+            diagnosticEvent?("start.refused", flow)
+            #endif
+            return
+        }
+        #if DEBUG
+        diagnosticEvent?("start.accepted", flow)
+        #endif
         beginLoading(request)
     }
 
     public func pause() {
-        guard flow.pause() else { return }
+        #if DEBUG
+        diagnosticEvent?("pause.entered", flow)
+        defer { diagnosticEvent?("pause.returned", flow) }
+        #endif
+        guard flow.pause() else {
+            #if DEBUG
+            diagnosticEvent?("pause.refused", flow)
+            #endif
+            return
+        }
+        #if DEBUG
+        diagnosticEvent?("pause.accepted", flow)
+        #endif
         synchronizeSession()
     }
 
     public func resume() {
+        #if DEBUG
+        diagnosticEvent?("resume.entered", flow)
+        defer { diagnosticEvent?("resume.returned", flow) }
+        #endif
         resumeMessage = nil
         if case .paused(_, let reasons) = flow.state, reasons.contains(.audioInterruption) {
             guard feedback?.recoverInterruption() ?? true else {
+                #if DEBUG
+                diagnosticEvent?("resume.audioRecoveryRefused", flow)
+                #endif
                 resumeMessage = "Audio is still interrupted. Try Resume again when it is available."
                 synchronizeSession()
                 return
             }
+            #if DEBUG
+            diagnosticEvent?("resume.audioRecoveryAllowed", flow)
+            #endif
             flow.endAudioInterruption(shouldResume: true)
         }
         if flow.resume() {
+            #if DEBUG
+            diagnosticEvent?("resume.accepted", flow)
+            #endif
             synchronizeSession()
             feedback?.playCue(.selection)
+        } else {
+            #if DEBUG
+            diagnosticEvent?("resume.refused", flow)
+            #endif
         }
     }
 
@@ -131,6 +176,11 @@ public final class ShellController: ObservableObject {
     }
 
     public func setApplicationActive(_ active: Bool) {
+        #if DEBUG
+        let event = active ? "application.active" : "application.inactive"
+        diagnosticEvent?(event + ".entered", flow)
+        defer { diagnosticEvent?(event + ".returned", flow) }
+        #endif
         if !active { persistCurrentState() }
         feedback?.setForeground(active)
         flow.setApplicationActive(active)
@@ -138,6 +188,17 @@ public final class ShellController: ObservableObject {
     }
 
     public func handleAudioEvent(_ event: ShellAudioEvent) {
+        #if DEBUG
+        let kind: String
+        switch event {
+        case .interruptionBegan: kind = "audio.interruptionBegan"
+        case .interruptionEnded: kind = "audio.interruptionEnded"
+        case .routeDisconnected: kind = "audio.routeDisconnected"
+        case .mediaServicesReset: kind = "audio.mediaServicesReset"
+        }
+        diagnosticEvent?(kind + ".entered", flow)
+        defer { diagnosticEvent?(kind + ".returned", flow) }
+        #endif
         switch event {
         case .interruptionBegan:
             flow.beginAudioInterruption()
