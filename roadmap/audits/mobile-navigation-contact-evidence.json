@@ -1,0 +1,220 @@
+{
+  "status": "independently-verified-local-focused-passed",
+  "scope": "Existing completed local focused result review only; no tests/builds/reruns performed. Hosted/full-suite acceptance remains unverified and separate. Contact-duration mechanism unproven.",
+  "capturedSourceRevision": "c9e9000e1ce1e8a12a5a0efe3cd88b61ee430fe4",
+  "worktreeDirtyAtCapture": true,
+  "verifiedInputRevision": "a72a1645bcbbb7e9e21f5c8217606c4584e18d06",
+  "sourceInputCount": 58,
+  "sourceSHA256": {
+    "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GameCore/Tests/GameCoreTests/BundledContentTests.swift": "b354b88172d826fb5d6019ad52576f5dd8414784077bd09c6272fffeeacb7894",
+    "Packages/GameCore/Tests/GameCoreTests/DeterministicInputTests.swift": "7f2762ed2cea378458ee76cf1bc929c01c1cd4a4a77fbbaf411466a6f630cc74",
+    "Packages/GameCore/Tests/GameCoreTests/SaveSnapshotTests.swift": "3d396b2ceeb625d7307fee7889163a53c985e0c011f19541edd75bd223f4b87b",
+    "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+    "Packages/GamePlatform/Package.swift": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "a233ac0b8477304c87a91d3fb8e3e74c2243492ce4221c6c8daa0b0697d2f2d8",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "8211f966d55510493217bd6a95f74ceaa6ef84d6b1578e23479afe09c4b56f73",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+    "Packages/GamePlatform/Tests/GamePlatformTests/LocalSaveStoreTests.swift": "582be8621810ef3ab516cf191405cf712ae38a428ec8e73a53395f6fc508f5da",
+    "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+    "Games/DevelopmentContent/Package.swift": "4766cd33140326223873e810003abbaf20d3b8c4cfd7f8b978b44b0262b8c7dc",
+    "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift": "5b2a364d249433925920ecab0989f02e709286effa69e212c1777b536e1c0255",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift": "a36419836043578ccd90a2fd984990660beebdb449ea489646c4109bbffcf355",
+    "Games/DevelopmentTitle/CONTENT.md": "377dce7e5bd997bfd84fe1ba9f7efacccf6ae9020b9d3ebd207ec3f9fee63bb3",
+    "Games/DevelopmentTitle/DevelopmentScene.swift": "3a952f54bfc9083f3eb20c96f097468b2c7d4c0f9ebc48f83e43aa9c6c590401",
+    "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "c6b133a365f5fbdc7cecc51c7d65aa87e61b8548c37308693bbb49778508c615",
+    "Games/DevelopmentTitle/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+    "Games/DevelopmentTitle/ShellModel.swift": "a359c9b9afaf9825a33e33e734e9ce6f3a462a0d714a1cffa10ba33acbce3ff0",
+    "Games/DevelopmentTitle/ShellUITestFixture.swift": "f71e8a71858414f6d3523d7d9edb06d84a7a6f07cf5322f407bc2112fc63214a",
+    "Games/DevelopmentTitle/ShellView.swift": "a44c1d322dbce0b6e24948b0c98a47a3a893bfda38910e7678653795366bd790",
+    "Tests/DevelopmentTitleTests/BundledContentTests.swift": "e1c37c0a6d7a035082277617603718cbe382b2d188777b9ddf369529da8ea827",
+    "Tests/DevelopmentTitleTests/SavePersistenceTests.swift": "3e6133d5e4ebbe68e833488451e93abc3e27435d7efac958b1b824d41b39b0c4",
+    "Tests/DevelopmentTitleTests/ShellModelTests.swift": "e471765a17daf80a747d0f3c07a05526eb02d07194b8e081ed3fc860fce96ccf",
+    "Tests/DevelopmentTitleTests/UITestFixtureTests.swift": "510a8080ec57d1c0b7e3d75729ca481fe6973fbb3640c3bfae188d3bec1aacf7",
+    "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "b46bcaf9cc8315660606f8dd500ba0afd4c68cec65ac78728ccd78362a0a036d",
+    "GameCore.xcodeproj/project.pbxproj": "85efa150f7d35fb4d91676c8968a7488adf1c60e908100302371f4072b46ae6c",
+    "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "af56683799ff6dc0831b373002b096df08c6b6b0000e992cbf9a7276ac30c80e",
+    "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+    "scripts/check-foundation.py": "bb3f373ef23b6143ec485abeceb7065dad0521738afa2e0dcd78cae779ac11ec",
+    "scripts/generate-project.py": "92ffc7a14cd06672e01b4b1907b9c35646c6d0747a799634cd653e56cb9b4e61",
+    "scripts/run-mobile-tests.py": "e440ece0e0578671fae8ff9e02c759d9a01ef81c2cadb4182d24ed4327e483ef",
+    "scripts/test-content-cli.py": "d7f57f23f8aa0de109a54b017084ded0e28706e0cc8649d0d9f058d0202815da",
+    "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+    "scripts/verify.sh": "6d3d0e99c451fb54b72e5982f85c141385e2a8973632349480e5751b019acaa8",
+    ".github/workflows/mobile.yml": "74a5d9068bc4f3a755ed0e42f5ec314240ea41da08af52630a569431b7065f43"
+  },
+  "allInputsMatchVerifiedRevisionAndCurrentFiles": true,
+  "xcode": "Xcode 27.0\nBuild version 27A266a",
+  "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+  "models": {
+    "iphone12": {
+      "summary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "EFFA4FAE-7CBB-4B7C-9683-ED26F8E47507",
+              "deviceName": "GameCore Focused iphone12 f865f662",
+              "modelName": "iPhone 12",
+              "osBuildNumber": "23A5287g",
+              "osVersion": "26.0",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 3,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "DevelopmentTitle \u00b7 Built with macOS 27.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1791165080.031,
+        "passedTests": 3,
+        "result": "Passed",
+        "runtimeWarnings": [],
+        "skippedTests": 0,
+        "startTime": 1791164993.14,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - DevelopmentTitle",
+        "topInsights": [],
+        "totalTestCount": 3
+      },
+      "executedTests": [
+        {
+          "test": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+          "seconds": 24.542
+        },
+        {
+          "test": "testLargeTextAndReducedMotionKeepControlsReachable",
+          "seconds": 16.476
+        },
+        {
+          "test": "testNavigationSuccessFailureResumeAndRestart",
+          "seconds": 33.503
+        }
+      ],
+      "resultBundle": "/private/tmp/gamecore-navigation-contact-20261004/iphone12-0.xcresult",
+      "ownedDevice": "EFFA4FAE-7CBB-4B7C-9683-ED26F8E47507",
+      "ownedDeviceAbsent": true,
+      "cleanup": {
+        "shutdown": {
+          "path": "/private/tmp/gamecore-navigation-contact-20261004/iphone12-shutdown.log",
+          "bytes": 0
+        },
+        "delete": {
+          "path": "/private/tmp/gamecore-navigation-contact-20261004/iphone12-delete.log",
+          "bytes": 0
+        }
+      }
+    },
+    "ipad9": {
+      "summary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "4DD55AC2-4B9C-4AA3-9630-C282428BB04F",
+              "deviceName": "GameCore Focused ipad9 2ab2e683",
+              "modelName": "iPad (9th generation)",
+              "osBuildNumber": "23A5287g",
+              "osVersion": "26.0",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 3,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "DevelopmentTitle \u00b7 Built with macOS 27.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1791165212.64,
+        "passedTests": 3,
+        "result": "Passed",
+        "runtimeWarnings": [],
+        "skippedTests": 0,
+        "startTime": 1791165132.243,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - DevelopmentTitle",
+        "topInsights": [],
+        "totalTestCount": 3
+      },
+      "executedTests": [
+        {
+          "test": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+          "seconds": 20.266
+        },
+        {
+          "test": "testLargeTextAndReducedMotionKeepControlsReachable",
+          "seconds": 15.543
+        },
+        {
+          "test": "testNavigationSuccessFailureResumeAndRestart",
+          "seconds": 32.053
+        }
+      ],
+      "resultBundle": "/private/tmp/gamecore-navigation-contact-20261004/ipad9-0.xcresult",
+      "ownedDevice": "4DD55AC2-4B9C-4AA3-9630-C282428BB04F",
+      "ownedDeviceAbsent": true,
+      "cleanup": {
+        "shutdown": {
+          "path": "/private/tmp/gamecore-navigation-contact-20261004/ipad9-shutdown.log",
+          "bytes": 0
+        },
+        "delete": {
+          "path": "/private/tmp/gamecore-navigation-contact-20261004/ipad9-delete.log",
+          "bytes": 0
+        }
+      }
+    }
+  },
+  "passedExecutions": 6,
+  "failedExecutions": 0,
+  "skippedExecutions": 0,
+  "expectedFailures": 0,
+  "runtimeWarnings": [],
+  "ownedSimulatorCleanupVerified": true,
+  "hostedAcceptanceComplete": false,
+  "hosted": {
+    "runID": 37253122290,
+    "headSHA": "a72a1645bcbbb7e9e21f5c8217606c4584e18d06",
+    "conclusion": "cancelled",
+    "url": "https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/37253122290",
+    "acceptanceComplete": false,
+    "reason": "User explicitly requested tests stop before full hosted acceptance completed."
+  }
+}

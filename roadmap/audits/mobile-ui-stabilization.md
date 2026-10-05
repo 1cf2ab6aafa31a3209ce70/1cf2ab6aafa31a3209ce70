@@ -1,6 +1,6 @@
 # Mobile UI stabilization and branch integration
 
-**Date:** 2026-10-02. **Status:** Verified; Epic 04 PR #6 merged.
+**Date:** 2026-10-04. **Status:** Epic 04 PR #6 merged; later navigation failures remain open for hosted verification. See [the current contact investigation](mobile-navigation-contact.md).
 
 ## Scope
 
@@ -66,6 +66,7 @@ All items are material because they govern accurate merge readiness or acceptanc
 | U07 | Serial CI has insufficient growth margin | Addressed | Independent geometry jobs with unchanged coverage and bounds |
 | U08 | Conflict resolution must preserve upstream module guidance | Addressed | Durable state and provisional Spike 06 wording retained |
 | U09 | Unrelated destructive setup can prevent another test from reaching its acceptance body | Addressed | Validated DEBUG UUID isolation removes only setup deletion; dedicated destructive coverage retained; actual activation-versus-presentation cause remains unproven |
+| U10 | Centered Pause/Resume contacts did not produce expected transitions in later CI | Open for hosted verification | [Contact investigation](mobile-navigation-contact.md): one 150 ms press preserves assertions; six local focused checks passed, hosted run canceled at user request |
 
 Simulator results establish the tested software behavior only. Minimum-runtime, physical performance and distribution checks remain explicit under [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md); unavailable physical devices and macOS are not current development blockers. Next is Epic 05 review and Spike 06; new prototype work was kept out of this testing/merge wrap-up.
 
@@ -74,8 +75,8 @@ Simulator results establish the tested software behavior only. Minimum-runtime, 
 The final reviewed source passed both selected methods twice on each iPhone 12/iPad (9th generation) geometry: eight executions, zero failures, skips or runtime warnings. Xcode 27.0 (`27A266a`) used iOS Simulator 26.0 (`23A5287g`). Both owned simulators were shut down and deleted. The recorded checkout was `133e870` with the final UI change uncommitted; all 56 captured inputs independently match committed `76a1da7a9a0b991af45c7340250ab45f2ed4283c`. The [manifest](mobile-ui-stabilization-evidence.json) retains both identities and the failed trials. This focused run does not replace full hosted acceptance.
 
 
-## Final documentation review
+## Historical documentation review (2026-10-02)
 
-Ready. Final coverage checked U01–U09 against the corrected source, executed tests, historical distinctions and current receipts; all nine are addressed. The activation-versus-presentation cause of the earlier setup failure remains unproven and is not claimed as repaired. Fixture isolation removes its unrelated setup dependency while dedicated destructive UI acceptance remains executed.
+Ready for the earlier U01–U09 record. Final coverage checked U01–U09 against the corrected source, executed tests, historical distinctions and current receipts; all nine are addressed. The activation-versus-presentation cause of the earlier setup failure remains unproven and is not claimed as repaired. Fixture isolation removes its unrelated setup dependency while dedicated destructive UI acceptance remains executed.
 
 Validation covers this record, the two epic audits' current follow-up sections and the evidence JSON: final sections re-read, all 17 local links across the three changed Markdown files resolved (no fragment targets), JSON parsed, whitespace and generated-project consistency checked, and all 58 current Epic 05 input bytes matched the verified hosted manifest. CONTRIBUTING and repository scripts expose no separate Markdown linter or documentation build. New run/merge references were verified through GitHub metadata, logs and artifacts; unchanged historical references in the epic audits were not re-fetched. Simulator, minimum-runtime and distribution limits remain explicit.
