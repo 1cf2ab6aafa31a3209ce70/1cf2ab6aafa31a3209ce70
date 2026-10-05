@@ -2,6 +2,12 @@ name: Mobile validation
 on:
   push:
   pull_request:
+  workflow_dispatch:
+    inputs:
+      navigation_only:
+        description: Run only the three navigation UI diagnostics
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -25,9 +31,15 @@ jobs:
           toolchain_version="$(xcodebuild -version)"
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
       - name: Verify packages and mobile builds
+        if: github.event_name != 'workflow_dispatch' || !inputs.navigation_only
         run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
       - name: Test ${{ matrix.model }} simulator
-        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" --model "${{ matrix.model }}"
+        env:
+          NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
+        run: |
+          arguments=()
+          if [[ "$NAVIGATION_ONLY" == "true" ]]; then arguments+=(--navigation-only); fi
+          bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" --model "${{ matrix.model }}" "${arguments[@]}"
       - name: Retain validation evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
@@ -40,5 +52,6 @@ jobs:
             ${{ runner.temp }}/foundation-ui/*-restart.json
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
+            ${{ runner.temp }}/foundation-ui/action-journals/
           if-no-files-found: ignore
           retention-days: 7
