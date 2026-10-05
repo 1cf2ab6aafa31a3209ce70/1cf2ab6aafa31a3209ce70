@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "dig-sample-01",
+  "gameType": "dig",
+  "contentVersion": 1,
+  "seed": 103,
+  "payload": {
+    "columns": 3,
+    "rows": 3,
+    "spawnCell": 0,
+    "targetCells": [
+      4,
+      8
+    ],
+    "asset": "marker.svg",
+    "nextLevelIDs": []
+  },
+  "localizationKeys": [
+    "sample.title"
+  ]
+}

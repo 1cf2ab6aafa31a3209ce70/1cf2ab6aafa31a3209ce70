@@ -1,6 +1,6 @@
 # GameCore
 
-An original, offline-first foundation for iPhone and iPad puzzle games. The development title provides a playable lifecycle practice: start, pause, resume, restart, success and failure. Settings and original practice progress are stored locally. Puzzle rules and levels remain roadmap work. macOS is deferred.
+An original, offline-first foundation for iPhone and iPad puzzle games. The development title provides a playable lifecycle practice: start, pause, resume, restart, success and failure. Settings and original practice progress are stored locally. Bundled development fixtures cover the four planned game types; complete puzzle rules and titles remain roadmap work. macOS is deferred.
 
 ## Build and run
 
@@ -15,7 +15,7 @@ bash scripts/verify.sh
 bash scripts/test-mobile.sh
 ```
 
-`verify.sh` checks generated-project consistency and package/privacy boundaries, runs the pure `GameCore` and `GamePlatform` tests, then builds Debug/Release for generic iOS Simulator and unsigned Release for generic iOS. It prints its temporary output directory; optionally pass a new absolute directory as the first argument. The generic iOS build is a compile check, not a device run.
+`verify.sh` checks generated-project consistency and package/privacy boundaries, runs `GameCore`, `GamePlatform` and title-content tests, validates every bundled fixture, then builds Debug/Release for generic iOS Simulator and unsigned Release for generic iOS. It prints its temporary output directory; optionally pass a new absolute directory as the first argument. The generic iOS build is a compile check, not a device run.
 
 `GamePlatform` declares macOS 10.15 as the minimum for command-line package logic tests. The application remains iOS/iPadOS-only.
 
@@ -44,6 +44,7 @@ The generator uses Python's standard library. CI checks generated files without 
 | `Packages/GameCore` | Renderer-independent core; no platform or title dependency |
 | `Packages/GamePlatform` | Shared mobile controller/UI and Apple adapters; depends on local `GameCore` |
 | `Games/DevelopmentTitle` | SwiftUI shell and title-owned SpriteKit practice scene |
+| `Games/DevelopmentContent` | Original bundled fixtures, title payload validation and the build-time validator |
 | `Tests/DevelopmentTitleTests` | App-hosted scene and preparation tests |
 | `Tests/DevelopmentTitleUITests` | Mobile navigation, lifecycle, settings and accessibility paths |
 | `scripts` | Project generation, structural checks and mobile build/test commands |
@@ -55,6 +56,6 @@ Each future title belongs under `Games/<Title>` and owns its rules, rendering, i
 
 ## Current direction
 
-[ADR-003](roadmap/decisions/ADR-003-simulator-mobile-foundation.md) accepts simulator evidence for mobile development; no physical device is required for this work. Simulator results do not establish device GPU/thermal/battery behavior or physical performance. iOS 18 runtime execution and distribution-readiness checks remain explicit before release; deployment-target compilation is not minimum-runtime execution. [Epic 01](roadmap/epics/01-foundation.md) is complete after local and hosted CI verification. Its [evidence report](roadmap/audits/epic-01-mobile-foundation.md) records the exact checks and clean-copy limits. [Epic 02](roadmap/epics/02-app-shell.md) is complete with the [shell evidence](roadmap/audits/epic-02-app-shell.md). [Spike 03](roadmap/spikes/03-save-durability.md) selects versioned per-title Codable snapshots with previous-good recovery; see [ADR-005](roadmap/decisions/ADR-005-local-save-durability.md) and [fixture evidence](roadmap/audits/spike-03-save-durability.md). [Epic 04](roadmap/epics/04-local-state.md) implements that storage policy; its [evidence report](roadmap/audits/epic-04-local-state.md) records validation and limits. Next is [Epic 05: bundled content and reproducible levels](roadmap/epics/05-content.md); subsequent work follows the [roadmap](ROADMAP.md).
+[ADR-003](roadmap/decisions/ADR-003-simulator-mobile-foundation.md) accepts simulator evidence for mobile development; no physical device is required for this work. Simulator results do not establish device GPU/thermal/battery behavior or physical performance. iOS 18 runtime execution and distribution-readiness checks remain explicit before release; deployment-target compilation is not minimum-runtime execution. [Epic 01](roadmap/epics/01-foundation.md) is complete after local and hosted CI verification. Its [evidence report](roadmap/audits/epic-01-mobile-foundation.md) records the exact checks and clean-copy limits. [Epic 02](roadmap/epics/02-app-shell.md) is complete with the [shell evidence](roadmap/audits/epic-02-app-shell.md). [Spike 03](roadmap/spikes/03-save-durability.md) selects versioned per-title Codable snapshots with previous-good recovery; see [ADR-005](roadmap/decisions/ADR-005-local-save-durability.md) and [fixture evidence](roadmap/audits/spike-03-save-durability.md). [Epic 04](roadmap/epics/04-local-state.md) implements that storage policy; its [evidence report](roadmap/audits/epic-04-local-state.md) records validation and limits. Epic 05 implements [bundled content and reproducible fixtures](docs/bundled-content.md). Its [acceptance evidence](roadmap/audits/epic-05-bundled-content.md) records successful local and hosted checks. Next is the two-developer-day [Spike 06 module comparison](roadmap/spikes/06-module-seam.md), following the [roadmap](ROADMAP.md).
 
 Apps work offline without tracking, telemetry, accounts, ads, purchases or cloud sync. See the [privacy contract](docs/privacy-contract.md), [contribution guide](CONTRIBUTING.md) and [content provenance policy](docs/asset-provenance.md). Project-authored code, documentation and resources use the [MIT license](LICENSE). Third-party material retains its own rights and notices; no candidate repository code or assets are included.

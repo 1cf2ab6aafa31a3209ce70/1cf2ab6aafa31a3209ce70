@@ -1,6 +1,6 @@
 # Content provenance
 
-Every title needs its own identity, assets, levels and presentation. Similar mechanics do not authorize copying a game's art, layouts, names, translations, sound or store material. The [preflight decision](../roadmap/decisions/ADR-001-first-party-foundation.md) allows design references only and the [third-party inclusion inventory](../roadmap/audits/preflight-inclusion-bom.md) is empty.
+Every title needs its own identity, assets, levels and presentation. Similar mechanics do not authorize copying a game's art, layouts, names, translations, sound or store material. The [preflight decision](../roadmap/decisions/ADR-001-first-party-foundation.md) allows design references only and no candidate material is included. The [inclusion inventory](../roadmap/audits/preflight-inclusion-bom.md) separately records the narrow public-domain SplitMix64 algorithm adaptation used for reproducible developer fixtures.
 
 The repository’s [MIT license](../LICENSE) covers project-authored code, documentation and resources unless a file or content record explicitly states otherwise. Contributions are made under the same terms. Third-party material retains its own rights, licenses and required notices; the project cannot relicense it merely by adding it to this repository. Review fonts, sound, icons, levels and promotional content separately, and retain evidence that permits the intended use.
 

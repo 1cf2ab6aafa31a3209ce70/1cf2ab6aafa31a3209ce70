@@ -263,7 +263,10 @@ final class DevelopmentTitleUITests: XCTestCase {
         XCTAssertTrue(button.waitForExistence(timeout: 10), "Missing control \(id)")
         reveal(app, button)
         XCTAssertTrue(button.isHittable, "Unreachable control \(id)")
-        button.tap()
+        // Hosted navigation evidence retained a centered 50 ms tap without
+        // the expected transition. Send one longer contact, not a retry;
+        // callers must still verify the resulting screen and behavior.
+        button.press(forDuration: 0.15)
     }
 
     @MainActor

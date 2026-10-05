@@ -94,4 +94,4 @@ All entries are material because they affect implementation guidance or acceptan
 
 ## Current branch stabilization follow-up
 
-The later documentation tip failed a shared UI assertion despite earlier successful acceptance. [The stabilization record](mobile-ui-stabilization.md) retains that failure, the evidence-backed helper corrections and eight passing focused executions. Independent per-geometry hosted checks are pending on the updated branch; historical hashes/results above remain unchanged.
+[The stabilization record](mobile-ui-stabilization.md) retains the later failed tips, helper corrections, unrelated setup failure and DEBUG-only UUID fixture isolation. [Final per-geometry hosted validation](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/37071968298) passed with 39 exact input hashes, 24 app/UI tests per geometry, all six selected restart invocations, both preservation/removal proofs and owned cleanup. Three additional app-hosted tests verify fixture isolation; dedicated reset/delete/cancel acceptance remains. Historical hashes/results above remain unchanged. Release storage, schema and time limits are unchanged.
