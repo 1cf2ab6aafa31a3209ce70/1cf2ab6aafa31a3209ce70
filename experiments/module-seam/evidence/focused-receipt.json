@@ -355,7 +355,7 @@
   "sourceHashTiming": "Captured after native execution. Experiment Swift sources were frozen during this run; no pre-run hash comparison was implemented in the executed verifier.",
   "executedVerifierSHA256": "1132044f722ccfcb083562f803250a97d0b2b46173220b65f879250d21a1e7ee",
   "finalVerifierSHA256": "3b88d5d1a32a7f51dd674641874b7c34f0b6f9f4c90229f3aa561883eb86ff1d",
-  "postRunChanges": "Verifier metadata gates now capture/compare experiment plus dependency sources before/after execution, reject warnings/expected failures and fail on cleanup/restoration errors. App, adapter and test Swift sources were not changed after native verification.",
+  "postRunChanges": "Verifier metadata gates now capture/compare experiment plus dependency sources before/after execution, reject warnings/expected failures and fail on cleanup/restoration errors. At original evidence recording, app, adapter and test Swift sources matched the native run. Subsequent review changed RuleSession and its existing regression test; see reviewFollowup.",
   "harnessChecks": [
     {
       "scenario": "pass",
@@ -384,5 +384,14 @@
   ],
   "harnessSourceSHA256": "056d7d457c20191edf9a50af1c8bff108845907fbcfc46b5743e9deeb0bb8dd3",
   "ownedDeviceIndependentlyAbsent": true,
-  "finalCodeCommit": "4ee7e9edd5db367d008f9bf8419c343da5b645cc"
+  "finalCodeCommit": "4ee7e9edd5db367d008f9bf8419c343da5b645cc",
+  "reviewFollowup": {
+    "receipt": "review-regression-receipt.json",
+    "changedInputs": [
+      "Sources/Contract/RuleSession.swift",
+      "Tests/ModuleSeamTests.swift"
+    ],
+    "scope": "One final cancellation regression passed after review. This fourteen-test receipt remains historical at finalCodeCommit.",
+    "fixCommit": "fc64f48d8b1723f69f93668734b5defaeec2d30b"
+  }
 }
