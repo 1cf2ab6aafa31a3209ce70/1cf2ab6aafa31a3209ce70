@@ -90,7 +90,21 @@ final class ModuleSeamTests: XCTestCase {
         }) }
         while continuation == nil { await Task.yield() }
         try await session.prepare(for: current)
+        var canceledLoaderEntered = false
+        let canceledBeforeEntry = Task {
+            try await session.prepare(for: old, loader: {
+                canceledLoaderEntered = true
+                return catalog
+            })
+        }
+        canceledBeforeEntry.cancel()
+        do {
+            try await canceledBeforeEntry.value
+            XCTFail("Canceled preparation accepted")
+        } catch { XCTAssertTrue(error is CancellationError) }
+        XCTAssertFalse(canceledLoaderEntered)
         session.begin(for: current)
+        XCTAssertEqual(session.request, current, "Canceled preparation must preserve the staged current load")
         continuation?.resume(returning: catalog)
         do { try await task.value; XCTFail("Superseded preparation accepted") } catch { }
         session.begin(for: old)

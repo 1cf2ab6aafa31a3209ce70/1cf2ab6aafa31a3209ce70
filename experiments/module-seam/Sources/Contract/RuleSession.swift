@@ -35,6 +35,7 @@ final class RuleSession: ObservableObject, ModuleSession {
         _ = progress.recordCompletion(levelID: level.id, score: 1)
     }
     func prepare(for request: LoadRequest, loader: () async throws -> DevelopmentCatalog) async throws {
+        try Task.checkCancellation()
         let epoch = UUID()
         preparationEpoch = epoch
         staged = nil
