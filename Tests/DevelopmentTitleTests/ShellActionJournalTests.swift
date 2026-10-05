@@ -27,7 +27,11 @@ final class ShellActionJournalTests: XCTestCase {
                                          feedback: nil, preparation: {}, preparationFailureMessage: "Unused fixture failure",
                                          prepareSession: {}, setPlaying: { _ in }, setReducedMotion: { _ in })
         journal.observe(controller)
-        controller.finishSplash(); controller.start()
+        journal.recordButton("shell.start", controller: controller)
+        controller.start() // Refused while splash is still active.
+        controller.finishSplash()
+        journal.recordButton("shell.start", controller: controller)
+        controller.start()
         let deadline = Date().addingTimeInterval(3)
         while case .loading = controller.flow.state, Date() < deadline { await Task.yield() }
         XCTAssertTrue(controller.flow.inputIsActive)
@@ -50,11 +54,15 @@ final class ShellActionJournalTests: XCTestCase {
         XCTAssertEqual(events.first?["kind"] as? String, "journal.header")
         XCTAssertEqual(events.map { $0["sequence"] as? Int }, Array(1...events.count).map(Optional.some))
         let kinds = events.compactMap { $0["kind"] as? String }
-        for expected in ["button.pause", "pause.entered", "pause.returned", "button.resume", "resume.entered",
+        for expected in ["button.start", "start.entered", "start.accepted", "start.refused", "start.returned",
+                         "button.pause", "pause.entered", "pause.returned", "button.resume", "resume.entered",
                          "resume.returned", "pause.accepted", "resume.accepted", "resume.refused", "application.inactive.returned", "application.active.returned",
                          "audio.interruptionBegan.returned", "audio.interruptionEnded.returned", "flow.published"] {
             XCTAssertTrue(kinds.contains(expected), expected)
         }
+        XCTAssertEqual(events.filter { $0["kind"] as? String == "button.start" }.count, 2)
+        XCTAssertEqual(events.first { $0["kind"] as? String == "start.refused" }?["state"] as? String, "splash")
+        XCTAssertEqual(events.first { $0["kind"] as? String == "start.accepted" }?["state"] as? String, "loading")
         XCTAssertEqual(events.first { $0["kind"] as? String == "pause.entered" }?["state"] as? String, "playing")
         XCTAssertEqual(events.first { $0["kind"] as? String == "pause.returned" }?["state"] as? String, "paused")
         let resumes = events.filter { $0["kind"] as? String == "resume.returned" }

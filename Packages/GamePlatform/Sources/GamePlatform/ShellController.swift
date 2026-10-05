@@ -78,7 +78,19 @@ public final class ShellController: ObservableObject {
     }
 
     public func start() {
-        guard persistenceReady, !recoveryRequired, let request = flow.start() else { return }
+        #if DEBUG
+        diagnosticEvent?("start.entered", flow)
+        defer { diagnosticEvent?("start.returned", flow) }
+        #endif
+        guard persistenceReady, !recoveryRequired, let request = flow.start() else {
+            #if DEBUG
+            diagnosticEvent?("start.refused", flow)
+            #endif
+            return
+        }
+        #if DEBUG
+        diagnosticEvent?("start.accepted", flow)
+        #endif
         beginLoading(request)
     }
 

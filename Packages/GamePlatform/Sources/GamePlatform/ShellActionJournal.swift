@@ -13,7 +13,8 @@ public final class ShellActionJournal {
     private static let maximumRecords = 512
     private static let markerReserve = 512
     private static let kinds: Set<String> = [
-        "journal.header", "flow.published", "button.pause", "button.resume",
+        "journal.header", "flow.published", "state.checkpoint", "button.start", "button.pause", "button.resume",
+        "start.entered", "start.accepted", "start.refused", "start.returned",
         "pause.entered", "pause.returned", "resume.entered", "resume.returned",
         "pause.accepted", "pause.refused", "resume.accepted", "resume.refused",
         "resume.audioRecoveryAllowed", "resume.audioRecoveryRefused",
@@ -29,6 +30,7 @@ public final class ShellActionJournal {
     private let writer: JournalWriter
     private let queue = DispatchQueue(label: "gamecore.fixture.action-journal", qos: .utility)
     private var subscription: AnyCancellable?
+    private var checkpointTask: Task<Void, Never>?
     private var sequence = 0
     private var capturedRecords: Int
     private var capturedBytes: Int
@@ -112,6 +114,7 @@ public final class ShellActionJournal {
     }
 
     public func observe(_ controller: ShellController) {
+        checkpointTask?.cancel()
         controller.diagnosticEvent = { [weak self, weak controller] kind, flow in
             guard let self, let controller else { return }
             self.record(kind: kind, flow: flow, persistenceReady: controller.persistenceReady,
@@ -122,11 +125,32 @@ public final class ShellActionJournal {
             self.record(kind: "flow.published", flow: flow, persistenceReady: controller.persistenceReady,
                         recoveryRequired: controller.recoveryRequired, resumeMessagePresent: controller.resumeMessage != nil)
         }
+        // Fixture-only continuity anchors. No strong binding spans the sleep,
+        // no flow action is invoked, and capture uses the same bounded journal.
+        checkpointTask = Task { [weak self, weak controller] in
+            while !Task.isCancelled {
+                do { try await Task.sleep(for: .seconds(5)) }
+                catch { return }
+                guard !Task.isCancelled, let self, let controller, !self.truncated else { return }
+                self.record(kind: "state.checkpoint", flow: controller.flow,
+                            persistenceReady: controller.persistenceReady,
+                            recoveryRequired: controller.recoveryRequired,
+                            resumeMessagePresent: controller.resumeMessage != nil)
+            }
+        }
     }
 
+    deinit { checkpointTask?.cancel() }
+
     public func recordButton(_ id: String, controller: ShellController) {
-        guard id == "shell.pause" || id == "shell.resume" else { return }
-        record(kind: id == "shell.pause" ? "button.pause" : "button.resume", flow: controller.flow,
+        let kind: String
+        switch id {
+        case "shell.start": kind = "button.start"
+        case "shell.pause": kind = "button.pause"
+        case "shell.resume": kind = "button.resume"
+        default: return
+        }
+        record(kind: kind, flow: controller.flow,
                persistenceReady: controller.persistenceReady, recoveryRequired: controller.recoveryRequired,
                resumeMessagePresent: controller.resumeMessage != nil)
     }
