@@ -1,0 +1,388 @@
+{
+  "scope": "one iPhone 12, serial module-only focused tests",
+  "models": {
+    "grid": {
+      "projectSHA256": "d6054f2239471bb087fffca010d1bca312a56911589360ce79c7416990956345",
+      "summary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+              "deviceName": "GameCore Spike06 owned",
+              "modelName": "iPhone 12",
+              "osBuildNumber": "23A5287g",
+              "osVersion": "26.0",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 7,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "GridSeam \u00b7 Built with macOS 27.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1791168047.39,
+        "passedTests": 7,
+        "result": "Passed",
+        "runtimeWarnings": [],
+        "skippedTests": 0,
+        "startTime": 1791168005.401,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - GridSeam",
+        "topInsights": [],
+        "totalTestCount": 7
+      }
+    },
+    "terrain": {
+      "projectSHA256": "74eb010fbe53ce89f49c36989301911fc019b097bcd46c1f4dbfc38a26432bae",
+      "summary": {
+        "devicesAndConfigurations": [
+          {
+            "device": {
+              "architecture": "arm64",
+              "deviceId": "83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+              "deviceName": "GameCore Spike06 owned",
+              "modelName": "iPhone 12",
+              "osBuildNumber": "23A5287g",
+              "osVersion": "26.0",
+              "platform": "iOS Simulator"
+            },
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "passedTests": 7,
+            "skippedTests": 0,
+            "testPlanConfiguration": {
+              "configurationId": "1",
+              "configurationName": "Test Scheme Action"
+            }
+          }
+        ],
+        "environmentDescription": "TerrainSeam \u00b7 Built with macOS 27.2",
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "finishTime": 1791168081.203,
+        "passedTests": 7,
+        "result": "Passed",
+        "runtimeWarnings": [],
+        "skippedTests": 0,
+        "startTime": 1791168059.879,
+        "statistics": [],
+        "testFailures": [],
+        "title": "Test - TerrainSeam",
+        "topInsights": [],
+        "totalTestCount": 7
+      }
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "log": "toolchain.log",
+      "exitCode": 0,
+      "seconds": 0.134
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "list",
+        "runtimes",
+        "-j"
+      ],
+      "log": "runtimes.log",
+      "exitCode": 0,
+      "seconds": 0.299
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "create",
+        "GameCore Spike06 owned",
+        "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+        "com.apple.CoreSimulator.SimRuntime.iOS-26-0"
+      ],
+      "log": "create.log",
+      "exitCode": 0,
+      "seconds": 0.241
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "83DF662D-F1FB-4941-8B0C-3148FBD7B222"
+      ],
+      "log": "boot.log",
+      "exitCode": 0,
+      "seconds": 0.832
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+        "-b"
+      ],
+      "log": "bootstatus.log",
+      "exitCode": 0,
+      "seconds": 29.046
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/scripts/generate-project.py",
+        "--modules",
+        "grid"
+      ],
+      "log": "grid-generate.log",
+      "exitCode": 0,
+      "seconds": 0.133
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "GridSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "build-for-testing"
+      ],
+      "log": "grid-build.log",
+      "exitCode": 0,
+      "seconds": 9.459
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "GridSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "platform=iOS Simulator,id=83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+        "-resultBundlePath",
+        "/private/tmp/gamecore-spike06-focused-final-20261004/grid.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "90",
+        "-collect-test-diagnostics",
+        "never",
+        "test-without-building"
+      ],
+      "log": "grid-tests.log",
+      "exitCode": 0,
+      "seconds": 43.316
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/gamecore-spike06-focused-final-20261004/grid.xcresult"
+      ],
+      "log": "grid-summary.log",
+      "exitCode": 0,
+      "seconds": 0.184
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/scripts/generate-project.py",
+        "--modules",
+        "terrain"
+      ],
+      "log": "terrain-generate.log",
+      "exitCode": 0,
+      "seconds": 0.241
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "TerrainSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "build-for-testing"
+      ],
+      "log": "terrain-build.log",
+      "exitCode": 0,
+      "seconds": 10.932
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "TerrainSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "platform=iOS Simulator,id=83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+        "-resultBundlePath",
+        "/private/tmp/gamecore-spike06-focused-final-20261004/terrain.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "90",
+        "-collect-test-diagnostics",
+        "never",
+        "test-without-building"
+      ],
+      "log": "terrain-tests.log",
+      "exitCode": 0,
+      "seconds": 22.375
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/gamecore-spike06-focused-final-20261004/terrain.xcresult"
+      ],
+      "log": "terrain-summary.log",
+      "exitCode": 0,
+      "seconds": 0.131
+    },
+    {
+      "command": [
+        "/opt/homebrew/opt/python@3.14/bin/python3.14",
+        "/Users/d/.codex/worktrees/0b5a/gamecore/experiments/module-seam/scripts/generate-project.py"
+      ],
+      "log": "restore-project.log",
+      "exitCode": 0,
+      "seconds": 0.077
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "shutdown",
+        "83DF662D-F1FB-4941-8B0C-3148FBD7B222"
+      ],
+      "log": "shutdown.log",
+      "exitCode": 0,
+      "seconds": 3.379
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "delete",
+        "83DF662D-F1FB-4941-8B0C-3148FBD7B222"
+      ],
+      "log": "delete.log",
+      "exitCode": 0,
+      "seconds": 0.236
+    }
+  ],
+  "toolchain": "Xcode 27.0\nBuild version 27A266a",
+  "runtime": {
+    "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+    "version": "26.0",
+    "buildversion": "23A5287g"
+  },
+  "deviceUUID": "83DF662D-F1FB-4941-8B0C-3148FBD7B222",
+  "status": "passed",
+  "sourceSHA256": {
+    "experiments/module-seam/Sources/App/ModuleFixture.swift": "9cc6843d85d1ef8712d7db8464859cfe0590e38c76a134959c2a48f6afd558e8",
+    "experiments/module-seam/Sources/App/ModuleHost.swift": "0e929ce2bd2306d65bd80596c64e354d561f1a60a8716132f2d990316faac9f0",
+    "experiments/module-seam/Sources/App/ModuleSeamApp.swift": "8e72a5d2ab6e7d929d78d50076ab76a6986dfecefd125d5f1444b26b83a19f86",
+    "experiments/module-seam/Sources/Contract/GameModule.swift": "58c41ef583c8091ab9ce3fb5f61122ea0c92d570d5dfaa079931c5f346ddfbd1",
+    "experiments/module-seam/Sources/Contract/RuleSession.swift": "13d7a741fdf9341346498c4e17703b9b27b0baa33a8e65891d7011de719c5a0a",
+    "experiments/module-seam/Sources/Grid/GridModule.swift": "0ff15f006263cb69e53ed32447248029d6b99d05143af3df6e31cf564bc220dd",
+    "experiments/module-seam/Sources/Terrain/TerrainModule.swift": "7ef61a51624ceec9b5e466bac10004f3d981381de0640fa0d88bff78e97fce81",
+    "experiments/module-seam/Tests/ModuleSeamTests.swift": "8ff26863460449211a89b8893defbc9b3d40bd1d0745c7b76f1e11c8bf0df64d",
+    "experiments/module-seam/UITests/ModuleSeamUITests.swift": "cbf6bf06358b807f02d0801a4d434ab2af3f9cd28bda1791ed4c5b1c9cddd9b8",
+    "experiments/module-seam/scripts/generate-project.py": "7935234af01d9e52e4cf48feb60439610684e8cbd71b8473b751f0268c0971a4",
+    "experiments/module-seam/scripts/verify.py": "1132044f722ccfcb083562f803250a97d0b2b46173220b65f879250d21a1e7ee"
+  },
+  "mergeBase": "cb11d713f0641d47bd59b85fe64dbe4401d70486",
+  "sourceHashTiming": "Captured after native execution. Experiment Swift sources were frozen during this run; no pre-run hash comparison was implemented in the executed verifier.",
+  "executedVerifierSHA256": "1132044f722ccfcb083562f803250a97d0b2b46173220b65f879250d21a1e7ee",
+  "finalVerifierSHA256": "3b88d5d1a32a7f51dd674641874b7c34f0b6f9f4c90229f3aa561883eb86ff1d",
+  "postRunChanges": "Verifier metadata gates now capture/compare experiment plus dependency sources before/after execution, reject warnings/expected failures and fail on cleanup/restoration errors. App, adapter and test Swift sources were not changed after native verification.",
+  "harnessChecks": [
+    {
+      "scenario": "pass",
+      "status": "passed",
+      "exception": null,
+      "ownedCleanupAttempted": true
+    },
+    {
+      "scenario": "restore-failure",
+      "status": "failed",
+      "exception": "SystemExit",
+      "ownedCleanupAttempted": true
+    },
+    {
+      "scenario": "boot-failure",
+      "status": "failed",
+      "exception": "RuntimeError",
+      "ownedCleanupAttempted": true
+    },
+    {
+      "scenario": "skipped-test",
+      "status": "failed",
+      "exception": "RuntimeError",
+      "ownedCleanupAttempted": true
+    }
+  ],
+  "harnessSourceSHA256": "056d7d457c20191edf9a50af1c8bff108845907fbcfc46b5743e9deeb0bb8dd3",
+  "ownedDeviceIndependentlyAbsent": true,
+  "finalCodeCommit": "4ee7e9edd5db367d008f9bf8419c343da5b645cc"
+}
