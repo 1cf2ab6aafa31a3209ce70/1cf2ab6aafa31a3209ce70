@@ -20,3 +20,9 @@
 - An updated content bundle does not silently erase earned completion for unchanged stable level IDs.
 
 **Outside this epic:** A remote level service, experiments on players, or full game content.
+
+## Status — 2026-10-02
+
+Complete for mobile simulator acceptance. The [evidence report](../audits/epic-05-bundled-content.md) and [source manifest](../audits/epic-05-bundled-content-evidence.json) retain 72 package tests, all three build configurations, clean invalid-build rejection, installed resource checks and 23 app/UI tests per geometry with shutdown/boot restore proofs. Local and hosted results identify their exact inputs separately. The [authoring guide](../../docs/bundled-content.md) defines stable-ID updates, deterministic fixtures and manual playtest reports.
+
+These are four original sample payloads and reference outcomes, not complete games or solvability certification. Minimum-runtime and distribution checks remain explicit under [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md); physical devices and macOS applications are outside current scope. Spike 06’s entry gate is met; its two-developer-day comparison has not started.

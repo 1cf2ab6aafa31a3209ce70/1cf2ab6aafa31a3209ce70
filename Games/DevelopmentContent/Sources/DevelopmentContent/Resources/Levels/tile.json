@@ -1,0 +1,22 @@
+{
+  "schemaVersion": 1,
+  "id": "tile-sample-01",
+  "gameType": "tile",
+  "contentVersion": 1,
+  "seed": 101,
+  "payload": {
+    "columns": 2,
+    "rows": 2,
+    "tokens": [
+      "leaf",
+      "stone",
+      "stone",
+      "leaf"
+    ],
+    "asset": "marker.svg",
+    "nextLevelIDs": []
+  },
+  "localizationKeys": [
+    "sample.title"
+  ]
+}

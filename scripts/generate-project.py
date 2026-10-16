@@ -67,8 +67,9 @@ unit_ref = add("unit-product", "isa = PBXFileReference; explicitFileType = wrapp
 package_refs = []
 package_products = []
 package_builds = []
-for name in ["GameCore", "GamePlatform"]:
-    ref = add(f"package-{name}", f"isa = XCLocalSwiftPackageReference; relativePath = {quoted(f'Packages/{name}')};")
+for name in ["GameCore", "GamePlatform", "DevelopmentContent"]:
+    package_path = f'Games/{name}' if name == 'DevelopmentContent' else f'Packages/{name}'
+    ref = add(f"package-{name}", f"isa = XCLocalSwiftPackageReference; relativePath = {quoted(package_path)};")
     product = add(f"package-product-{name}", f"isa = XCSwiftPackageProductDependency; package = {ref}; productName = {name};")
     package_refs.append(ref)
     package_products.append(product)
@@ -91,6 +92,11 @@ for name, directory in [("app", "Games/DevelopmentTitle"), ("ui", "Tests/Develop
     phases[f"{name}-frameworks"] = add(f"{name}-frameworks", f"isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = {array(framework_builds)}; runOnlyForDeploymentPostprocessing = 0;")
     phases[f"{name}-resources"] = add(f"{name}-resources", "isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;")
 
+# Validate the exact copied SwiftPM resources before app compilation/packaging.
+# This is a host authoring tool; the app links only the title library product.
+validation_script = 'set -eu\ncd "$SRCROOT"\n/usr/bin/env -u SDK_NAME -u SDK_DIR -u PLATFORM_NAME -u SWIFT_EXEC SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)" /usr/bin/xcrun --sdk macosx swift run --package-path Games/DevelopmentContent --scratch-path "$DERIVED_FILE_DIR/ContentValidation" content-validator Games/DevelopmentContent/Sources/DevelopmentContent/Resources\n'
+validation_phase = add("content-validation", f"isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = (); runOnlyForDeploymentPostprocessing = 0; alwaysOutOfDate = 1; shellPath = /bin/sh; shellScript = {quoted(validation_script)};")
+
 refs.append(add("app-info", f"isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = {quoted('Games/DevelopmentTitle/Info.plist')}; sourceTree = SOURCE_ROOT;"))
 products = add("products", f"isa = PBXGroup; name = Products; sourceTree = {quoted('<group>')}; children = {array([app_ref, test_ref, unit_ref])};")
 group = add("main-group", f"isa = PBXGroup; sourceTree = {quoted('<group>')}; children = {array(refs + [products])};")
@@ -105,8 +111,9 @@ app_config = configs("app", {
     "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
     "MARKETING_VERSION": "0.0.1",
     "CURRENT_PROJECT_VERSION": "1",
+    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
 })
-app = add("app-target", f"isa = PBXNativeTarget; name = DevelopmentTitle; productName = DevelopmentTitle; productReference = {app_ref}; productType = {quoted('com.apple.product-type.application')}; buildConfigurationList = {app_config}; buildPhases = {array([phases['app'], phases['app-frameworks'], phases['app-resources']])}; buildRules = (); dependencies = (); packageProductDependencies = {array(package_products)};")
+app = add("app-target", f"isa = PBXNativeTarget; name = DevelopmentTitle; productName = DevelopmentTitle; productReference = {app_ref}; productType = {quoted('com.apple.product-type.application')}; buildConfigurationList = {app_config}; buildPhases = {array([validation_phase, phases['app'], phases['app-frameworks'], phases['app-resources']])}; buildRules = (); dependencies = (); packageProductDependencies = {array(package_products)};")
 project_id = ident("project")
 proxy = add("app-proxy", f"isa = PBXContainerItemProxy; containerPortal = {project_id}; proxyType = 1; remoteGlobalIDString = {app}; remoteInfo = DevelopmentTitle;")
 dependency = add("app-dependency", f"isa = PBXTargetDependency; target = {app}; targetProxy = {proxy};")
@@ -171,4 +178,4 @@ else:
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content.encode("utf-8"))
-    print(f"Generated {PROJECT.name} and {WORKSPACE.name} with {len(refs)} app/test sources and two local package products")
+    print(f"Generated {PROJECT.name} and {WORKSPACE.name} with {len(refs)} app/test sources and three local package products")

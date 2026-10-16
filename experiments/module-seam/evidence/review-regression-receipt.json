@@ -1,0 +1,275 @@
+{
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "name": "checkout",
+      "exitCode": 0,
+      "seconds": 0.01
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--short"
+      ],
+      "name": "status",
+      "exitCode": 0,
+      "seconds": 0.02
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "name": "toolchain",
+      "exitCode": 0,
+      "seconds": 0.29
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "GridSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-only-testing:GridSeamTests/ModuleSeamTests/testSupersededPreparationCannotReplaceNewSession",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "build-for-testing"
+      ],
+      "name": "build",
+      "exitCode": 0,
+      "seconds": 5.95
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "create",
+        "GameCore Spike06 review owned",
+        "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+        "com.apple.CoreSimulator.SimRuntime.iOS-26-0"
+      ],
+      "name": "create",
+      "exitCode": 0,
+      "seconds": 0.29
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "4C866A8E-35BF-495E-9745-09904545CB07"
+      ],
+      "name": "boot",
+      "exitCode": 0,
+      "seconds": 1.63
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "4C866A8E-35BF-495E-9745-09904545CB07",
+        "-b"
+      ],
+      "name": "bootstatus",
+      "exitCode": 0,
+      "seconds": 27.29
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "experiments/module-seam/ModuleSeam.xcodeproj",
+        "-scheme",
+        "GridSeam",
+        "-derivedDataPath",
+        "/private/tmp/gamecore-spike06-focused-20261004/build",
+        "-jobs",
+        "2",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-only-testing:GridSeamTests/ModuleSeamTests/testSupersededPreparationCannotReplaceNewSession",
+        "-destination",
+        "platform=iOS Simulator,id=4C866A8E-35BF-495E-9745-09904545CB07",
+        "-resultBundlePath",
+        "/private/tmp/gamecore-spike06-review-regression-20261004/regression.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "90",
+        "-collect-test-diagnostics",
+        "never",
+        "test-without-building"
+      ],
+      "name": "regression",
+      "exitCode": 0,
+      "seconds": 12.26
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/gamecore-spike06-review-regression-20261004/regression.xcresult"
+      ],
+      "name": "summary",
+      "exitCode": 0,
+      "seconds": 0.5
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "shutdown",
+        "4C866A8E-35BF-495E-9745-09904545CB07"
+      ],
+      "name": "shutdown",
+      "exitCode": 0,
+      "seconds": 3.41
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "delete",
+        "4C866A8E-35BF-495E-9745-09904545CB07"
+      ],
+      "name": "delete",
+      "exitCode": 0,
+      "seconds": 0.25
+    }
+  ],
+  "inputsBefore": {
+    "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift": "5b2a364d249433925920ecab0989f02e709286effa69e212c1777b536e1c0255",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "a233ac0b8477304c87a91d3fb8e3e74c2243492ce4221c6c8daa0b0697d2f2d8",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "8211f966d55510493217bd6a95f74ceaa6ef84d6b1578e23479afe09c4b56f73",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "experiments/module-seam/Sources/App/ModuleFixture.swift": "9cc6843d85d1ef8712d7db8464859cfe0590e38c76a134959c2a48f6afd558e8",
+    "experiments/module-seam/Sources/App/ModuleHost.swift": "0e929ce2bd2306d65bd80596c64e354d561f1a60a8716132f2d990316faac9f0",
+    "experiments/module-seam/Sources/App/ModuleSeamApp.swift": "8e72a5d2ab6e7d929d78d50076ab76a6986dfecefd125d5f1444b26b83a19f86",
+    "experiments/module-seam/Sources/Contract/GameModule.swift": "58c41ef583c8091ab9ce3fb5f61122ea0c92d570d5dfaa079931c5f346ddfbd1",
+    "experiments/module-seam/Sources/Contract/RuleSession.swift": "fbf13f94fc4c390c93f05d1fd700e5f4de8ac4ef6eda6ef1d4550290f80511f1",
+    "experiments/module-seam/Sources/Grid/GridModule.swift": "0ff15f006263cb69e53ed32447248029d6b99d05143af3df6e31cf564bc220dd",
+    "experiments/module-seam/Sources/Terrain/TerrainModule.swift": "7ef61a51624ceec9b5e466bac10004f3d981381de0640fa0d88bff78e97fce81",
+    "experiments/module-seam/Tests/ModuleSeamTests.swift": "a1894f59f01a6d52d3ade94e2dc470422ad3bc8767864217dbb43ae93fa08e22",
+    "experiments/module-seam/UITests/ModuleSeamUITests.swift": "cbf6bf06358b807f02d0801a4d434ab2af3f9cd28bda1791ed4c5b1c9cddd9b8"
+  },
+  "checkout": "b700afcefb0502734d0ca74454ff0a6e8a853609",
+  "workingTree": "\u001b[32mM\u001b[m experiments/module-seam/Sources/Contract/RuleSession.swift\n \u001b[32mM\u001b[m experiments/module-seam/Tests/ModuleSeamTests.swift",
+  "toolchain": "Xcode 27.0\nBuild version 27A266a",
+  "runtime": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+  "deviceUUID": "4C866A8E-35BF-495E-9745-09904545CB07",
+  "summary": {
+    "devicesAndConfigurations": [
+      {
+        "device": {
+          "architecture": "arm64",
+          "deviceId": "4C866A8E-35BF-495E-9745-09904545CB07",
+          "deviceName": "GameCore Spike06 review owned",
+          "modelName": "iPhone 12",
+          "osBuildNumber": "23A5287g",
+          "osVersion": "26.0",
+          "platform": "iOS Simulator"
+        },
+        "expectedFailures": 0,
+        "failedTests": 0,
+        "passedTests": 1,
+        "skippedTests": 0,
+        "testPlanConfiguration": {
+          "configurationId": "1",
+          "configurationName": "Test Scheme Action"
+        }
+      }
+    ],
+    "environmentDescription": "GridSeam \u00b7 Built with macOS 27.2",
+    "expectedFailures": 0,
+    "failedTests": 0,
+    "finishTime": 1791170910.634,
+    "passedTests": 1,
+    "result": "Passed",
+    "runtimeWarnings": [],
+    "skippedTests": 0,
+    "startTime": 1791170902.223,
+    "statistics": [],
+    "testFailures": [],
+    "title": "Test - GridSeam",
+    "topInsights": [],
+    "totalTestCount": 1
+  },
+  "status": "passed",
+  "inputsAfter": {
+    "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift": "5b2a364d249433925920ecab0989f02e709286effa69e212c1777b536e1c0255",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "a233ac0b8477304c87a91d3fb8e3e74c2243492ce4221c6c8daa0b0697d2f2d8",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "8211f966d55510493217bd6a95f74ceaa6ef84d6b1578e23479afe09c4b56f73",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "experiments/module-seam/Sources/App/ModuleFixture.swift": "9cc6843d85d1ef8712d7db8464859cfe0590e38c76a134959c2a48f6afd558e8",
+    "experiments/module-seam/Sources/App/ModuleHost.swift": "0e929ce2bd2306d65bd80596c64e354d561f1a60a8716132f2d990316faac9f0",
+    "experiments/module-seam/Sources/App/ModuleSeamApp.swift": "8e72a5d2ab6e7d929d78d50076ab76a6986dfecefd125d5f1444b26b83a19f86",
+    "experiments/module-seam/Sources/Contract/GameModule.swift": "58c41ef583c8091ab9ce3fb5f61122ea0c92d570d5dfaa079931c5f346ddfbd1",
+    "experiments/module-seam/Sources/Contract/RuleSession.swift": "fbf13f94fc4c390c93f05d1fd700e5f4de8ac4ef6eda6ef1d4550290f80511f1",
+    "experiments/module-seam/Sources/Grid/GridModule.swift": "0ff15f006263cb69e53ed32447248029d6b99d05143af3df6e31cf564bc220dd",
+    "experiments/module-seam/Sources/Terrain/TerrainModule.swift": "7ef61a51624ceec9b5e466bac10004f3d981381de0640fa0d88bff78e97fce81",
+    "experiments/module-seam/Tests/ModuleSeamTests.swift": "a1894f59f01a6d52d3ade94e2dc470422ad3bc8767864217dbb43ae93fa08e22",
+    "experiments/module-seam/UITests/ModuleSeamUITests.swift": "cbf6bf06358b807f02d0801a4d434ab2af3f9cd28bda1791ed4c5b1c9cddd9b8"
+  },
+  "verifiedSwiftCommit": "fc64f48d8b1723f69f93668734b5defaeec2d30b"
+}

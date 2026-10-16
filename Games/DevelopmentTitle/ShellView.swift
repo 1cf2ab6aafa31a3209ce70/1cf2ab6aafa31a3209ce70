@@ -9,7 +9,19 @@ struct ShellView: View {
     @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     var forceReducedMotion = false
 
+    @ViewBuilder
     var body: some View {
+        #if DEBUG
+        shellContent.environment(\.shellDiagnosticAction, { [weak model] id in
+            guard let model else { return }
+            model.diagnostics?.recordButton(id, controller: model.controller)
+        })
+        #else
+        shellContent
+        #endif
+    }
+
+    private var shellContent: some View {
         SharedShellView(controller: model.controller, presentation: Self.presentation,
                         forceReducedMotion: forceReducedMotion) {
             SpriteView(scene: model.scene, isPaused: !model.controller.flow.inputIsActive)

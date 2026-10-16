@@ -11,6 +11,9 @@ python3 scripts/generate-project.py --check
 python3 scripts/check-foundation.py
 swift test --package-path Packages/GameCore --scratch-path "$output_dir/core" 2>&1 | tee "$output_dir/core-tests.log"
 swift test --package-path Packages/GamePlatform --scratch-path "$output_dir/platform" 2>&1 | tee "$output_dir/platform-tests.log"
+swift test --package-path Games/DevelopmentContent --scratch-path "$output_dir/content" 2>&1 | tee "$output_dir/content-tests.log"
+swift run --package-path Games/DevelopmentContent --scratch-path "$output_dir/content" content-validator Games/DevelopmentContent/Sources/DevelopmentContent/Resources 2>&1 | tee "$output_dir/content-validation.log"
+python3 scripts/test-content-cli.py "$output_dir/content/debug/content-validator" | tee "$output_dir/content-invalid-fixtures.log"
 for configuration in Debug Release; do
   xcodebuild -workspace GameCore.xcworkspace -scheme DevelopmentTitle \
     -configuration "$configuration" -destination 'generic/platform=iOS Simulator' \

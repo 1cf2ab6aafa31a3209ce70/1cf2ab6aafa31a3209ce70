@@ -16,3 +16,7 @@
 - Compiling prototypes, a documented registration interface, and a dependency diagram.
 - Decision record with at least one rejected over-generalized API and a migration rule for evolving the module contract.
 - A concrete list of capabilities that remain title-owned: simulation, hit testing, physics, rendering, and genre-specific UI.
+
+## Outcome — 2026-10-04
+
+Completed the two-renderer experiment with a compile-time associated-session/view seam, existing shell-service bridge and independent module builds. [ADR-006](../decisions/ADR-006-game-module-seam.md) records the decision and migration rule; the [audit](../audits/spike-06-module-seam.md) records 14 passing focused checks on one owned iPhone 12 simulator and the broader integration limits. Next: Epic 07, original per-title catalogs and thin app targets.

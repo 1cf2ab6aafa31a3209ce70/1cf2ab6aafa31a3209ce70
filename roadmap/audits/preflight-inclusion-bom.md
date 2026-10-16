@@ -11,7 +11,7 @@
 | Leaves of Blocks source, tests, resources, tooling | None; design reference only | None | None | None introduced by this audit |
 | GateEngine source, packages, resources, tooling | None; declined | None | None | None introduced by this audit |
 
-This is an empty inclusion inventory, not a claim that the candidates have no dependencies or license obligations. Temporary upstream checkouts and build products used for investigation are outside the game repository. Only authored audit documentation is added here. No Swift package, lockfile, copied test, binary, image, sound, font, or third-party release tool is proposed for inclusion.
+The preflight candidate inventory is empty, not a claim that the candidates have no dependencies or license obligations. Temporary upstream checkouts and build products used for investigation are outside the game repository. Only authored audit documentation is added here. No Swift package, lockfile, copied test, binary, image, sound, font, or third-party release tool is proposed for inclusion.
 
 Apple's Swift standard library and the proposed SwiftUI, SpriteKit, RealityKit, and Foundation frameworks are platform/toolchain inputs, not newly vendored open-source packages. The audit host used Xcode 27.0 (27A266a), Swift 6.4 (swiftlang-6.4.0.34.1), and Apple SDKs 27.0. Spike 00 must pin the supported development and deployment matrix; these observed versions do not establish it.
 
@@ -26,3 +26,17 @@ Apple's Swift standard library and the proposed SwiftUI, SpriteKit, RealityKit, 
 References to source are evidence links, not permission to vendor it. Any later inclusion needs a new row recording upstream URL, full revision, exact copied paths or package product, local destination, license and notice location, transitive graph, asset provenance, runtime data flows, supported platforms, review result, and maintenance owner. Record bundled C/C++ code and fonts as well as package-manager dependencies.
 
 The game-core maintainer owns this inventory. Update it in the same change that first introduces third-party material; do not treat this audit's empty inventory as permanent license or privacy clearance.
+
+## Epic 05 narrow algorithm review — 2026-10-02
+
+The reproducibility contract needs a specified integer PRNG; Swift system randomness and distribution internals do not supply that stable contract. `DeterministicRNG` adapts the fixed SplitMix64 formula into Swift, with independently implemented bounded rejection sampling. It is not suitable for cryptography. No C source, binary or external package is bundled. This review does not change the preflight candidates’ reference-only decisions.
+
+| Field | Reviewed material |
+| --- | --- |
+| Upstream and identity | [Sebastiano Vigna’s SplitMix64 reference](https://prng.di.unimi.it/splitmix64.c), retrieved 2026-10-02; SHA-256 `071795a8e29978a5cbd7015ce8f7d772e7ab4631e574e9102b748fe99105ff3d`. The upstream file has no exposed revision identifier; the digest pins the reviewed bytes |
+| Local destination | `Packages/GameCore/Sources/GameCore/DeterministicInput.swift`, `DeterministicRNG.next()` integer formula and constants |
+| Rights and notice | Reference dedicates its rights to the public domain and additionally grants use/copy/modify/distribute permission. Retain [the reference notice](../../Games/DevelopmentContent/Sources/DevelopmentContent/Resources/SplitMix64-NOTICE.txt), included in the development content resource bundle; project additions use MIT |
+| Dependencies and resources | No direct or transitive dependency; no imported game assets, tests or tooling |
+| Data flows and platforms | Pure UInt64 state on the existing Swift/iOS platforms; no filesystem, network, entropy-service, telemetry or account access |
+| Review and maintenance | Small-team implementation and independent review; repository maintainer owns the fixed algorithm and known-vector fixtures. Algorithm changes require deliberate content/fixture versioning |
+| Reproducibility | Wrapping UInt64 operations and explicit bounded sampling; host and mobile fixture expectations are checked in Epic 05 validation |
