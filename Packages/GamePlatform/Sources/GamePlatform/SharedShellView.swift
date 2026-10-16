@@ -44,6 +44,18 @@ public struct ShellPresentation: Sendable {
     }
 }
 
+#if DEBUG
+private struct ShellDiagnosticActionKey: EnvironmentKey {
+    static let defaultValue: ((String) -> Void)? = nil
+}
+extension EnvironmentValues {
+    public var shellDiagnosticAction: ((String) -> Void)? {
+        get { self[ShellDiagnosticActionKey.self] }
+        set { self[ShellDiagnosticActionKey.self] = newValue }
+    }
+}
+#endif
+
 /// Common mobile UI and lifecycle integration. A title supplies its renderer
 /// and active play controls as ordinary SwiftUI content, without a module protocol.
 @MainActor
@@ -176,6 +188,9 @@ public struct ShellActionButton: View {
     private let identifier: String
     private let prominent: Bool
     private let action: () -> Void
+    #if DEBUG
+    @Environment(\.shellDiagnosticAction) private var diagnosticAction
+    #endif
 
     public init(_ title: String, id: String, prominent: Bool = false, action: @escaping () -> Void) {
         self.title = title
@@ -185,7 +200,12 @@ public struct ShellActionButton: View {
     }
 
     public var body: some View {
-        Button(action: action) {
+        Button {
+            #if DEBUG
+            diagnosticAction?(identifier)
+            #endif
+            action()
+        } label: {
             Text(title)
                 .font(.headline)
                 .foregroundStyle(Color.primary)

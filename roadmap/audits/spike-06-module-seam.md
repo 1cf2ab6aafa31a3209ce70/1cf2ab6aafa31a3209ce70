@@ -2,7 +2,7 @@
 
 **Date:** 2026-10-04. **Status:** Complete within the timebox and focused simulator scope; experiment decision accepted.
 
-PR #7 was merged by explicit user instruction at `cb11d713f0641d47bd59b85fe64dbe4401d70486`. Its navigation contact change still has no completed hosted acceptance run; merging does not close that separate [U10 finding](mobile-navigation-contact.md).
+PR #7 was merged by explicit user instruction at `cb11d713f0641d47bd59b85fe64dbe4401d70486`. Its navigation contact change subsequently passed complete hosted checks, but a later same-input iPhone Resume failure required the separate [U10 investigation](mobile-navigation-contact.md). Current full hosted acceptance subsequently passed exact `0b85d51` on both geometries, closing U10 for that revision. The scoped DEBUG diagnostic run passed six navigation cases and does not prove the cause of earlier failures. These foundation checks remain separate from this spike’s focused experiment evidence.
 
 The [experiment](../../experiments/module-seam/README.md) and [ADR-006](../decisions/ADR-006-game-module-seam.md) compare existing closure registration with a narrow associated-view/session protocol. The protocol uses the existing shell, feedback and save services. Original SpriteKit block and non-AR RealityKit terrain studies retain their own renderers and hit testing. Shared production packages and the production app are unchanged. Both targets use the original development catalog in separate app containers; independent production-title catalogs remain Epic 07 work.
 

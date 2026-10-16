@@ -242,7 +242,9 @@ final class DevelopmentTitleUITests: XCTestCase {
         let app = XCUIApplication()
         // A new namespace isolates each test. Retain this identity on the same
         // application object when a test relaunches to verify persisted state.
-        app.launchArguments = arguments + ["--ui-test-fixture", UUID().uuidString]
+        let identity = UUID()
+        app.launchArguments = arguments + ["--ui-test-fixture", identity.uuidString]
+        print("GAMECORE_UI_FIXTURE \(identity.uuidString) case=\(name)")
         app.launch()
         waitForHeading(app, "shell.menu")
         waitForSaved(app)

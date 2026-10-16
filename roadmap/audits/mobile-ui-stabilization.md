@@ -1,6 +1,6 @@
 # Mobile UI stabilization and branch integration
 
-**Date:** 2026-10-04. **Status:** Epic 04 PR #6 merged; later navigation failures remain open for hosted verification. See [the current contact investigation](mobile-navigation-contact.md).
+**Date:** 2026-10-04. **Status:** Epic 04 PR #6 merged; current full navigation acceptance passed at `0b85d51`. Earlier failures and mechanism limits remain in [the contact investigation](mobile-navigation-contact.md).
 
 ## Scope
 
@@ -38,7 +38,7 @@ Only the launch helper's unrelated Settings/Delete precondition was removed. The
 
 Three new [app-hosted test methods](../../Tests/DevelopmentTitleTests/UITestFixtureTests.swift) cover the unchanged default path, canonical/lowercase UUID handling and pure parsing without directory creation; nine missing/empty/malformed/path/duplicate argument vectors; same-UUID relaunch persistence, different-UUID initial isolation plus save/delete, preservation of the first fixture, and unchanged default `save.json`/`save.previous.json` bytes after invalid arguments and fixture operations. The reviewed test SHA-256 is `510a8080ec57d1c0b7e3d75729ca481fe6973fbb3640c3bfae188d3bec1aacf7`. The final local run executed all three methods and the complete 26-test app/UI suite on each geometry, plus all six selected restart invocations and both byte-preservation/fixture-removal proofs. All 58 input hashes match committed `ab613a84`; owned shutdown/delete passed and both simulator UUIDs were independently absent. Package checks (72), CLI rejection cases (11) and all three mobile builds passed. The Release app binary contains no fixture-selector literal; the Debug app retains it in its debug dylib, consistent with the reviewed compilation guards.
 
-### Verified current acceptance
+### Verified fixture-isolation acceptance
 
 Both final matrices completed successfully under Xcode 26.6 (`17F113`) and iOS Simulator 26.5 (`23F77`). Each artifact records one selected geometry and clean source. All hashes match the published branch head and expected input manifest; Epic 04 also matches its actual PR merge checkout `9e01b5b`.
 
@@ -66,9 +66,21 @@ All items are material because they govern accurate merge readiness or acceptanc
 | U07 | Serial CI has insufficient growth margin | Addressed | Independent geometry jobs with unchanged coverage and bounds |
 | U08 | Conflict resolution must preserve upstream module guidance | Addressed | Durable state and provisional Spike 06 wording retained |
 | U09 | Unrelated destructive setup can prevent another test from reaching its acceptance body | Addressed | Validated DEBUG UUID isolation removes only setup deletion; dedicated destructive coverage retained; actual activation-versus-presentation cause remains unproven |
-| U10 | Centered Pause/Resume contacts did not produce expected transitions in later CI | Open for hosted verification | [Contact investigation](mobile-navigation-contact.md): one 150 ms press preserves assertions; six local focused checks passed, hosted run canceled at user request |
+| U10 | Centered Pause/Resume contacts did not produce expected transitions in later CI | Addressed for current revision acceptance | [Contact investigation](mobile-navigation-contact.md) and [combined evidence](mobile-navigation-hosted-evidence.json): final full run passed exact `0b85d51` on both geometries; all earlier failures retained and mechanism/repeat reliability unproven |
 
-Simulator results establish the tested software behavior only. Minimum-runtime, physical performance and distribution checks remain explicit under [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md); unavailable physical devices and macOS are not current development blockers. Next is Epic 05 review and Spike 06; new prototype work was kept out of this testing/merge wrap-up.
+Simulator results establish the tested software behavior only. Minimum-runtime, physical performance and distribution checks remain explicit under [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md); unavailable physical devices and macOS are not current development blockers. Epic 05 and Spike 06 are now merged. Next is [Epic 07](../epics/07-module-integration.md); current integration navigation acceptance remains separate from their historical acceptance records.
+
+## Later navigation follow-up
+
+PR 7 merged with user authorization. Its verified full hosted run `37255509103` at `cb11d71` passed both geometries, but integration run `37259795034` at `d4cb256` later failed iPhone Foreground/Rotation after a centered Resume contact; all 58 foundation inputs were identical. The original short-contact hypothesis therefore does not establish a repaired mechanism. The [contact audit](mobile-navigation-contact.md) retains both exact identities, failure evidence and the subsequent DEBUG fixture-only action/state diagnostics at `e8158f2`.
+
+Manual run `37268374149` passed three navigation cases per geometry with all 60 inputs matching clean `e8158f2`, zero failures/skips/runtime warnings and successful owned cleanup. Each case’s complete, contiguous journal recorded an entered and accepted Resume leading to playing state, without errors or truncation. This scoped diagnostic pass omits package/restart checks and cannot alone close U10’s full hosted acceptance or establish the cause of earlier failures.
+
+[Full hosted acceptance run 37269199562](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/37269199562) at `e8158f2` later failed iPad’s initial Large Text Start → playing transition: 27/28 app/UI tests passed, no skips/runtime warnings; package/build checks passed, but restart proof was not reached. iPhone passed all 28 app/UI tests and three selected restart invocations with preservation/removal proof. The failing iPad fixture’s matching 60-input journal records ended during launch, before contact, and Start was not instrumented; the activation/rejection mechanism remains unproven.
+
+Revision `0b85d51` extends only DEBUG observation with actual Start entry/decision/return and weak five-second state checkpoints; two focused journal methods and the incremental Release simulator build passed. Packaged Debug/Release marker inspection confirmed exclusion.
+
+[New full run 37270994911](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/37270994911) passed at exact `0b85d51`; the final verified artifacts establish checkpoint execution and full hosted acceptance. It preserves all product guards/actions, contact inputs, strict postconditions, privacy payloads and timeout bounds. Both final clean 60-input artifacts matched `0b85d51`: 72 distinct package checks, 11 CLI rejection cases and three builds per job, 28 app/UI tests per geometry, six selected restart invocations, both preservation/removal proofs and owned cleanup. All summaries had zero failures/skips/expected failures/runtime warnings. All six UI journals per geometry had post-Start checkpoints and accepted Start reaching playing, without errors/truncation; [combined evidence](mobile-navigation-hosted-evidence.json) retains the manifests and checks. This closes current revision acceptance, not the original activation mechanism or a repeat-reliability claim.
 
 ## Historical focused execution
 
