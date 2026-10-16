@@ -23,6 +23,8 @@ The disposable experiment has its own build/test commands in its README. Its ren
 
 Keep changes focused and explain the behavior or decision they change. Include relevant validation and remaining uncertainty. Preserve the roadmap's dependencies unless an explicit decision revises them. Simulator results must be labeled with runtime and geometry; a deployment-target build is not execution on the minimum OS.
 
+Feature branches target `integration/first-party-foundation`. Promotion PRs carry reviewed integration history to `main` and add no content of their own. Land any fix a promotion needs on integration first, then promote again. If content does reach `main` directly, merge `main` back into integration through a PR before further integration work. Promotion merge commits that exist only on `main` are harmless; content commits there conflict with the next promotion, as in [PR 10](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/10).
+
 - `Packages/GameCore` contains renderer-independent domain interfaces and pure logic. It must not import title or renderer implementations.
 - `Packages/GamePlatform` depends on `GameCore` and owns the reusable mobile shell/controller and Apple platform adapters. Its SwiftUI shell accepts title-provided renderer and gameplay views without importing a title.
 - `Games/DevelopmentContent` is a local title-content package with original fixtures and one shared validation implementation for its app loader and command-line tool. It depends only on `GameCore`; neither foundation package imports it.
