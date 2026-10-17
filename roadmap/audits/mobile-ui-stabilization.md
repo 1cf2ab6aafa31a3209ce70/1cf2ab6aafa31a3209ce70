@@ -1,6 +1,6 @@
 # Mobile UI stabilization and branch integration
 
-**Date:** 2026-10-04. **Status:** Epic 04 PR #6 merged; current full navigation acceptance passed at `0b85d51`. Earlier failures and mechanism limits remain in [the contact investigation](mobile-navigation-contact.md).
+**Date:** 2026-10-04. **Status:** Epic 04 PR #6 merged; full navigation acceptance passed at `0b85d51`. A same-source iPad recurrence at `2dc849e` (N06), earlier failures and mechanism limits are recorded in [the contact investigation](mobile-navigation-contact.md).
 
 ## Scope
 
@@ -66,7 +66,7 @@ All items are material because they govern accurate merge readiness or acceptanc
 | U07 | Serial CI has insufficient growth margin | Addressed | Independent geometry jobs with unchanged coverage and bounds |
 | U08 | Conflict resolution must preserve upstream module guidance | Addressed | Durable state and provisional Spike 06 wording retained |
 | U09 | Unrelated destructive setup can prevent another test from reaching its acceptance body | Addressed | Validated DEBUG UUID isolation removes only setup deletion; dedicated destructive coverage retained; actual activation-versus-presentation cause remains unproven |
-| U10 | Centered Pause/Resume contacts did not produce expected transitions in later CI | Addressed for current revision acceptance | [Contact investigation](mobile-navigation-contact.md) and [combined evidence](mobile-navigation-hosted-evidence.json): final full run passed exact `0b85d51` on both geometries; all earlier failures retained and mechanism/repeat reliability unproven |
+| U10 | Centered Pause/Resume contacts did not produce expected transitions in later CI | Addressed for current revision acceptance | [Contact investigation](mobile-navigation-contact.md) and [combined evidence](mobile-navigation-hosted-evidence.json): final full run passed exact `0b85d51` on both geometries; all earlier failures retained; same-source `2dc849e` recurrence (N06) shows no Pause action entry after an on-target pressed contact; mechanism unobserved and repeat reliability not established |
 
 Simulator results establish the tested software behavior only. Minimum-runtime, physical performance and distribution checks remain explicit under [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md); unavailable physical devices and macOS are not current development blockers. Epic 05 and Spike 06 are now merged. Next is [Epic 07](../epics/07-module-integration.md); current integration navigation acceptance remains separate from their historical acceptance records.
 

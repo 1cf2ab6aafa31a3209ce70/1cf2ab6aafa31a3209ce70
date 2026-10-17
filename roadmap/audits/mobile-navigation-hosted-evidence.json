@@ -1968,5 +1968,135 @@
   "sourceRevisions": [
     "e8158f2fedd85372f5881be0203b73ae55502b55",
     "0b85d518394ab51df9580aaa46d74a4a1c93731c"
-  ]
+  ],
+  "postAcceptanceRecurrence": {
+    "runID": 38865714337,
+    "event": "push",
+    "headBranch": "wip/foundation-main-promotion-2",
+    "status": "completed",
+    "conclusion": "failure",
+    "sourceRevision": "2dc849ed2d33894e86a3f8ae0feb42fd1ac2f490",
+    "navigationOnly": false,
+    "toolchain": {
+      "xcode": "Xcode 26.6 (17F113)",
+      "runtime": "iOS 26.5 (23F77)"
+    },
+    "inventory": {
+      "inputs": 60,
+      "worktreeDirty": false,
+      "matchesSourceRevision": true,
+      "differsFromAcceptedRevision": false,
+      "note": "2dc849e differs from 0b85d51 only in six roadmap/audits files, none inventoried; its tree is identical to d57d81c"
+    },
+    "models": {
+      "iphone12": {
+        "conclusion": "success"
+      },
+      "ipad9": {
+        "conclusion": "failure",
+        "packageAndBuildChecks": "passed",
+        "appAndUITests": {
+          "executed": 28,
+          "passed": 27,
+          "failed": 1
+        },
+        "restartProof": "not reached"
+      }
+    },
+    "failure": {
+      "model": "ipad9",
+      "case": "testNavigationSuccessFailureResumeAndRestart",
+      "assertion": "Missing heading shell.paused",
+      "helperLine": 257,
+      "caseSeconds": 162.095,
+      "stage": "Second Pause, after a complete first cycle and a second accepted Start",
+      "pauseContact": [
+        405,
+        616
+      ],
+      "pauseContactDurationSeconds": 0.15,
+      "pauseFrame": [
+        85,
+        583,
+        640,
+        66
+      ],
+      "window": [
+        810,
+        1080
+      ],
+      "contactRecordWallTime": 1792135647.321,
+      "finalHierarchyState": "playing",
+      "finalSavedStatus": "Local data saved",
+      "fixtureUUID": "82124D54-9EF5-44CA-A0CA-9072E987EC6C"
+    },
+    "journal": {
+      "records": 67,
+      "launches": 1,
+      "contiguousSequence": [
+        1,
+        67
+      ],
+      "missing": false,
+      "truncated": false,
+      "parsePartial": false,
+      "collectorErrors": [],
+      "firstPause": "sequence 19-23: button.pause, pause.entered, paused published, pause.accepted, pause.returned",
+      "secondStart": "sequence 42-47: button.start, start.entered, loading published, start.accepted, start.returned, playing published",
+      "afterSecondStart": "sequence 48-67: state.checkpoint only; playing, inputActive true, no pause reasons",
+      "bracketingCheckpoints": [
+        {
+          "sequence": 62,
+          "wallTime": 1792135644.74
+        },
+        {
+          "sequence": 63,
+          "wallTime": 1792135649.98
+        }
+      ],
+      "laterCheckpoints": 4,
+      "pauseRecordsAfterContact": 0
+    },
+    "video": {
+      "recordingStartWallTime": 1792135501.979,
+      "pressedAppearanceSeconds": [
+        145.2,
+        145.433
+      ],
+      "samplingFPS": 30,
+      "observation": "Pause showed its pressed appearance for about 0.13 s at the contact time, then a normal release fade; the playing screen remained. No pressed frame was sampled before the successful first Pause transition in the same launch."
+    },
+    "sameTreeRuns": [
+      {
+        "runID": 38865722682,
+        "event": "pull_request",
+        "sourceRevision": "2dc849ed2d33894e86a3f8ae0feb42fd1ac2f490",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38867373659,
+        "event": "push",
+        "ref": "main",
+        "sourceRevision": "d57d81c0a7b90be7a9807366d20d1c3e109d96b5",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38867431544,
+        "event": "push",
+        "ref": "integration/first-party-foundation",
+        "sourceRevision": "d57d81c0a7b90be7a9807366d20d1c3e109d96b5",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38865389607,
+        "event": "push",
+        "ref": "integration/first-party-foundation",
+        "sourceRevision": "3217ffb",
+        "conclusion": "cancelled",
+        "note": "Canceled by the workflow concurrency group when d57d81c was pushed to the same ref; supplies no result"
+      }
+    ],
+    "rawEvidencePath": "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/45b5aaa0-19a3-40df-82f0-5b6ccba90890/scratchpad/run-38865714337",
+    "interpretation": "Later committed same-launch checkpoints bracket the on-target contact with no writer, collection, truncation or tail-loss uncertainty, so the Pause ShellActionButton action was not entered for this contact. The button rendered its pressed state. Controller refusal and lifecycle/audio pause are excluded for this failure. The mechanism between press recognition and action dispatch is unobserved; frequency, hardware behavior and hosted load as a cause are not established."
+  }
 }

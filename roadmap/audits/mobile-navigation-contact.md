@@ -1,6 +1,6 @@
 # Navigation contact-duration investigation
 
-**Date:** 2026-10-04. **Status:** Current full hosted acceptance passed at `0b85d51`; U10 addressed for that revision. Earlier failures and the unproven activation mechanism remain recorded.
+**Date:** 2026-10-04; recurrence recorded 2026-10-16. **Status:** Full hosted acceptance passed at `0b85d51`; U10 addressed for that revision. A same-source iPad recurrence at `2dc849e` (N06) is the first instrumented failure and shows a Pause action that was not entered. Earlier failures remain recorded; the mechanism is still unobserved.
 
 Two hosted failures retained a centered 50 ms XCTest tap without the expected shell transition. The trial changes only the shared UI-test helper to one native 150 ms press. It changes no production source, fixture selection, retries, scrolling, waits, assertions or timeout allowances. The existing existence/reachability and caller transition checks remain mandatory. A press request does not itself prove delivery or SwiftUI action entry.
 
@@ -68,9 +68,25 @@ The two existing journal test methods passed against unchanged before/after comp
 
 All six case-mapped UI journals per geometry were healthy, complete and contiguous, with no writer/collection errors or truncation. iPhone contained 237 rows including 51 checkpoints; iPad contained 251 rows including 65 checkpoints. Every UI case had a checkpoint after Start, and accepted Start reached playing state, including the previously failing Large Text case. These rows establish callback acceptance and later state in the executed instrumented cases; they do not retrospectively explain earlier uninstrumented failures. The [combined hosted evidence](mobile-navigation-hosted-evidence.json) retains exact manifests, scoped prior results, journal checks and final restart/cleanup proof.
 
+## Post-acceptance same-source recurrence
+
+[Push run 38865714337](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/38865714337) tested `2dc849ed2d33894e86a3f8ae0feb42fd1ac2f490`, the head of promotion [PR 10](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/10). It differs from `0b85d51` only in six `roadmap/audits` files, none inventoried; all 60 inventoried input hashes match `2dc849e`. Xcode 26.6 (`17F113`), iOS Simulator 26.5 (`23F77`). iPhone passed. iPad passed package/build checks and 27 of 28 app/UI tests. `testNavigationSuccessFailureResumeAndRestart` failed `Missing heading shell.paused` at helper line 257 in 162.095 seconds, below its 180-second cap. Restart proof was not reached.
+
+The failure came at the second Pause, after a complete first cycle and a second accepted Start. The retained synthesized-event record shows one 150 ms press at `(405,616)`, centered within Pause `(85,583,640,66)` in an 810×1080 window. The final hierarchy still showed the playing controls at the same frames, with Local data saved.
+
+The case-mapped journal (`82124D54…`) had one launch, contiguous sequence 1–67, and no missing, truncated, partial-parse or collector errors. The first Pause recorded `button.pause` → `pause.entered` → paused → `pause.accepted` → `pause.returned` (19–23). The second Start recorded `button.start` → `start.entered` → loading → `start.accepted` → `start.returned` → playing (42–47). Rows 48–67 are checkpoints only: playing, input active, no pause reasons. Checkpoints 62 and 63 fall about 2.6 seconds before and 2.7 seconds after the contact record, and four more follow. No `button.pause` or `pause.*` row exists after the second Start.
+
+The retained screen recording, sampled at 30 fps, shows Pause in its pressed appearance for about 0.13 seconds at the contact time, then a normal release fade; the playing screen remained. No pressed frame was sampled before the successful first Pause transition in the same launch.
+
+By the criterion above, later committed same-launch events bracket the contact without writer, truncation or tail-loss uncertainty. **The Pause `ShellActionButton` action was not entered for this on-target contact, although the button rendered its pressed state.** Controller refusal and lifecycle/audio pause are excluded for this failure. The remaining gap lies between SwiftUI press recognition and Button action dispatch, for example a canceled touch; the current journal cannot observe it. This one failure does not establish frequency, behavior on hardware, or hosted load as a cause.
+
+The same tree passed both geometries in [PR run 38865722682](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/38865722682), and at tree-identical `d57d81c` in [main push 38867373659](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/38867373659) and [integration push 38867431544](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/38867431544). Integration push 38865389607 at `3217ffb` was canceled by the workflow concurrency group when `d57d81c` reached the same ref; it supplies no result. Passing runs do not supersede the failure.
+
+Next, add a passive DEBUG observation before any targeting, retry or product change. Recording shell ScrollView phase transitions (`onScrollPhaseChange`, available at the iOS 18 deployment target) would show whether the scroll view claimed the contact. Capturing Button press state would require a different button style or an added gesture, which changes the arbitration under test. The [combined hosted evidence](mobile-navigation-hosted-evidence.json) records this run under `postAcceptanceRecurrence`. Raw evidence: run artifact `mobile-validation-evidence-ipad9`.
+
 ## Current disposition and finite review ledger
 
-**U10 is addressed for full hosted acceptance of `0b85d51`.** The original six-case local trial, canceled hosted run, verified `cb11d71` pass, later same-input failure and `e8158f2` full iPad failure remain separate historical evidence. The instrumentation changes timing and improves observation; the original activation mechanism and repeat reliability remain unproven. No production guard or action, contact duration, retry, strict postcondition or timeout allowance was changed by these diagnostics. Epic 05 and Spike 06 are merged; [Epic 07](../epics/07-module-integration.md) is next.
+**U10 is addressed for full hosted acceptance of `0b85d51`.** The original six-case local trial, canceled hosted run, verified `cb11d71` pass, later same-input failure and `e8158f2` full iPad failure remain separate historical evidence. The instrumentation changes timing and improves observation. The `2dc849e` recurrence (N06) shows that repeat reliability is not established and narrows that failure to missing Button action entry after an on-target pressed contact. No production guard or action, contact duration, retry, strict postcondition or timeout allowance was changed by these diagnostics. Epic 05 and Spike 06 are merged; [Epic 07](../epics/07-module-integration.md) is next.
 
 | ID | Finding | Disposition |
 | --- | --- | --- |
@@ -79,4 +95,5 @@ All six case-mapped UI journals per geometry were healthy, complete and contiguo
 | N03 | Diagnostics must preserve Release, privacy and original actions/assertions | Addressed: reviewed source, local checks, Release exclusion and scoped/full hosted evidence |
 | N04 | Missing events or diagnostic green must not prove an activation mechanism | Addressed: continuity, tail, timing and scope limits explicit |
 | N05 | Full iPad failure exposed an uninstrumented Start boundary and no later continuity anchor | Addressed: `0b85d51` Start diagnostics and actual post-Start checkpoints verified in final full artifacts |
-| U10 | Current hosted navigation acceptance | Addressed for exact `0b85d51`: complete package/build/UI/restart evidence on both geometries; mechanism and repeat reliability remain unproven |
+| N06 | Same-source iPad recurrence at `2dc849e`: on-target Pause contact rendered pressed, but no action entry, with bracketing checkpoints | Open: add passive scroll-phase observation before any targeting, retry or product change |
+| U10 | Current hosted navigation acceptance | Addressed for exact `0b85d51`: complete package/build/UI/restart evidence on both geometries; mechanism unobserved and repeat reliability not established (N06) |
