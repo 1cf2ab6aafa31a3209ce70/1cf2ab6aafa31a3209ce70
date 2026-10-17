@@ -3,6 +3,7 @@ import Combine
 import Darwin
 import Foundation
 import GameCore
+import SwiftUI
 
 /// Bounded, fixture-only diagnostics. Missing events never prove non-delivery:
 /// an interrupted process or failed writer can leave an incomplete tail.
@@ -23,7 +24,9 @@ public final class ShellActionJournal {
         "audio.interruptionBegan.entered", "audio.interruptionBegan.returned",
         "audio.interruptionEnded.entered", "audio.interruptionEnded.returned",
         "audio.routeDisconnected.entered", "audio.routeDisconnected.returned",
-        "audio.mediaServicesReset.entered", "audio.mediaServicesReset.returned"
+        "audio.mediaServicesReset.entered", "audio.mediaServicesReset.returned",
+        "scroll.idle", "scroll.tracking", "scroll.interacting", "scroll.decelerating", "scroll.animating",
+        "scroll.unknown"
     ]
     private let fixtureID: UUID
     private let launchID = UUID()
@@ -149,6 +152,23 @@ public final class ShellActionJournal {
         case "shell.pause": kind = "button.pause"
         case "shell.resume": kind = "button.resume"
         default: return
+        }
+        record(kind: kind, flow: controller.flow,
+               persistenceReady: controller.persistenceReady, recoveryRequired: controller.recoveryRequired,
+               resumeMessagePresent: controller.resumeMessage != nil)
+    }
+
+    /// Passive shell scroll observation: shows whether the scroll view took a
+    /// contact that produced no button record. It never drives scrolling.
+    public func recordScrollPhase(_ phase: ScrollPhase, controller: ShellController) {
+        let kind: String
+        switch phase {
+        case .idle: kind = "scroll.idle"
+        case .tracking: kind = "scroll.tracking"
+        case .interacting: kind = "scroll.interacting"
+        case .decelerating: kind = "scroll.decelerating"
+        case .animating: kind = "scroll.animating"
+        @unknown default: kind = "scroll.unknown"
         }
         record(kind: kind, flow: controller.flow,
                persistenceReady: controller.persistenceReady, recoveryRequired: controller.recoveryRequired,
