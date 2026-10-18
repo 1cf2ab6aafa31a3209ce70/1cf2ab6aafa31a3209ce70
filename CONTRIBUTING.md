@@ -25,6 +25,8 @@ Keep changes focused and explain the behavior or decision they change. Include r
 
 Feature branches target `integration/first-party-foundation`. Promotion PRs carry reviewed integration history to `main` and add no content of their own. Land any fix a promotion needs on integration first, then promote again. If content does reach `main` directly, merge `main` back into integration through a PR before further integration work. Promotion merge commits that exist only on `main` are harmless; content commits there conflict with the next promotion, as in [PR 10](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/10).
 
+Scale evidence to the change. Shared packages, the module contract, persistence, the privacy surface, CI and release candidates keep full records: source identity, toolchain and runtime, input inventories and an audit entry. Title-owned gameplay, content and art changes need the PR's CI result plus a short PR note on what was exercised. Add an audit entry for those only when recording a failure, a decision or acceptance.
+
 - `Packages/GameCore` contains renderer-independent domain interfaces and pure logic. It must not import title or renderer implementations.
 - `Packages/GamePlatform` depends on `GameCore` and owns the reusable mobile shell/controller and Apple platform adapters. Its SwiftUI shell accepts title-provided renderer and gameplay views without importing a title.
 - `Games/DevelopmentContent` is a local title-content package with original fixtures and one shared validation implementation for its app loader and command-line tool. It depends only on `GameCore`; neither foundation package imports it.

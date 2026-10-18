@@ -2,7 +2,9 @@
 
 **Decision needed:** Find a feasible way to render and simulate a satisfying excavation or hole-growth mechanic on the supported devices while preserving the existing core interface.
 
-**Timebox:** Three developer days. **Entry:** Epic 10 is complete. **Next:** Epic 12.
+**Timebox:** Three developer days. **Entry:** Epic 07 has a production `GameModule` contract (version 1, provisional). **Next:** Epic 08; this decision governs Epic 12.
+
+**Why now:** Terrain is the investigation most likely to require a contract change. Running it before any production title adopts version 1 keeps such a change to one contract revision instead of a migration across titles.
 
 **Execution policy:** Follow [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md) and the [prepared scenarios](../plans/later-spike-test-plans.md#spike-11--dig-feasibility). Use the supported mobile simulator geometries; physical hardware is unavailable and macOS is deferred. Record simulator limits explicitly rather than claiming physical performance.
 
@@ -19,6 +21,6 @@
 
 - Reproducible prototype, simulator measurements with their limits, agreed workload budgets, decision record, and a risk list with mitigations. Simulator measurements do not satisfy physical performance targets or minimum-OS runtime coverage.
 - An explicit scope choice: deformable 3D terrain, simplified 3D chunks, or 2D excavation. Preserve the player fantasy within the measured workload limits, with physical performance uncertainty recorded for release review.
-- A confirmed `GameModule` integration path with no terrain-specific types added to core APIs.
+- A confirmed `GameModule` integration path with no terrain-specific types added to core APIs, or a specified version 1 contract change for Epic 07's owners to make before Epic 09A adopts it.
 
 If none meets the budget, Epic 12 starts with the 2D fallback instead of an unbounded engine project.
