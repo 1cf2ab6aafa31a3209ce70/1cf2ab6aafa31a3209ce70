@@ -1,11 +1,17 @@
 name: Mobile validation
 on:
+  # Pull requests cover feature branches; pushes run only on the shared branches.
   push:
+    branches: [main, integration/first-party-foundation]
   pull_request:
   workflow_dispatch:
     inputs:
       navigation_only:
         description: Run only the three navigation UI diagnostics
+        type: boolean
+        default: false
+      minimum_runtime:
+        description: Also run the iOS 18 minimum-runtime job
         type: boolean
         default: false
 permissions:
@@ -54,4 +60,45 @@ jobs:
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
             ${{ runner.temp }}/foundation-ui/action-journals/
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 30
+  minimum-runtime:
+    # The deployment floor is iOS 18.0; ADR-003 keeps minimum-runtime execution explicit.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.minimum_runtime)
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '18.0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Install the iOS 18.0 simulator runtime when absent
+        run: |
+          runtime="com.apple.CoreSimulator.SimRuntime.iOS-${GAMECORE_SIM_RUNTIME_VERSION//./-}"
+          if ! xcrun simctl list runtimes | grep -q "$runtime"; then
+            xcodebuild -downloadPlatform iOS -buildVersion "$GAMECORE_SIM_RUNTIME_VERSION"
+          fi
+          if ! xcrun simctl list runtimes | grep -q "$runtime"; then
+            echo "::error::iOS $GAMECORE_SIM_RUNTIME_VERSION simulator runtime is unavailable on this runner"
+            xcrun simctl list runtimes
+            exit 1
+          fi
+      - name: Test iphone12 on the minimum runtime
+        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model iphone12
+      - name: Retain minimum-runtime evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: mobile-minimum-runtime-evidence
+          path: |
+            ${{ runner.temp }}/minimum-runtime-ui/*.log
+            ${{ runner.temp }}/minimum-runtime-ui/inventory.json
+            ${{ runner.temp }}/minimum-runtime-ui/*-restart.json
+            ${{ runner.temp }}/minimum-runtime-ui/*.xcresult
+            ${{ runner.temp }}/minimum-runtime-ui/*-diagnostics/
+            ${{ runner.temp }}/minimum-runtime-ui/action-journals/
+          if-no-files-found: ignore
+          retention-days: 30
