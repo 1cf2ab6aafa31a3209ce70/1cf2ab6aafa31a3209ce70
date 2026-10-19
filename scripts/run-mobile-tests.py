@@ -123,7 +123,9 @@ def collect_boot_diagnostics(device, model, output):
 def collect_action_journals(device, model, output):
     """Copy only bounded diagnostic journals from this owned app's UUID fixtures."""
     destination = output / "action-journals" / model
-    receipt = {"device": device, "model": model, "byteLimit": 128 * 1024,
+    # Each journal caps itself at 128 KiB. With touch phases, six passing
+    # cases reached about 127 KiB together, and a retried case adds a journal.
+    receipt = {"device": device, "model": model, "byteLimit": 1024 * 1024,
                "files": [], "missing": False, "truncated": False, "errors": []}
     try:
         destination.mkdir(parents=True, exist_ok=True)
@@ -227,6 +229,48 @@ def collect_action_journals(device, model, output):
             (destination / "receipt.json").write_text(json.dumps(receipt, indent=2) + "\n")
         except OSError as error:
             print(f"Action journal receipt warning ({model}): {error}", file=sys.stderr)
+
+
+def report_retries(model, output):
+    """Name every case that failed before passing or failing again; never hide a retry."""
+    result_bundle = output / f"{model}.xcresult"
+    report = {"model": model, "cases": [], "errors": []}
+    try:
+        if not result_bundle.exists():
+            raise ValueError("No result bundle")
+        tree = json.loads(run(["xcrun", "xcresulttool", "get", "test-results", "tests",
+                               "--path", str(result_bundle)], timeout=120))
+
+        def visit(node):
+            repetitions = [child for child in node.get("children", [])
+                           if child.get("nodeType") == "Repetition"]
+            if node.get("nodeType") == "Test Case" and any(r.get("result") == "Failed" for r in repetitions):
+                report["cases"].append({
+                    "test": node.get("nodeIdentifier") or node.get("name"),
+                    "result": node.get("result"),
+                    "repetitions": [{"name": r.get("name"), "result": r.get("result"),
+                                     "failures": [c.get("name") for c in r.get("children", [])
+                                                  if c.get("nodeType") == "Failure Message"]}
+                                    for r in repetitions]})
+            for child in node.get("children", []):
+                visit(child)
+
+        for node in tree.get("testNodes", []):
+            visit(node)
+    except Exception as error:
+        report["errors"].append(str(error))
+        print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    try:
+        (output / f"{model}-retries.json").write_text(json.dumps(report, indent=2) + "\n")
+    except OSError as error:
+        print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    for case in report["cases"]:
+        first = next((r for r in case["repetitions"] if r["result"] == "Failed"), {})
+        failures = "; ".join(first.get("failures", [])).replace("\n", " ")
+        message = f"{model} {case['test']} {case['result']} after retry; first failure: {failures}"
+        print(f"RETRIED {message}", flush=True)
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=UI test retried::{message}", flush=True)
 
 
 def source_identity():
@@ -377,6 +421,9 @@ def main():
             # Hosted accessibility queries can exceed 120 seconds for a passing
             # multi-step UI case. Each case gets 180 seconds; the separate
             # 900-second whole-suite cap remains the aggregate failure bound.
+            # A failed case runs once more (N06 in the navigation-contact audit:
+            # hosted contacts intermittently enter no action). Every retry is
+            # reported by name, and a second failure still fails the suite.
             selectors = []
             if args.navigation_only:
                 selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
@@ -387,11 +434,13 @@ def main():
                 run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                              "-resultBundlePath", str(output / f"{model}.xcresult"),
                              "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                             "-maximum-test-execution-time-allowance", "180"] + selectors + ["test-without-building"],
+                             "-maximum-test-execution-time-allowance", "180",
+                             "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
                     log=output / f"{model}.log", timeout=900)
             finally:
                 collect_action_journals(device, model, output)
                 journal_collected = True
+                report_retries(model, output)
             print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
             if not args.navigation_only:
                 verify_restart(xcode, device, model, output, runtime["identifier"])
