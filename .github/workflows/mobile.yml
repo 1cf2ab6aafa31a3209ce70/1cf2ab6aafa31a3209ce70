@@ -32,6 +32,7 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       titles: ${{ steps.select.outputs.titles }}
+      lifecycle: ${{ steps.select.outputs.lifecycle }}
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
         with:
@@ -43,16 +44,21 @@ jobs:
           BASE_SHA: ${{ github.event.pull_request.base.sha }}
           NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
         run: |
+          # Adding and removing titles is rechecked when the tooling or shared packages change.
+          lifecycle=true
           if [[ "$NAVIGATION_ONLY" == "true" ]]; then
             titles='["DevelopmentTitle"]'
+            lifecycle=false
           elif [[ "$EVENT" == "pull_request" ]]; then
             git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > "$RUNNER_TEMP/changed.txt"
             titles="$(python3 scripts/titles.py affected "$RUNNER_TEMP/changed.txt")"
+            grep -qE '^(scripts/|\.github/|Packages/)' "$RUNNER_TEMP/changed.txt" || lifecycle=false
           else
             titles="$(python3 scripts/titles.py targets | python3 -c 'import json, sys; print(json.dumps(sys.stdin.read().split()))')"
           fi
-          echo "Titles to test: $titles"
+          echo "Titles to test: $titles; title lifecycle check: $lifecycle"
           echo "titles=$titles" >> "$GITHUB_OUTPUT"
+          echo "lifecycle=$lifecycle" >> "$GITHUB_OUTPUT"
   verify:
     # Shared packages, every title's content and every build, on every change.
     if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only)
@@ -117,6 +123,33 @@ jobs:
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
             ${{ runner.temp }}/foundation-ui/action-journals/
+          if-no-files-found: ignore
+          retention-days: 30
+  title-lifecycle:
+    # Removing each title leaves the checks, core tests and other titles
+    # building; a scaffolded third title builds before any gameplay.
+    needs: plan
+    if: needs.plan.outputs.lifecycle == 'true'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Remove each title and scaffold a third
+        run: python3 scripts/test-title-lifecycle.py "$RUNNER_TEMP/title-lifecycle"
+      - name: Retain lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: title-lifecycle-evidence
+          path: |
+            ${{ runner.temp }}/title-lifecycle/receipt.json
+            ${{ runner.temp }}/title-lifecycle/*.log
           if-no-files-found: ignore
           retention-days: 30
   minimum-runtime:

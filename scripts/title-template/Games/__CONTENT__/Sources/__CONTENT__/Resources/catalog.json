@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "titleID": "__TITLE_ID__",
+  "contentVersion": 1,
+  "levels": [
+    {"id": "level-01", "file": "Levels/level-01.json", "gameType": "__GAME_TYPE__"}
+  ],
+  "assets": [],
+  "localizationKeys": []
+}
