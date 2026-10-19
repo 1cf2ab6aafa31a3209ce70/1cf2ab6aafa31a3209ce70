@@ -15,6 +15,8 @@ import tempfile
 import time
 import uuid
 
+import titles as title_manifests
+
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
     ("iphone12", "com.apple.CoreSimulator.SimDeviceType.iPhone-12"),
@@ -122,7 +124,7 @@ def collect_boot_diagnostics(device, model, output):
         print(message, file=sys.stderr)
 
 
-def collect_action_journals(device, model, output):
+def collect_action_journals(device, model, output, bundle_identifier):
     """Copy only bounded diagnostic journals from this owned app's UUID fixtures."""
     destination = output / "action-journals" / model
     # Each journal caps itself at 128 KiB, and a retried case adds a journal.
@@ -131,7 +133,7 @@ def collect_action_journals(device, model, output):
     try:
         destination.mkdir(parents=True, exist_ok=True)
         container = Path(run(["xcrun", "simctl", "get_app_container", device,
-                              "local.gamecore.DevelopmentTitle", "data"], timeout=30))
+                              bundle_identifier, "data"], timeout=30))
         if not container.is_absolute() or container.resolve() != container:
             raise ValueError("App container is not an absolute path without symlinks")
         fixtures = container / "Library/Application Support/GameCoreSaves/UIAutomationFixtures"
@@ -343,9 +345,9 @@ def source_identity():
             "sourceSHA256": sources}
 
 
-def verify_restart(xcode, device, model, output, runtime_identifier):
+def verify_restart(xcode, device, model, output, runtime_identifier, title):
     """Validate test-reported paths; never delete an inferred sandbox location."""
-    restart_test = "DevelopmentTitleTests/SavePersistenceTests/testSimulatorRestartPersistence"
+    restart_test = title.restart_proof
     receipt_prefix = "GAMECORE_RESTART_RECEIPT "
 
     def invoke(label):
@@ -371,7 +373,7 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
         # xcodebuild can refresh a data container. Discover it after the test,
         # then validate the exact Foundation path emitted by that known test.
         container = Path(run(["xcrun", "simctl", "get_app_container", device,
-                              "local.gamecore.DevelopmentTitle", "data"])).resolve()
+                              title.bundle_identifier, "data"])).resolve()
         root = Path(receipt["root"])
         sandbox = Path(receipt["sandboxRoot"])
         if (not root.is_absolute() or not sandbox.is_absolute()
@@ -418,15 +420,83 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
     print(f"PASS {model}: settings/progress restored after simulator restart", flush=True)
 
 
+def test_title(title, selected_models, output, runtime, record_device, navigation_only):
+    """Build one title's scheme, then run its app-hosted and UI tests on each owned device."""
+    xcode = ["xcodebuild", "-workspace", "GameCore.xcworkspace", "-scheme", title.target,
+             "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
+    run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
+                 "build-for-testing"], log=output / "build.log", timeout=600)
+    for model, device_type in selected_models:
+        device = None
+        journal_collected = False
+        try:
+            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
+                          device_type, runtime["identifier"]])
+            record_device({"title": title.target, "model": model, "type": device_type, "id": device})
+            run(["xcrun", "simctl", "boot", device])
+            try:
+                run(["xcrun", "simctl", "bootstatus", device, "-b"],
+                    log=output / f"{model}-boot.log", timeout=600)
+            except RuntimeError:
+                collect_boot_diagnostics(device, model, output)
+                raise
+            # Hosted accessibility queries can exceed 120 seconds for a passing
+            # multi-step UI case. Each case gets 180 seconds; the separate
+            # 900-second whole-suite cap remains the aggregate failure bound.
+            # A failed case runs once more (N06 in the navigation-contact audit:
+            # XCTest's synthesized touches race backboardd on loaded simulators).
+            # Every retry is reported by name, and a second failure still fails.
+            selectors = []
+            if navigation_only:
+                selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
+                             for name in ("testNavigationSuccessFailureResumeAndRestart",
+                                          "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+                                          "testLargeTextAndReducedMotionKeepControlsReachable")]
+            try:
+                run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
+                             "-resultBundlePath", str(output / f"{model}.xcresult"),
+                             "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
+                             "-maximum-test-execution-time-allowance", "180",
+                             "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
+                    log=output / f"{model}.log", timeout=900)
+            finally:
+                collect_action_journals(device, model, output, title.bundle_identifier)
+                journal_collected = True
+                report_retries(model, output)
+            print(f"PASS {title.target} {model}: {output / (model + '.xcresult')}", flush=True)
+            if not navigation_only and title.restart_proof:
+                verify_restart(xcode, device, model, output, runtime["identifier"], title)
+        finally:
+            if device:
+                if not journal_collected:
+                    collect_action_journals(device, model, output, title.bundle_identifier)
+                # Only UUIDs returned by create in this invocation are cleaned up.
+                for operation in ("shutdown", "delete"):
+                    try:
+                        run(["xcrun", "simctl", operation, device],
+                            log=output / f"{model}-{operation}.log", timeout=90)
+                    except RuntimeError as error:
+                        print(f"Cleanup warning ({title.target} {model}): {error}", file=sys.stderr)
+
+
 def main():
+    titles = title_manifests.load()
+    targets = [title.target for title in titles]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", nargs="?", help="New absolute output directory (default: temporary)")
     parser.add_argument("--model", choices=[model for model, _ in MODELS],
                         help="Run only this simulator geometry (default: both)")
+    parser.add_argument("--title", action="append", choices=targets,
+                        help="Run only this title; repeat to select several (default: every title)")
     parser.add_argument("--navigation-only", action="store_true",
-                        help="Run three navigation UI diagnostics only; omit restart proof")
+                        help="Run three DevelopmentTitle navigation UI diagnostics only; omit restart proof")
     args = parser.parse_args()
     selected_models = tuple(item for item in MODELS if args.model is None or item[0] == args.model)
+    selected_titles = [title for title in titles if args.title is None or title.target in args.title]
+    if args.navigation_only:
+        if any(title.target != "DevelopmentTitle" for title in selected_titles if args.title):
+            parser.error("--navigation-only applies to DevelopmentTitle only")
+        selected_titles = [title for title in selected_titles if title.target == "DevelopmentTitle"]
     if args.output:
         output = Path(args.output)
         if not output.is_absolute():
@@ -449,68 +519,23 @@ def main():
     metadata = {"xcode": run(["xcodebuild", "-version"]), "runtime": runtime["identifier"],
                 "runtimeVersion": runtime["version"], "runtimeBuild": runtime.get("buildversion"),
                 "selectedModels": [model for model, _ in selected_models],
+                "selectedTitles": [title.target for title in selected_titles],
                 "navigationOnly": args.navigation_only,
                 **source_identity(), "devices": []}
+
+    def record_device(device):
+        metadata["devices"].append(device)
+        (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
+
     (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
     run(["python3", "scripts/generate-project.py", "--check"])
-    xcode = ["xcodebuild", "-workspace", "GameCore.xcworkspace", "-scheme", "DevelopmentTitle",
-             "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
-    run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
-                 "build-for-testing"], log=output / "build.log", timeout=600)
-    for model, device_type in selected_models:
-        device = None
-        journal_collected = False
-        try:
-            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
-                          device_type, runtime["identifier"]])
-            metadata["devices"].append({"model": model, "type": device_type, "id": device})
-            (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
-            run(["xcrun", "simctl", "boot", device])
-            try:
-                run(["xcrun", "simctl", "bootstatus", device, "-b"],
-                    log=output / f"{model}-boot.log", timeout=600)
-            except RuntimeError:
-                collect_boot_diagnostics(device, model, output)
-                raise
-            # Hosted accessibility queries can exceed 120 seconds for a passing
-            # multi-step UI case. Each case gets 180 seconds; the separate
-            # 900-second whole-suite cap remains the aggregate failure bound.
-            # A failed case runs once more (N06 in the navigation-contact audit:
-            # XCTest's synthesized touches race backboardd on loaded simulators).
-            # Every retry is reported by name, and a second failure still fails.
-            selectors = []
-            if args.navigation_only:
-                selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
-                             for name in ("testNavigationSuccessFailureResumeAndRestart",
-                                          "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
-                                          "testLargeTextAndReducedMotionKeepControlsReachable")]
-            try:
-                run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
-                             "-resultBundlePath", str(output / f"{model}.xcresult"),
-                             "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                             "-maximum-test-execution-time-allowance", "180",
-                             "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
-                    log=output / f"{model}.log", timeout=900)
-            finally:
-                collect_action_journals(device, model, output)
-                journal_collected = True
-                report_retries(model, output)
-            print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
-            if not args.navigation_only:
-                verify_restart(xcode, device, model, output, runtime["identifier"])
-        finally:
-            if device:
-                if not journal_collected:
-                    collect_action_journals(device, model, output)
-                # Only UUIDs returned by create in this invocation are cleaned up.
-                for operation in ("shutdown", "delete"):
-                    try:
-                        run(["xcrun", "simctl", operation, device],
-                            log=output / f"{model}-{operation}.log", timeout=90)
-                    except RuntimeError as error:
-                        print(f"Cleanup warning ({model}): {error}", file=sys.stderr)
+    for title in selected_titles:
+        # One title keeps the established flat layout; several get one directory each.
+        title_output = output if len(selected_titles) == 1 else output / title.target
+        title_output.mkdir(exist_ok=True)
+        test_title(title, selected_models, title_output, runtime, record_device, args.navigation_only)
     scope = "Navigation diagnostics" if args.navigation_only else "Mobile app and UI tests"
-    print(f"{scope} passed; no physical performance claim", flush=True)
+    print(f"{scope} passed for {', '.join(title.target for title in selected_titles)}; no physical performance claim", flush=True)
 
 
 if __name__ == "__main__":

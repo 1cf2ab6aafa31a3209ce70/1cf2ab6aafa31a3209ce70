@@ -7,8 +7,7 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = ROOT / "Games/DevelopmentContent/Sources/DevelopmentContent/Resources"
+SAMPLES = Path(__file__).resolve().parent / "Sources/DevelopmentContent/Resources"
 
 
 def main():
