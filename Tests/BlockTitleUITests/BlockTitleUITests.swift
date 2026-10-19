@@ -4,6 +4,10 @@ import XCTest
 /// accessible block controls and with a touch on the SpriteKit board, then
 /// confirm the saved progress after relaunch.
 final class BlockTitleUITests: XCTestCase {
+    /// One accessibility query on a loaded hosted runner can stall for
+    /// seconds (N08); waits bound only failures.
+    private let queryAllowance: TimeInterval = 30
+
     @MainActor
     func testClearFirstBoardThenRelaunchContinuesWithTheSecond() {
         continueAfterFailure = false
@@ -22,14 +26,14 @@ final class BlockTitleUITests: XCTestCase {
             .press(forDuration: 0.15)
         let remaining = app.staticTexts["block.remaining"]
         reveal(app, remaining)
-        XCTAssertTrue(remaining.wait(for: \.label, toEqual: "Blocks left: 4", timeout: 5),
+        XCTAssertTrue(remaining.wait(for: \.label, toEqual: "Blocks left: 4", timeout: queryAllowance),
                       "A touch on the board clears its group")
         tap(app, "block.cell.4")
         tap(app, "block.cell.5")
         waitFor(app.staticTexts["shell.result.success"])
         let status = app.staticTexts["save.status"]
         reveal(app, status)
-        XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: 10))
+        XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: queryAllowance))
         attachScreen("block-cleared")
 
         app.terminate()
@@ -39,7 +43,7 @@ final class BlockTitleUITests: XCTestCase {
         XCTAssertEqual(progress.label, "Completed levels: 1")
         tap(app, "shell.start")
         waitFor(app.staticTexts["shell.play"])
-        XCTAssertTrue(app.buttons["block.cell.15"].waitForExistence(timeout: 10), "The second board is 4x4")
+        XCTAssertTrue(app.buttons["block.cell.15"].waitForExistence(timeout: queryAllowance), "The second board is 4x4")
     }
 
     @MainActor
@@ -72,19 +76,19 @@ final class BlockTitleUITests: XCTestCase {
         waitFor(app.staticTexts["shell.menu"])
         let status = app.staticTexts["save.status"]
         waitFor(status)
-        XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: 10))
+        XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: queryAllowance))
         return app
     }
 
     @MainActor
     private func waitFor(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertTrue(element.waitForExistence(timeout: 15), "Missing \(element)", file: file, line: line)
+        XCTAssertTrue(element.waitForExistence(timeout: queryAllowance), "Missing \(element)", file: file, line: line)
     }
 
     @MainActor
     private func tap(_ app: XCUIApplication, _ id: String) {
         let button = app.buttons[id]
-        XCTAssertTrue(button.waitForExistence(timeout: 10), "Missing control \(id)")
+        XCTAssertTrue(button.waitForExistence(timeout: queryAllowance), "Missing control \(id)")
         reveal(app, button)
         XCTAssertTrue(button.isHittable, "Unreachable control \(id)")
         button.press(forDuration: 0.15)
