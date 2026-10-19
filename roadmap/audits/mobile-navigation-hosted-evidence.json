@@ -2189,5 +2189,103 @@
     },
     "rawEvidencePath": "run artifact mobile-validation-evidence-iphone12 (30-day retention not yet in effect for this run)",
     "interpretation": "Second instrumented occurrence of the N06 signature, on iPhone and a different shell button. Scroll phases show no tracking or interaction around the contact, so the scroll view claiming the touch is not supported for this failure. The remaining gap is between touch delivery to the app and SwiftUI Button action dispatch."
-  }
+  },
+  "laterHostedFailures": [
+    {
+      "runID": 39162857338,
+      "event": "pull_request",
+      "pullRequest": 12,
+      "checkoutRevision": "3e10bc66e734d95a32a9542ceea4da114e6dcecd",
+      "containsScrollPhaseCode": true,
+      "inventory": {
+        "inputs": 60,
+        "matchesCheckoutRevision": true
+      },
+      "model": "iphone12",
+      "case": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+      "assertion": "Missing heading shell.play",
+      "caseSeconds": 76.346,
+      "stage": "First Start",
+      "contact": [
+        195,
+        321.6667
+      ],
+      "frame": [
+        24,
+        288.7,
+        342,
+        66
+      ],
+      "contactRecordWallTime": 1792356233.523,
+      "fixtureUUID": "27F4A2E3-8B62-4283-982B-0BB79F701B90",
+      "journal": {
+        "records": 22,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          22
+        ],
+        "collectorErrors": [],
+        "buttonStartRows": 0,
+        "scrollRows": [
+          "sequence 3: scroll.idle at launch"
+        ],
+        "checkpointGapSeconds": 14.9,
+        "bracketingCheckpoints": [
+          {
+            "sequence": 18,
+            "wallTime": 1792356228.256
+          },
+          {
+            "sequence": 19,
+            "wallTime": 1792356233.272
+          },
+          {
+            "sequence": 20,
+            "wallTime": 1792356238.566
+          }
+        ]
+      },
+      "preContactQueryStallSeconds": 42,
+      "otherModel": "ipad9 success",
+      "sameCommitPushRun": {
+        "runID": 39162852799,
+        "conclusion": "success"
+      },
+      "interpretation": "Instrumented Start not entered; no scroll claim."
+    },
+    {
+      "runID": 39166098886,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "75b21777566396df63f574eaed8ad1b7d3cb6801",
+      "containsScrollPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "ipad9",
+      "case": "testPlayerExportPresentsFilesAndCancellationKeepsProgress",
+      "assertion": "Native Files exporter was not presented",
+      "caseSeconds": 131.752,
+      "contact": [
+        405,
+        752.5
+      ],
+      "frame": [
+        135,
+        726.5,
+        540,
+        52
+      ],
+      "contactRecordWallTime": 1792358237.994,
+      "finalHierarchy": "Settings form, Export enabled, no exporter, about 11.7 s after the contact record",
+      "preContactQueryStallSeconds": 67,
+      "otherJobs": {
+        "iphone12": "success",
+        "minimum-runtime": "success"
+      },
+      "interpretation": "Same outcome on an uninstrumented Form button; action non-entry not established."
+    }
+  ]
 }
