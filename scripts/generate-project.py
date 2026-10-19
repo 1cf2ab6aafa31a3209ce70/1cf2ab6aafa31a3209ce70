@@ -68,6 +68,10 @@ def configs(name, extra):
     return add(f"{name}-config-list", f"isa = XCConfigurationList; buildConfigurations = {array(ids)}; defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;")
 
 
+# Title resources the generator bundles when present; scripts/check-foundation.py reviews them.
+TITLE_RESOURCES = [("Assets.xcassets", "folder.assetcatalog"), ("Localizable.xcstrings", "text.json.xcstrings"),
+                   ("PrivacyInfo.xcprivacy", "text.xml")]
+
 # Shared foundation packages first, then each title's own content package.
 package_paths = {"GameCore": "Packages/GameCore", "GamePlatform": "Packages/GamePlatform"}
 for title in TITLES:
@@ -106,7 +110,14 @@ for title in TITLES:
         framework_builds = [add(f"{name}-{kind}-link-{index}", f"isa = PBXBuildFile; productRef = {product};")
                             for index, product in enumerate(linked)] if kind != "ui" else []
         phases[f"{kind}-frameworks"] = add(f"{name}-{kind}-frameworks", f"isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = {array(framework_builds)}; runOnlyForDeploymentPostprocessing = 0;")
-        phases[f"{kind}-resources"] = add(f"{name}-{kind}-resources", "isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;")
+        resource_builds = []
+        for resource, file_type in (TITLE_RESOURCES if kind == "app" else []):
+            if (title.directory / resource).exists():
+                path = f"{title.source_directory}/{resource}"
+                ref = add(f"ref-{path}", f"isa = PBXFileReference; lastKnownFileType = {file_type}; path = {quoted(path)}; sourceTree = SOURCE_ROOT;")
+                refs.append(ref)
+                resource_builds.append(add(f"build-{path}", f"isa = PBXBuildFile; fileRef = {ref};"))
+        phases[f"{kind}-resources"] = add(f"{name}-{kind}-resources", f"isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = {array(resource_builds)}; runOnlyForDeploymentPostprocessing = 0;")
 
     # Validate the exact copied SwiftPM resources before app compilation/packaging.
     # This is a host authoring tool; the app links only the title library product.
@@ -125,6 +136,11 @@ for title in TITLES:
         "CURRENT_PROJECT_VERSION": "1",
         "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
     }
+    if (title.directory / "Assets.xcassets/AppIcon.appiconset").is_dir():
+        app_settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+    if (title.directory / "Localizable.xcstrings").is_file():
+        app_settings["LOCALIZATION_PREFERS_STRING_CATALOGS"] = "YES"
+        app_settings["SWIFT_EMIT_LOC_STRINGS"] = "YES"
     info_plist = title.directory / "Info.plist"
     if info_plist.is_file():
         info_path = str(info_plist.relative_to(ROOT))

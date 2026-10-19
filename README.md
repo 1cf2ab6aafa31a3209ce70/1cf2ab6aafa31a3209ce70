@@ -54,7 +54,7 @@ The generator uses Python's standard library. CI checks generated files without 
 | `experiments/save-durability` | Disposable Codable filesystem failure/recovery fixtures |
 | `roadmap` | Ordered briefs, decisions, audits and validation plans |
 
-Each title belongs under `Games/<Title>` with a `title.json` manifest, and owns its rules, rendering, identity and resources; its content package and tests sit beside it. The generator, checks, test runner and CI read titles only from the manifests. The disposable renderer experiment is separate from production targets.
+Each title belongs under `Games/<Title>` with a `title.json` manifest, and owns its rules, rendering, identity and resources; its content package and tests sit beside it. The generator, checks, test runner and CI read titles only from the manifests. [Adding a title](docs/adding-a-title.md) shows how to scaffold one with `scripts/new-title.py`. The disposable renderer experiment is separate from production targets.
 
 ## Current direction
 

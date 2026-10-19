@@ -112,6 +112,41 @@ def check_content_package(title):
             f"{name}: catalog titleID must match the {title.target} manifest's titleID")
 
 
+# Every title ships exactly these reviewed resources from its directory.
+TITLE_RESOURCES = {"Assets.xcassets", "Localizable.xcstrings", "PrivacyInfo.xcprivacy"}
+# The apps do not track or collect data. The one required-reason API is the
+# save store's attributesOfItem, whose result includes file timestamps: C617.1
+# covers metadata of files inside the app container. A change here needs a
+# privacy review of the built bundle (docs/privacy-contract.md).
+REVIEWED_PRIVACY_MANIFEST = {
+    "NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [], "NSPrivacyCollectedDataTypes": [],
+    "NSPrivacyAccessedAPITypes": [{"NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+                                   "NSPrivacyAccessedAPITypeReasons": ["C617.1"]}]}
+
+
+def check_title_resources(title):
+    """Icon, string catalog and privacy manifest for one title."""
+    directory = title.directory
+    privacy = plistlib.loads((directory / "PrivacyInfo.xcprivacy").read_bytes())
+    require(privacy == REVIEWED_PRIVACY_MANIFEST, f"{title.target}: privacy manifest differs from the reviewed declaration")
+    strings = json.loads((directory / "Localizable.xcstrings").read_text())
+    require(strings.get("sourceLanguage") == "en" and isinstance(strings.get("strings"), dict),
+            f"{title.target}: string catalog must use English as its source language")
+    catalog = directory / "Assets.xcassets"
+    entries = sorted(path.name for path in catalog.iterdir() if path.name != ".DS_Store")
+    require(entries == ["AppIcon.appiconset", "Contents.json"], f"{title.target}: asset catalog holds only the app icon")
+    icon_set = catalog / "AppIcon.appiconset"
+    images = json.loads((icon_set / "Contents.json").read_text())["images"]
+    require(len(images) == 1 and images[0].get("idiom") == "universal" and images[0].get("size") == "1024x1024",
+            f"{title.target}: one universal 1024-point app icon")
+    require(sorted(path.name for path in icon_set.iterdir() if path.name != ".DS_Store") == sorted(["Contents.json", images[0]["filename"]]),
+            f"{title.target}: app icon set holds only its declared image")
+    data = (icon_set / images[0]["filename"]).read_bytes()
+    width, height, depth, color_type = int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big"), data[24], data[25]
+    require(data[:8] == b"\x89PNG\r\n\x1a\n" and data[12:16] == b"IHDR" and (width, height, depth, color_type) == (1024, 1024, 8, 2),
+            f"{title.target}: app icon must be an opaque 8-bit RGB 1024x1024 PNG")
+
+
 def check_project():
     project = command_json(["plutil", "-convert", "json", "-o", "-", "GameCore.xcodeproj/project.pbxproj"])
     objects = project["objects"]
@@ -165,6 +200,13 @@ def check_project():
                             "Unexpected linked framework; review foundation dependency policy")
                     linked.append(build["productRef"])
         require(len(linked) == 3 and set(linked) == own, f"{title.target}: core, platform and its own content products must be linked")
+        resources = []
+        for phase_id in app["buildPhases"]:
+            if objects[phase_id]["isa"] == "PBXResourcesBuildPhase":
+                resources += [objects[objects[build_id]["fileRef"]]["path"] for build_id in objects[phase_id]["files"]]
+        require(sorted(resources) == sorted(f"{title.source_directory}/{name}" for name in TITLE_RESOURCES),
+                f"{title.target}: the app bundles exactly its icon, string catalog and privacy manifest")
+        check_title_resources(title)
         configurations = objects[app["buildConfigurationList"]]["buildConfigurations"]
         for configuration in configurations:
             settings = objects[configuration]["buildSettings"]
