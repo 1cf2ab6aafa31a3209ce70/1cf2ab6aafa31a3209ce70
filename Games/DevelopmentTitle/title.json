@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "target": "DevelopmentTitle",
+  "titleID": "development-practice",
+  "appDisplayName": "Development Title",
+  "bundleIdentifier": "local.gamecore.DevelopmentTitle",
+  "contentPackage": "Games/DevelopmentContent",
+  "unitTests": "Tests/DevelopmentTitleTests",
+  "uiTests": "Tests/DevelopmentTitleUITests",
+  "restartProof": "DevelopmentTitleTests/SavePersistenceTests/testSimulatorRestartPersistence"
+}
