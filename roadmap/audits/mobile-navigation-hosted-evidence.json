@@ -2098,5 +2098,194 @@
     ],
     "rawEvidencePath": "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/45b5aaa0-19a3-40df-82f0-5b6ccba90890/scratchpad/run-38865714337",
     "interpretation": "Later committed same-launch checkpoints bracket the on-target contact with no writer, collection, truncation or tail-loss uncertainty, so the Pause ShellActionButton action was not entered for this contact. The button rendered its pressed state. Controller refusal and lifecycle/audio pause are excluded for this failure. The mechanism between press recognition and action dispatch is unobserved; frequency, hardware behavior and hosted load as a cause are not established."
-  }
+  },
+  "scrollPhaseRecurrence": {
+    "runID": 39160850417,
+    "event": "pull_request",
+    "pullRequest": 12,
+    "conclusion": "failure",
+    "checkoutRevision": "4945d0cd8cacdfcf57a2abfb0c2cb9ce24e5c05b",
+    "treeEquals": "e0b61a369a5f0c249c511b8f6795e2056726d0ac",
+    "toolchain": {
+      "xcode": "Xcode 26.6 (17F113)",
+      "runtime": "iOS 26.5 (23F77)"
+    },
+    "inventory": {
+      "inputs": 60,
+      "worktreeDirty": false,
+      "matchesCheckoutRevision": true
+    },
+    "models": {
+      "ipad9": {
+        "conclusion": "success"
+      },
+      "iphone12": {
+        "conclusion": "failure",
+        "appAndUITests": {
+          "executed": 28,
+          "passed": 27,
+          "failed": 1
+        },
+        "restartProof": "not reached"
+      }
+    },
+    "failure": {
+      "model": "iphone12",
+      "case": "testNavigationSuccessFailureResumeAndRestart",
+      "assertion": "Missing heading shell.play",
+      "helperLine": 257,
+      "caseSeconds": 95.474,
+      "stage": "Practice again on the success result, after accepted Start, Pause, Resume and Complete",
+      "retryContact": [
+        195,
+        374
+      ],
+      "retryContactDurationSeconds": 0.15,
+      "retryFrame": [
+        24,
+        341,
+        342,
+        66
+      ],
+      "window": [
+        390,
+        844
+      ],
+      "contactRecordWallTime": 1792353790.036,
+      "finalHierarchyState": "result.success",
+      "fixtureUUID": "9025051C-28C1-41A3-A741-19A8BF6AB0EB"
+    },
+    "journal": {
+      "records": 45,
+      "launches": 1,
+      "contiguousSequence": [
+        1,
+        45
+      ],
+      "missing": false,
+      "truncated": false,
+      "parsePartial": false,
+      "collectorErrors": [],
+      "scrollRows": [
+        "sequence 3: scroll.idle at launch"
+      ],
+      "afterResult": "sequence 38-45: result.success published, then checkpoints only; persistence ready, no recovery, same current request",
+      "bracketingCheckpoints": [
+        {
+          "sequence": 41,
+          "wallTime": 1792353785.113
+        },
+        {
+          "sequence": 42,
+          "wallTime": 1792353790.197
+        }
+      ],
+      "laterCheckpoints": 3,
+      "restartEvidence": "restart() has no journal tag; its guard cannot refuse with a current request, persistence ready and no recovery, and no loading state was published"
+    },
+    "video": {
+      "recordingStartWallTime": 1792353710.65,
+      "observation": "Practice again showed its pressed appearance at the contact time, then a normal release; the result screen remained."
+    },
+    "rawEvidencePath": "run artifact mobile-validation-evidence-iphone12 (30-day retention not yet in effect for this run)",
+    "interpretation": "Second instrumented occurrence of the N06 signature, on iPhone and a different shell button. Scroll phases show no tracking or interaction around the contact, so the scroll view claiming the touch is not supported for this failure. The remaining gap is between touch delivery to the app and SwiftUI Button action dispatch."
+  },
+  "laterHostedFailures": [
+    {
+      "runID": 39162857338,
+      "event": "pull_request",
+      "pullRequest": 12,
+      "checkoutRevision": "3e10bc66e734d95a32a9542ceea4da114e6dcecd",
+      "containsScrollPhaseCode": true,
+      "inventory": {
+        "inputs": 60,
+        "matchesCheckoutRevision": true
+      },
+      "model": "iphone12",
+      "case": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+      "assertion": "Missing heading shell.play",
+      "caseSeconds": 76.346,
+      "stage": "First Start",
+      "contact": [
+        195,
+        321.6667
+      ],
+      "frame": [
+        24,
+        288.7,
+        342,
+        66
+      ],
+      "contactRecordWallTime": 1792356233.523,
+      "fixtureUUID": "27F4A2E3-8B62-4283-982B-0BB79F701B90",
+      "journal": {
+        "records": 22,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          22
+        ],
+        "collectorErrors": [],
+        "buttonStartRows": 0,
+        "scrollRows": [
+          "sequence 3: scroll.idle at launch"
+        ],
+        "checkpointGapSeconds": 14.9,
+        "bracketingCheckpoints": [
+          {
+            "sequence": 18,
+            "wallTime": 1792356228.256
+          },
+          {
+            "sequence": 19,
+            "wallTime": 1792356233.272
+          },
+          {
+            "sequence": 20,
+            "wallTime": 1792356238.566
+          }
+        ]
+      },
+      "preContactQueryStallSeconds": 42,
+      "otherModel": "ipad9 success",
+      "sameCommitPushRun": {
+        "runID": 39162852799,
+        "conclusion": "success"
+      },
+      "interpretation": "Instrumented Start not entered; no scroll claim."
+    },
+    {
+      "runID": 39166098886,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "75b21777566396df63f574eaed8ad1b7d3cb6801",
+      "containsScrollPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "ipad9",
+      "case": "testPlayerExportPresentsFilesAndCancellationKeepsProgress",
+      "assertion": "Native Files exporter was not presented",
+      "caseSeconds": 131.752,
+      "contact": [
+        405,
+        752.5
+      ],
+      "frame": [
+        135,
+        726.5,
+        540,
+        52
+      ],
+      "contactRecordWallTime": 1792358237.994,
+      "finalHierarchy": "Settings form, Export enabled, no exporter, about 11.7 s after the contact record",
+      "preContactQueryStallSeconds": 67,
+      "otherJobs": {
+        "iphone12": "success",
+        "minimum-runtime": "success"
+      },
+      "interpretation": "Same outcome on an uninstrumented Form button; action non-entry not established."
+    }
+  ]
 }

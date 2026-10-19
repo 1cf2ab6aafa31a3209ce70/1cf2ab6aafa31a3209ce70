@@ -48,10 +48,17 @@ public struct ShellPresentation: Sendable {
 private struct ShellDiagnosticActionKey: EnvironmentKey {
     static let defaultValue: ((String) -> Void)? = nil
 }
+private struct ShellDiagnosticScrollPhaseKey: EnvironmentKey {
+    static let defaultValue: ((ScrollPhase) -> Void)? = nil
+}
 extension EnvironmentValues {
     public var shellDiagnosticAction: ((String) -> Void)? {
         get { self[ShellDiagnosticActionKey.self] }
         set { self[ShellDiagnosticActionKey.self] = newValue }
+    }
+    public var shellDiagnosticScrollPhase: ((ScrollPhase) -> Void)? {
+        get { self[ShellDiagnosticScrollPhaseKey.self] }
+        set { self[ShellDiagnosticScrollPhaseKey.self] = newValue }
     }
 }
 #endif
@@ -64,6 +71,9 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
     @State private var showingSettings = false
+    #if DEBUG
+    @Environment(\.shellDiagnosticScrollPhase) private var diagnosticScrollPhase
+    #endif
     private let presentation: ShellPresentation
     private let forceReducedMotion: Bool
     private let gameplayHost: () -> GameplayHost
@@ -113,6 +123,9 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
             .frame(maxWidth: .infinity)
         }
         .accessibilityIdentifier("shell.scroll")
+        #if DEBUG
+        .onScrollPhaseChange { _, phase in diagnosticScrollPhase?(phase) }
+        #endif
         .background(Color(.systemGroupedBackground))
         .sheet(isPresented: $showingSettings) {
             SharedShellSettingsView(controller: controller, presentation: presentation)
