@@ -10,7 +10,7 @@
 2. Use the existing development practice as the second, smoke-test title target. Build the reference game as the first vertical slice of the [block title](09a-block-title.md): one or two original levels and only the rules the contract tests need. Give both targets distinct bundle IDs, app icons, content catalogs, and save namespaces. Epic 09A extends this slice rather than replacing it.
 3. Add a new-title template or generator, extending `scripts/generate-project.py`, for project configuration, asset catalogs, localization, privacy metadata, and CI registration. Generated targets must compile before custom gameplay is added.
 4. Add contract tests that run a fake module through launch, level load, pause, result, save, and relaunch; verify that module failures show a recoverable shell error.
-5. Scale CI with the number of targets. Run a title's app-hosted and UI tests when that title or a shared package changes; run shared-package checks on every change. Keep each job within the workflow timeout with headroom. Every title's UI tests keep the N06 diagnostics: the action journal and scroll-phase records.
+5. Scale CI with the number of targets. Run a title's app-hosted and UI tests when that title or a shared package changes; run shared-package checks on every change. Keep each job within the workflow timeout with headroom. Every title's UI tests run through the collector, which retries a failed case once and checks each failure against the simulator input fault behind N06.
 6. Document which APIs title authors can rely on and how to evolve content and module contracts. Publish the contract as version 1, provisional until Spike 11 confirms that a terrain title fits it.
 
 ## Acceptance

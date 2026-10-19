@@ -2285,7 +2285,230 @@
         "iphone12": "success",
         "minimum-runtime": "success"
       },
-      "interpretation": "Same outcome on an uninstrumented Form button; action non-entry not established."
+      "interpretation": "Same outcome on an uninstrumented Form button; action non-entry not established.",
+      "reclassified": {
+        "finding": "N07",
+        "touchDelivery": "intact: one touch state, 150 ms down to up",
+        "actionRan": true,
+        "filesViewServiceReadySeconds": 24.1,
+        "previousWaitSeconds": 10,
+        "newWaitSeconds": 60
+      }
+    },
+    {
+      "runID": 39191221739,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "b161617a2ecd415295109ea26128d373a87850ed",
+      "containsScrollPhaseCode": true,
+      "containsTouchPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "iphone12",
+      "runtime": "26.5 (23F77)",
+      "case": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+      "assertion": "Missing heading shell.result.success",
+      "caseSeconds": 60.032,
+      "stage": "Complete practice after rotation",
+      "contact": [
+        195,
+        667
+      ],
+      "frame": [
+        24,
+        634,
+        342,
+        66
+      ],
+      "contactDurationSeconds": 0.15,
+      "contactRecordWallTime": 1792378120.24,
+      "fixtureUUID": "5362DE39-2CB8-4C7E-B926-5C79BDBAF007",
+      "journal": {
+        "records": 47,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          47
+        ],
+        "collectorErrors": [],
+        "buttonCompleteRows": 0,
+        "scrollRows": [
+          "sequence 37-40: reveal drag interacting, decelerating, idle; idle at 1792378098.252"
+        ],
+        "bracketingCheckpoints": [
+          {
+            "sequence": 44,
+            "wallTime": 1792378118.564
+          },
+          {
+            "sequence": 45,
+            "wallTime": 1792378123.736
+          }
+        ]
+      },
+      "recording": "Pressed for about 0.27 s, then normal release; playing screen remained",
+      "preContactQueryStallSeconds": 14,
+      "interpretation": "Instrumented Complete not entered; no scroll claim."
+    },
+    {
+      "runID": 39191221739,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "b161617a2ecd415295109ea26128d373a87850ed",
+      "containsScrollPhaseCode": true,
+      "containsTouchPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "iphone12",
+      "job": "minimum-runtime",
+      "runtime": "18.0 (22A3351)",
+      "case": "testSettingsAndProgressPersistOnRelaunch",
+      "assertion": "waitForSwitchValue timed out at line 308: Haptics stayed 1",
+      "caseSeconds": 32.192,
+      "stage": "Haptics toggle in Settings",
+      "contact": [
+        345,
+        313.67
+      ],
+      "frame": [
+        20,
+        291.7,
+        350,
+        44
+      ],
+      "contactDurationSeconds": 0.05,
+      "contactRecordWallTime": 1792378665.763,
+      "fixtureUUID": "9F55C354-86B7-470A-B1E7-EE821298F135",
+      "journal": {
+        "records": 17,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          17
+        ],
+        "collectorErrors": [],
+        "precedingToggleFlowUpdates": [
+          {
+            "sequence": 13,
+            "wallTime": 1792378655.457
+          },
+          {
+            "sequence": 15,
+            "wallTime": 1792378660.306
+          }
+        ],
+        "bracketingCheckpoints": [
+          {
+            "sequence": 16,
+            "wallTime": 1792378662.412
+          },
+          {
+            "sequence": 17,
+            "wallTime": 1792378667.72
+          }
+        ]
+      },
+      "preContactQueryStallSeconds": 0,
+      "interpretation": "Native Toggle binding not set on iOS 18.0; no long stall."
     }
-  ]
+  ],
+  "ciRetry": {
+    "introducedBy": "collector -retry-tests-on-failure -test-iterations 2",
+    "scope": "App and UI test invocation; restart proof unchanged",
+    "reporting": [
+      "<model>-retries.json",
+      "RETRIED stdout line",
+      "GitHub Actions warning annotation"
+    ],
+    "journalCollectionBudgetBytes": {
+      "before": 131072,
+      "after": 1048576
+    },
+    "budgetEvidence": {
+      "runID": 39192165136,
+      "iphone12JournalBytes": 129523,
+      "ipad9JournalBytes": 129180,
+      "journals": 6
+    },
+    "localProbe": "Xcode 27.1: fail-then-pass case exits 0; result bundle records First Run failed, Retry 1 passed",
+    "status": "N06 cause identified outside the app; retry is the mitigation",
+    "inputFaultScan": "When a case failed, export diagnostics and count unknown-digitizer or >100 ms touch-state faults; warn when failed runs exceed faults"
+  },
+  "inputInjectionFaults": {
+    "source": "result bundle diagnostics: simctl_diagnostics/<device>/system.logarchive, backboardd TouchEvents",
+    "mechanism": "XCTest plays each synthesized gesture through a new virtual digitizer; backboardd registers it while the first events arrive",
+    "runs": [
+      {
+        "runID": 38865714337,
+        "model": "ipad9",
+        "contact": "Pause",
+        "runtime": "26.5",
+        "synthesizedGestures": 62,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-16 07:27:26.934",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39160850417,
+        "model": "iphone12",
+        "contact": "Practice again",
+        "runtime": "26.5",
+        "synthesizedGestures": 59,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-18 20:03:09.676",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39162857338,
+        "model": "iphone12",
+        "contact": "Start",
+        "runtime": "26.5",
+        "synthesizedGestures": 62,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-18 20:43:53.159",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39191221739,
+        "model": "iphone12",
+        "contact": "Complete practice",
+        "runtime": "26.5",
+        "synthesizedGestures": 65,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-19 02:48:39.889",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39191221739,
+        "model": "iphone12",
+        "job": "minimum-runtime",
+        "contact": "Haptics toggle",
+        "runtime": "18.0",
+        "synthesizedGestures": 57,
+        "fault": "late touch state; gesture replayed compressed",
+        "faultTime": "2026-10-19 02:57:45.736",
+        "touchStateDelaySeconds": 0.357,
+        "otherGesturesDelaySeconds": [
+          0.002,
+          0.01
+        ],
+        "replayedDownToUpSeconds": 0.005
+      },
+      {
+        "runID": 39166098886,
+        "model": "ipad9",
+        "contact": "Export local data",
+        "runtime": "26.5",
+        "synthesizedGestures": 61,
+        "fault": null,
+        "note": "Not N06; see N07"
+      }
+    ],
+    "faultsPerN06Run": 1,
+    "faultsOutsideFailedContacts": 0
+  }
 }

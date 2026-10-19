@@ -161,7 +161,9 @@ final class DevelopmentTitleUITests: XCTestCase {
         tap(app, "shell.settings")
         tap(app, "save.export")
         let picker = app.navigationBars["FullDocumentManagerViewControllerNavigationBar"]
-        XCTAssertTrue(picker.waitForExistence(timeout: 10), "Native Files exporter was not presented")
+        // Files is an out-of-process view service. Its first launch on a fresh
+        // hosted simulator took 24 seconds after Export ran (run 39166098886).
+        XCTAssertTrue(picker.waitForExistence(timeout: 60), "Native Files exporter was not presented")
         attachScreen("native-files-export")
         let sidebar = app.navigationBars.matching(NSPredicate(format: "identifier IN %@", [
             "com_apple_DocumentManager_Service.DOCSidebarView", "DOCSidebarView"
