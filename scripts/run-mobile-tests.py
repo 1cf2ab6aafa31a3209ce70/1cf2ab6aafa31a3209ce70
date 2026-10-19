@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Run mobile app and UI tests on owned disposable simulators; never touch other devices."""
 import argparse
+from datetime import datetime
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import stat
 import subprocess
@@ -231,10 +233,48 @@ def collect_action_journals(device, model, output):
             print(f"Action journal receipt warning ({model}): {error}", file=sys.stderr)
 
 
+def scan_input_faults(result_bundle):
+    """Find simulator input-injection faults (N06) in the bundle's failure diagnostics.
+
+    XCTest plays each synthesized gesture through a new virtual digitizer, and
+    backboardd registers it while the first events arrive. Under load it either
+    builds a second touch state for the same digitizer, so the touch-up is
+    skipped and the contact is canceled ("unknown digitizer"), or initializes
+    the state late and replays the queued gesture compressed.
+    """
+    faults = []
+    archives = 0
+    with tempfile.TemporaryDirectory(prefix="gamecore-diagnostics-") as directory:
+        run(["xcrun", "xcresulttool", "export", "diagnostics", "--path", str(result_bundle),
+             "--output-path", directory], timeout=300)
+        for archive in sorted(Path(directory).rglob("system.logarchive")):
+            archives += 1
+            lines = run(["/usr/bin/log", "show", "--archive", str(archive), "--info", "--debug",
+                         "--style", "compact", "--predicate",
+                         'process == "backboardd" AND category == "TouchEvents"'], timeout=300).splitlines()
+            attached = {}
+            for line in lines:
+                stamp = line[:23]
+                sender = re.search(r"sender(?:ID)?:? (?:0x)?([0-9A-Fa-f]+)", line)
+                sender = sender.group(1).upper() if sender else None
+                if "digitizer attached" in line and sender:
+                    attached[sender] = stamp
+                elif "unknown digitizer" in line:
+                    faults.append({"time": stamp, "kind": "duplicate touch state; touch-up skipped"})
+                elif "init: <BKDirectTouchState" in line and sender in attached:
+                    delay = (datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S.%f")
+                             - datetime.strptime(attached.pop(sender), "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
+                    # Normal registration takes 2-10 ms; the observed fault took 357 ms.
+                    if delay > 0.1:
+                        faults.append({"time": stamp, "kind": "late touch state; gesture replayed compressed",
+                                       "delaySeconds": round(delay, 3)})
+    return {"archives": archives, "faults": faults}
+
+
 def report_retries(model, output):
     """Name every case that failed before passing or failing again; never hide a retry."""
     result_bundle = output / f"{model}.xcresult"
-    report = {"model": model, "cases": [], "errors": []}
+    report = {"model": model, "cases": [], "inputFaults": None, "errors": []}
     try:
         if not result_bundle.exists():
             raise ValueError("No result bundle")
@@ -257,6 +297,8 @@ def report_retries(model, output):
 
         for node in tree.get("testNodes", []):
             visit(node)
+        if report["cases"]:
+            report["inputFaults"] = scan_input_faults(result_bundle)
     except Exception as error:
         report["errors"].append(str(error))
         print(f"Retry report warning ({model}): {error}", file=sys.stderr)
@@ -264,6 +306,8 @@ def report_retries(model, output):
         (output / f"{model}-retries.json").write_text(json.dumps(report, indent=2) + "\n")
     except OSError as error:
         print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    failed_runs = sum(r["result"] == "Failed" for case in report["cases"] for r in case["repetitions"])
+    faults = len((report["inputFaults"] or {}).get("faults", []))
     for case in report["cases"]:
         first = next((r for r in case["repetitions"] if r["result"] == "Failed"), {})
         failures = "; ".join(first.get("failures", [])).replace("\n", " ")
@@ -271,6 +315,17 @@ def report_retries(model, output):
         print(f"RETRIED {message}", flush=True)
         if os.environ.get("GITHUB_ACTIONS") == "true":
             print(f"::warning title=UI test retried::{message}", flush=True)
+    if report["cases"]:
+        # A failure without a matching injection fault may be an app defect.
+        if not (report["inputFaults"] or {}).get("archives"):
+            verdict = "no simulator log in the result bundle; cannot classify, investigate"
+        elif faults >= failed_runs:
+            verdict = "each failed run has a matching simulator input fault"
+        else:
+            verdict = f"{failed_runs - faults} failed run(s) lack a simulator input fault; investigate"
+        print(f"INPUT FAULTS {model}: {faults} for {failed_runs} failed run(s); {verdict}", flush=True)
+        if faults < failed_runs and os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=Unexplained UI failure::{model}: {verdict}", flush=True)
 
 
 def source_identity():
@@ -422,8 +477,8 @@ def main():
             # multi-step UI case. Each case gets 180 seconds; the separate
             # 900-second whole-suite cap remains the aggregate failure bound.
             # A failed case runs once more (N06 in the navigation-contact audit:
-            # hosted contacts intermittently enter no action). Every retry is
-            # reported by name, and a second failure still fails the suite.
+            # XCTest's synthesized touches race backboardd on loaded simulators).
+            # Every retry is reported by name, and a second failure still fails.
             selectors = []
             if args.navigation_only:
                 selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
