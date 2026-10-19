@@ -56,7 +56,7 @@ for module in (['grid','terrain'] if args.modules=='both' else [args.modules]):
         frameworks=add(targetname+'frameworks','isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = '+arr(links)+'; runOnlyForDeploymentPostprocessing = 0;')
         resources=add(targetname+'resources','isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;')
         settings=dict(PRODUCT_NAME='$(TARGET_NAME)',PRODUCT_BUNDLE_IDENTIFIER='local.gamecore.'+targetname,GENERATE_INFOPLIST_FILE='YES')
-        if kind=='app': settings.update(INFOPLIST_KEY_UIApplicationSceneManifest_Generation='YES',INFOPLIST_KEY_UILaunchScreen_Generation='YES',INFOPLIST_KEY_UISupportedInterfaceOrientations='UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight',MARKETING_VERSION='0.0.1',CURRENT_PROJECT_VERSION='1')
+        if kind=='app': settings.update(INFOPLIST_KEY_UIApplicationSceneManifest_Generation='YES',INFOPLIST_KEY_UILaunchScreen_Generation='YES',INFOPLIST_KEY_UISupportedInterfaceOrientations='UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight',INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad='UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight',MARKETING_VERSION='0.0.1',CURRENT_PROJECT_VERSION='1')
         elif kind=='ui': settings.update(TEST_TARGET_NAME=name)
         else: settings.update(TEST_HOST='$(BUILT_PRODUCTS_DIR)/'+name+'.app/'+name,BUNDLE_LOADER='$(TEST_HOST)')
         config=configs(targetname,settings)
