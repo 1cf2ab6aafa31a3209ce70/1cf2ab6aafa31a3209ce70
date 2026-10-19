@@ -3,12 +3,13 @@ import GameCore
 import GamePlatform
 import SwiftUI
 
-/// The title owns its stable renderer and original preparation. Shared
-/// coordination and UI consume the controller without depending on this type.
+/// Composition root for the development title: it opens local storage and
+/// registers the practice module. Shared coordination and UI depend on neither.
 @MainActor
 final class ShellModel: ObservableObject {
-    let scene: DevelopmentScene
-    let controller: ShellController
+    let host: ModuleHost<PracticeModule>
+    var scene: DevelopmentScene { host.module.scene }
+    var controller: ShellController { host.controller }
     #if DEBUG
     private(set) var diagnostics: ShellActionJournal?
     #endif
@@ -50,22 +51,7 @@ final class ShellModel: ObservableObject {
     }
 
     init(feedback: ShellFeedbackController?, store: LocalSaveStore? = nil, storageError: String? = nil, preparation: @escaping ShellController.Preparation) {
-        let scene = DevelopmentScene(size: CGSize(width: 320, height: 240))
-        self.scene = scene
-        controller = ShellController(
-            title: TitleRegistration(id: "development-practice", displayName: "Practice studio"),
-            feedback: feedback,
-            preparation: preparation,
-            preparationFailureMessage: "Practice could not be prepared. Please try again.",
-            prepareSession: scene.prepareSession,
-            setPlaying: scene.setPlaying,
-            setReducedMotion: scene.setReducedMotion,
-            store: store,
-            initialPersistenceError: storageError,
-            recordSuccess: { progress in
-                // Synthetic practice progress verifies persistence, not game rules.
-                _ = progress.recordCompletion(levelID: "practice", score: 1, unlocks: ["practice-complete"])
-            }
-        )
+        host = ModuleHost(module: PracticeModule(preparation: preparation), feedback: feedback,
+                          store: store, storageError: storageError)
     }
 }
