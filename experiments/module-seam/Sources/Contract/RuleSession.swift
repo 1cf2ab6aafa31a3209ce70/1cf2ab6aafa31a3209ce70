@@ -2,6 +2,7 @@ import Combine
 import DevelopmentContent
 import Foundation
 import GameCore
+import GamePlatform
 
 /// Experiment-owned state. No renderer types, frame time or traces in saves.
 @MainActor

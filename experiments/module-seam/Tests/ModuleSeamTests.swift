@@ -12,11 +12,12 @@ import XCTest
 @MainActor
 final class ModuleSeamTests: XCTestCase {
     final class FakeModule: ObservableObject, GameModule {
+        let title = TitleRegistration(id: "development-practice", displayName: "Fake")
         let session = RuleSession(levelID: "block-sample-01")
-        let displayName = "Fake"
         var contractVersion = 1
+        var presentation: ShellPresentation { .seam }
         func makeGameplay() -> some View { EmptyView() }
-        func makeControls() -> some View { EmptyView() }
+        func makeControls(_ context: ModulePlayContext) -> some View { EmptyView() }
         func setReducedMotion(_ enabled: Bool) { session.reducedMotion = enabled }
     }
     final class IndependentSession: ModuleSession {
@@ -31,10 +32,11 @@ final class ModuleSeamTests: XCTestCase {
         func recordSuccess(in progress: inout SaveProgress) { _ = progress.recordCompletion(levelID: "independent-original-level") }
     }
     final class IndependentModule: ObservableObject, GameModule {
+        let title = TitleRegistration(id: "development-practice", displayName: "Independent simulation")
         let session = IndependentSession()
-        let displayName = "Independent simulation"
+        var presentation: ShellPresentation { .seam }
         func makeGameplay() -> some View { Text("Independent renderer") }
-        func makeControls() -> some View { EmptyView() }
+        func makeControls(_ context: ModulePlayContext) -> some View { EmptyView() }
         func setReducedMotion(_ enabled: Bool) { }
     }
     func testIndependentSessionAndSettingsDelivery() async {
@@ -44,7 +46,7 @@ final class ModuleSeamTests: XCTestCase {
             XCTAssertThrowsError(try ModuleFixture.root(defaultRoot: root, arguments: args))
         }
 
-        let host = ModuleHost(module: IndependentModule())
+        let host = ModuleHost(module: IndependentModule(), feedback: nil)
         XCTAssertEqual(host.module.session.settingsCalls, 1)
         host.controller.finishSplash(); host.controller.start(); await waitForLoad(host.controller)
         XCTAssertEqual(host.module.session.settingsCalls, 1)
@@ -113,7 +115,7 @@ final class ModuleSeamTests: XCTestCase {
     func testHostRejectsVersionAndLateOutcomes() async {
         let module = FakeModule()
         module.contractVersion = 2
-        let host = ModuleHost(module: module)
+        let host = ModuleHost(module: module, feedback: nil)
         host.controller.finishSplash(); host.controller.start()
         await waitForLoad(host.controller)
         if case .loadFailed = host.controller.flow.state { } else { XCTFail("Unsupported registration accepted") }
@@ -130,7 +132,7 @@ final class ModuleSeamTests: XCTestCase {
         XCTAssertTrue(host.controller.progress.completedLevels.isEmpty)
     }
     func testPauseBackgroundSettingsAndFailure() async {
-        let host = ModuleHost(module: FakeModule())
+        let host = ModuleHost(module: FakeModule(), feedback: nil)
         let controller = host.controller, session = host.module.session
         controller.finishSplash(); controller.start(); await waitForLoad(controller)
         controller.pause(); session.select(index: 1); XCTAssertTrue(session.inputs.isEmpty)
@@ -153,18 +155,18 @@ final class ModuleSeamTests: XCTestCase {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
         let store = try LocalSaveStore(titleID: "development-practice", root: root)
-        let host = ModuleHost(module: module, store: store)
+        let host = ModuleHost(module: module, feedback: nil, store: store)
         host.controller.finishSplash(); await host.controller.flushPersistence()
         _ = host.controller.updateSettings(sound: false)
         host.controller.start(); await waitForLoad(host.controller)
         let level = try XCTUnwrap(module.session.level)
-        _ = module.makeGameplay(); _ = module.makeControls()
+        _ = module.makeGameplay(); _ = module.makeControls(ModulePlayContext(reducesMotion: false, pause: {}))
         for input in FixtureRules.solutionFixture(level: level).inputs { module.session.select(index: input.action.index) }
         await host.controller.flushPersistence()
         let saved = try await store.load()
         XCTAssertEqual(saved.snapshot.progress.completedLevels, [level.id])
         XCTAssertFalse(saved.snapshot.settings.soundEnabled)
-        let restored = ModuleHost(module: FakeModule(), store: store)
+        let restored = ModuleHost(module: FakeModule(), feedback: nil, store: store)
         restored.controller.finishSplash(); await restored.controller.flushPersistence()
         XCTAssertFalse(restored.module.session.settings.soundEnabled)
         // Delete invalidates a retained old outcome token before storage work.

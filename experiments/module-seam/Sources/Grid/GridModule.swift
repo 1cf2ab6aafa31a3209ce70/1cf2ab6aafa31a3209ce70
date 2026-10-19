@@ -1,4 +1,6 @@
 import DevelopmentContent
+import GameCore
+import GamePlatform
 import SpriteKit
 import SwiftUI
 
@@ -6,8 +8,8 @@ import SwiftUI
 /// SpriteKit frames and animation never advance the deterministic rules.
 @MainActor
 final class GridModule: ObservableObject, GameModule {
+    let title = TitleRegistration(id: "development-practice", displayName: "Block grid")
     let session: RuleSession
-    let displayName = "Block grid"
     private let scene: GridScene
 
     init() {
@@ -20,7 +22,12 @@ final class GridModule: ObservableObject, GameModule {
         GridGameplayView(session: session, scene: scene)
     }
 
-    func makeControls() -> GridControlsView { GridControlsView(session: session) }
+    var presentation: ShellPresentation { .seam }
+
+    func makeControls(_ context: ModulePlayContext) -> some View {
+        let session = session
+        return SeamPlayControls(context: context, end: session.fail) { GridControlsView(session: session) }
+    }
 
     func setReducedMotion(_ enabled: Bool) {
         session.reducedMotion = enabled

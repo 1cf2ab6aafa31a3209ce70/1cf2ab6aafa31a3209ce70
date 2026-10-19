@@ -1,5 +1,7 @@
 import Combine
 import DevelopmentContent
+import GameCore
+import GamePlatform
 import RealityKit
 import SwiftUI
 import UIKit
@@ -7,8 +9,8 @@ import UIKit
 /// Disposable title-owned renderer; rules, shell flow and saves stay outside it.
 @MainActor
 final class TerrainModule: ObservableObject, GameModule {
+    let title = TitleRegistration(id: "development-practice", displayName: "Terrain study")
     let session: RuleSession
-    let displayName = "Terrain study"
     private let renderer: TerrainRenderer
 
     convenience init() {
@@ -24,8 +26,11 @@ final class TerrainModule: ObservableObject, GameModule {
         TerrainGameplayView(session: session, renderer: renderer)
     }
 
-    func makeControls() -> TerrainControlsView {
-        TerrainControlsView(session: session)
+    var presentation: ShellPresentation { .seam }
+
+    func makeControls(_ context: ModulePlayContext) -> some View {
+        let session = session
+        return SeamPlayControls(context: context, end: session.fail) { TerrainControlsView(session: session) }
     }
 
     func setReducedMotion(_ reduced: Bool) {
