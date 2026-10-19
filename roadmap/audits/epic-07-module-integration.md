@@ -54,5 +54,6 @@ The first UI run found that `LazyVGrid` creates block buttons only near the visi
 | `scripts/verify.sh` with both titles | `aef1447`, Xcode 27.1 | Core, platform and both content packages' tests; 11 CLI rejection cases; six builds |
 | `scripts/test-mobile.sh`, both titles | `aef1447`, iOS Simulator 26.0 | Practice title 28 of 28 and Block Match 6 of 6 on each geometry, no retries; both restart proofs |
 | `scripts/test-title-lifecycle.py` | Clean `8cf8c66`, Xcode 27.1 | Without Block Match, the practice title builds; without the practice title, Block Match builds; both with checks and core and platform tests; a scaffolded `ExampleTitle` passes its checks and content tests and builds with its tests |
+| Scaffolded `ExampleTitle` on simulators | `0d80a41` plus `new-title.py`, iOS Simulator 26.0 | Its app-hosted test (load, pause gating, completion, save, relaunch) and UI test passed on iPhone 12 and iPad (9th generation) without edits |
 
 Each pull request's hosted CI runs the foundation matrix on its final revision.
