@@ -17,10 +17,6 @@ struct ShellView: View {
                 guard let model else { return }
                 model.diagnostics?.recordButton(id, controller: model.controller)
             })
-            .environment(\.shellDiagnosticScrollPhase, { [weak model] phase in
-                guard let model else { return }
-                model.diagnostics?.recordScrollPhase(phase, controller: model.controller)
-            })
         #else
         shellContent
         #endif

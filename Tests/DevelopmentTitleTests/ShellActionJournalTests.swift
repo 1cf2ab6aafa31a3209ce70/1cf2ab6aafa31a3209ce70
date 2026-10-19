@@ -2,8 +2,6 @@
 import Foundation
 import GameCore
 import GamePlatform
-import SwiftUI
-import UIKit
 import XCTest
 
 @MainActor
@@ -49,12 +47,6 @@ final class ShellActionJournalTests: XCTestCase {
         controller.handleAudioEvent(.interruptionBegan)
         controller.handleAudioEvent(.interruptionEnded(shouldResume: false))
         controller.resume()
-        for phase in [ScrollPhase.tracking, .interacting, .decelerating, .animating, .idle] {
-            journal.recordScrollPhase(phase, controller: controller)
-        }
-        for phase in [UITouch.Phase.began, .moved, .stationary, .ended, .began, .cancelled] {
-            journal.recordTouchPhase(phase, controller: controller)
-        }
         journal.record(kind: "private free text sentinel", flow: controller.flow,
                        persistenceReady: true, recoveryRequired: false, resumeMessagePresent: false)
         await journal.flush()
@@ -77,12 +69,6 @@ final class ShellActionJournalTests: XCTestCase {
         XCTAssertEqual(resumes.first?["state"] as? String, "paused")
         XCTAssertEqual(resumes.last?["state"] as? String, "playing")
         XCTAssertTrue((resumes.first?["pauseReasons"] as? [String])?.contains("applicationInactive") == true)
-        let scrolls = events.filter { ($0["kind"] as? String)?.hasPrefix("scroll.") == true }
-        XCTAssertEqual(scrolls.compactMap { $0["kind"] as? String },
-                       ["scroll.tracking", "scroll.interacting", "scroll.decelerating", "scroll.animating", "scroll.idle"])
-        XCTAssertTrue(scrolls.allSatisfy { $0["state"] != nil && $0["inputActive"] != nil })
-        let touches = events.compactMap { $0["kind"] as? String }.filter { $0.hasPrefix("touch.") }
-        XCTAssertEqual(touches, ["touch.began", "touch.ended", "touch.began", "touch.cancelled"])
         XCTAssertEqual(events.last?["kind"] as? String, "event.unknown")
         let text = try String(contentsOf: root.appendingPathComponent("diagnostics/action-state.jsonl"), encoding: .utf8)
         XCTAssertFalse(text.contains("private"))

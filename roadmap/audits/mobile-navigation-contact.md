@@ -146,9 +146,13 @@ Because the fault is in the simulator's input path, running the case again is th
 
 After each suite, the collector reads the result bundle and writes `<model>-retries.json`. It names every case with a failed repetition and its first failure message, prints a `RETRIED` line, and adds a warning annotation on GitHub Actions. When any case failed, it also exports the bundle's diagnostics and scans backboardd's log for both fault forms: `unknown digitizer`, or touch-state initialization more than 100 ms after the digitizer attached. It then prints `INPUT FAULTS <model>: <faults> for <failed runs>`, with a warning when a failed run has no matching fault. Against the six failed bundles, the scan found exactly one fault in each of the five N06 bundles, at the failed contact, and none in the Export bundle. Each scan took 2–9 seconds.
 
-The retry hides no evidence. The failed iteration keeps its attachments and diagnostics in the result bundle, and its launch writes its own fixture journal, touch phases included. The collector's shared journal budget rises from 128 KiB to 1 MiB, because each journal already caps itself at 128 KiB. A local probe on Xcode 27.1 confirmed the semantics: a case that fails once then passes exits 0, and the result bundle records `First Run` failed and `Retry 1` passed.
+The retry hides no evidence. The failed iteration keeps its attachments and diagnostics in the result bundle, and its launch writes its own fixture journal. The collector's shared journal budget rises from 128 KiB to 1 MiB, because each journal already caps itself at 128 KiB. A local probe on Xcode 27.1 confirmed the semantics: a case that fails once then passes exits 0, and the result bundle records `First Run` failed and `Retry 1` passed.
 
 A retry with a matching input fault needs no entry here. A failed run without one may be an app defect: investigate it and record it here. Two failures of the same case in one suite fail the job.
+
+## Scroll- and touch-phase observers removed
+
+The simulator log answers what the scroll-phase and touch-phase observers were added to show, so both are removed. The fixture journal no longer records `scroll.*` or `touch.*` tags, the shell ScrollView has no DEBUG scroll-phase hook, and `UIWindow.sendEvent(_:)` is no longer exchanged. Button, flow, lifecycle, audio and checkpoint records are unchanged. Journals from earlier runs keep their scroll and touch rows.
 
 ## Current disposition and finite review ledger
 

@@ -125,8 +125,7 @@ def collect_boot_diagnostics(device, model, output):
 def collect_action_journals(device, model, output):
     """Copy only bounded diagnostic journals from this owned app's UUID fixtures."""
     destination = output / "action-journals" / model
-    # Each journal caps itself at 128 KiB. With touch phases, six passing
-    # cases reached about 127 KiB together, and a retried case adds a journal.
+    # Each journal caps itself at 128 KiB, and a retried case adds a journal.
     receipt = {"device": device, "model": model, "byteLimit": 1024 * 1024,
                "files": [], "missing": False, "truncated": False, "errors": []}
     try:
