@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 """Check failure and cleanup orchestration without starting native processes."""
 import json
+import os
 from pathlib import Path
 import runpy
 import subprocess
@@ -9,8 +10,10 @@ import tempfile
 from unittest.mock import patch
 
 script = Path(__file__).with_name('verify.py')
+# CI pins a runtime and enables annotations; neither belongs in a mocked run.
+for key in ['GAMECORE_SIM_RUNTIME_VERSION', 'GITHUB_ACTIONS']: os.environ.pop(key, None)
 results = []
-for scenario in ['pass', 'retried-pass', 'restore-failure', 'boot-failure', 'skipped-test', 'test-timeout']:
+for scenario in ['pass', 'retried-pass', 'restore-failure', 'boot-failure', 'skipped-test', 'test-timeout', 'missing-runtime']:
     with tempfile.TemporaryDirectory(prefix='gamecore-s06-harness-') as temp:
         out = Path(temp)/'evidence'
         calls = []
@@ -35,15 +38,16 @@ for scenario in ['pass', 'retried-pass', 'restore-failure', 'boot-failure', 'ski
             return subprocess.CompletedProcess(command, code)
         error = None
         # The input-fault scan uses Popen; refuse it so a retry is classified without native processes.
+        pin = {'GAMECORE_SIM_RUNTIME_VERSION': '18.0'} if scenario == 'missing-runtime' else {}
         with patch('subprocess.run', side_effect=fake), patch('subprocess.Popen', side_effect=OSError('mocked')), \
-                patch.object(sys, 'argv', [str(script), str(out)]):
+                patch.dict(os.environ, pin), patch.object(sys, 'argv', [str(script), str(out)]):
             try: runpy.run_path(str(script), run_name='__main__')
             except (RuntimeError, SystemExit) as exception: error = type(exception).__name__
         receipt = json.loads((out/'receipt.json').read_text())
         assert receipt['status'] == ('passed' if scenario.endswith('pass') else 'failed'), scenario
         assert bool(error) == (not scenario.endswith('pass')), scenario
         created = {'FAKE-OWNED-' + c[-2].rsplit('.', 1)[-1] for c in calls if 'simctl' in c and 'create' in c}
-        assert created
+        assert bool(created) == (scenario != 'missing-runtime'), scenario
         for action in ['shutdown', 'delete']:
             assert {c[-1] for c in calls if 'simctl' in c and action in c} >= created, (scenario, action)
         if scenario.endswith('pass'):
