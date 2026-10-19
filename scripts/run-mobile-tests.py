@@ -283,10 +283,13 @@ def scan_input_faults(result_bundle):
     return {"archives": archives, "faults": faults}
 
 
+LAUNCH_TIMEOUT = "Timed out while launching application via Xcode"
+
+
 def report_retries(model, output):
     """Name every case that failed before passing or failing again; never hide a retry."""
     result_bundle = output / f"{model}.xcresult"
-    report = {"model": model, "cases": [], "inputFaults": None, "errors": []}
+    report = {"model": model, "cases": [], "inputFaults": None, "launchTimeouts": 0, "errors": []}
     try:
         if not result_bundle.exists():
             raise ValueError("No result bundle")
@@ -314,12 +317,16 @@ def report_retries(model, output):
     except Exception as error:
         report["errors"].append(str(error))
         print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    failed = [r for case in report["cases"] for r in case["repetitions"] if r["result"] == "Failed"]
+    failed_runs = len(failed)
+    # N10: xcodebuild forwarded a launch to the simulator after XCTest's launch
+    # timeout. The failure message names it; the app had not started yet.
+    report["launchTimeouts"] = sum(any(LAUNCH_TIMEOUT in failure for failure in r["failures"]) for r in failed)
+    faults = len((report["inputFaults"] or {}).get("faults", [])) + report["launchTimeouts"]
     try:
         (output / f"{model}-retries.json").write_text(json.dumps(report, indent=2) + "\n")
     except OSError as error:
         print(f"Retry report warning ({model}): {error}", file=sys.stderr)
-    failed_runs = sum(r["result"] == "Failed" for case in report["cases"] for r in case["repetitions"])
-    faults = len((report["inputFaults"] or {}).get("faults", []))
     for case in report["cases"]:
         first = next((r for r in case["repetitions"] if r["result"] == "Failed"), {})
         failures = "; ".join(first.get("failures", [])).replace("\n", " ")
@@ -329,10 +336,10 @@ def report_retries(model, output):
             print(f"::warning title=UI test retried::{message}", flush=True)
     if report["cases"]:
         # A failure without a matching injection fault may be an app defect.
-        if not (report["inputFaults"] or {}).get("archives"):
+        if faults >= failed_runs:
+            verdict = "each failed run has a matching simulator input fault or launch timeout"
+        elif not (report["inputFaults"] or {}).get("archives"):
             verdict = "no simulator log in the result bundle; cannot classify, investigate"
-        elif faults >= failed_runs:
-            verdict = "each failed run has a matching simulator input fault"
         else:
             verdict = f"{failed_runs - faults} failed run(s) lack a simulator input fault; investigate"
         print(f"INPUT FAULTS {model}: {faults} for {failed_runs} failed run(s); {verdict}", flush=True)
