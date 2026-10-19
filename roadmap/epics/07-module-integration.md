@@ -22,3 +22,7 @@
 - A contributor can create a third skeletal title using documented steps without copying core source files.
 
 **Outside this epic:** Complete block, tile, unscrew, or dig mechanics. The reference slice carries only what the contract tests need.
+
+## Status — 2026-10-19
+
+Complete for mobile simulator acceptance. [Module contract version 1](../decisions/ADR-007-module-contract-v1.md), provisional until Spike 11, carries the practice title and the Block Match reference slice, each with its own bundle identifier, icon, catalog and save namespace. Titles come from `title.json` manifests, which drive generation, checks, the mobile test runner and CI. `scripts/new-title.py` creates a third title that builds and passes its tests before any gameplay, and [Adding a title](../../docs/adding-a-title.md) documents what a title may rely on. The [evidence report](../audits/epic-07-module-integration.md) maps each acceptance item to local and hosted checks. Spike 11's entry gate is satisfied.
