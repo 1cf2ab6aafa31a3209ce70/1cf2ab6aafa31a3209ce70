@@ -21,12 +21,12 @@ public final class ModuleHost<Module: GameModule>: ObservableObject {
         self.module = module
         let bridge = ControllerReference()
         let session = module.session
-        let supported = Self.supportedContractVersions.contains(module.contractVersion)
         let controller = ShellController(
             title: module.title,
             feedback: feedback,
             preparation: {
-                guard supported else {
+                // Checked on every load, before the session is touched.
+                guard Self.supportedContractVersions.contains(module.contractVersion) else {
                     throw ContentValidationError(message: "Unsupported module contract version")
                 }
                 // The controller exists before any load; a missing request means
