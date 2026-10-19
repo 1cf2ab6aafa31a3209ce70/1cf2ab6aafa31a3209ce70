@@ -19,6 +19,23 @@ The first command checks generated-project consistency and architecture/privacy 
 
 The disposable experiment has its own build/test commands in its README. Its renderer integration evidence does not make the experiment a production package or title.
 
+## UI test failures
+
+Read the simulator's log before changing app code, test input or instrumentation. Every failed result bundle carries it:
+
+```sh
+xcrun xcresulttool export diagnostics --path <model>.xcresult --output-path <dir>
+find <dir> -name system.logarchive
+/usr/bin/log show --archive <archive> --info --debug --style compact \
+  --predicate 'process == "backboardd" AND category == "TouchEvents"'
+```
+
+Call `/usr/bin/log` by full path, because zsh has its own `log` builtin.
+
+A control that renders pressed but runs no action, or a toggle that does not change, is usually the simulator fault behind [N06](roadmap/audits/mobile-navigation-contact.md). backboardd logs `*** unknown digitizer`, or initializes a `BKDirectTouchState` more than 100 ms after `digitizer attached`. The fault drops or compresses an XCTest synthesized gesture before the app receives it, in about 1 of 60 gestures on loaded hosted runners, and no app change can prevent it. The collector already retries the case and records the match under `inputFaults` in `<model>-retries.json`, so nothing more is needed. From 2026-10-04 to 2026-10-18 this signature was investigated with a longer press, an action journal and scroll- and touch-phase observers before anyone read this log. Do not repeat that.
+
+A system view that fails to appear, such as the Files exporter, may still be launching. Its first launch on a fresh hosted simulator took 24 seconds (N07), so wait generously for out-of-process system UI.
+
 ## Changes and ownership
 
 Keep changes focused and explain the behavior or decision they change. Include relevant validation and remaining uncertainty. Preserve the roadmap's dependencies unless an explicit decision revises them. Simulator results must be labeled with runtime and geometry; a deployment-target build is not execution on the minimum OS.
