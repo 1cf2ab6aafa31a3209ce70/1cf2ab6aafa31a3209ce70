@@ -235,7 +235,9 @@ final class DevelopmentTitleUITests: XCTestCase {
     private func waitForSaved(_ app: XCUIApplication) {
         let saved = app.staticTexts["save.status"]
         let expected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Local data saved"), object: saved)
-        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 10), .completed)
+        // One hosted accessibility query alone took 9.4 seconds while the
+        // label already read saved (N08), so allow for the query, not the app.
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 30), .completed)
     }
 
     @MainActor
