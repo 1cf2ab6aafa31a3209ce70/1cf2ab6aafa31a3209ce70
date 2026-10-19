@@ -15,37 +15,17 @@ final class ShellModel: ObservableObject {
     #endif
 
     convenience init() {
-        let store: LocalSaveStore?
-        let storageError: String?
-        #if DEBUG
-        var diagnostics: ShellActionJournal?
-        #endif
-        do {
-            let defaultRoot = try LocalSaveStore.applicationSupportRoot()
-            #if DEBUG
-            let root = try ShellUITestFixture.storageRoot(defaultRoot: defaultRoot, arguments: ProcessInfo.processInfo.arguments)
-            #else
-            let root = defaultRoot
-            #endif
-            store = try LocalSaveStore(titleID: "development-practice", root: root)
-            storageError = nil
-            #if DEBUG
-            if root != defaultRoot, let identity = UUID(uuidString: root.lastPathComponent) {
-                do { diagnostics = try ShellActionJournal(fixtureRoot: root, fixtureID: identity) }
-                catch { print("GAMECORE_JOURNAL_UNAVAILABLE") }
-            }
-            #endif
-        } catch {
-            store = nil
-            storageError = "Local data could not be opened: \(error.localizedDescription). Close and reopen the app to retry. Existing data has been preserved."
-        }
-        self.init(feedback: ShellFeedbackController(), store: store, storageError: storageError, preparation: {
+        let storage = TitleStorage.open(titleID: "development-practice")
+        self.init(feedback: ShellFeedbackController(), store: storage.store, storageError: storage.errorMessage, preparation: {
             await Task.yield()
             try Task.checkCancellation()
             _ = try BundledContent.load()
         })
         #if DEBUG
-        self.diagnostics = diagnostics
+        if let fixture = storage.fixture {
+            do { diagnostics = try ShellActionJournal(fixtureRoot: fixture.root, fixtureID: fixture.identity) }
+            catch { print("GAMECORE_JOURNAL_UNAVAILABLE") }
+        }
         diagnostics?.observe(controller)
         #endif
     }

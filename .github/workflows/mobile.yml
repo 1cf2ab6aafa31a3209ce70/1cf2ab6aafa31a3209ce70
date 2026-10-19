@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
     inputs:
       navigation_only:
-        description: Run only the three navigation UI diagnostics
+        description: Run only the three DevelopmentTitle navigation UI diagnostics
         type: boolean
         default: false
       minimum_runtime:
@@ -24,11 +24,65 @@ concurrency:
   group: mobile-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
-  foundation:
+  plan:
+    # Titles come from Games/*/title.json. A pull request tests the titles its
+    # changes touch, and every title when a shared path changes; pushes and
+    # manual runs test every title.
     if: github.event_name != 'workflow_dispatch' || !inputs.module_seam
+    runs-on: ubuntu-latest
+    outputs:
+      titles: ${{ steps.select.outputs.titles }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - name: Select titles to test
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
+        run: |
+          if [[ "$NAVIGATION_ONLY" == "true" ]]; then
+            titles='["DevelopmentTitle"]'
+          elif [[ "$EVENT" == "pull_request" ]]; then
+            git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > "$RUNNER_TEMP/changed.txt"
+            titles="$(python3 scripts/titles.py affected "$RUNNER_TEMP/changed.txt")"
+          else
+            titles="$(python3 scripts/titles.py targets | python3 -c 'import json, sys; print(json.dumps(sys.stdin.read().split()))')"
+          fi
+          echo "Titles to test: $titles"
+          echo "titles=$titles" >> "$GITHUB_OUTPUT"
+  verify:
+    # Shared packages, every title's content and every build, on every change.
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only)
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Verify packages and mobile builds
+        run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
+      - name: Retain verification logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: mobile-verification-logs
+          path: ${{ runner.temp }}/foundation-verification/*.log
+          if-no-files-found: ignore
+          retention-days: 30
+  foundation:
+    needs: plan
+    if: needs.plan.outputs.titles != '[]'
     strategy:
       fail-fast: false
       matrix:
+        title: ${{ fromJSON(needs.plan.outputs.titles) }}
         model: [iphone12, ipad9]
     runs-on: macos-26
     timeout-minutes: 45
@@ -41,23 +95,21 @@ jobs:
         run: |
           toolchain_version="$(xcodebuild -version)"
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
-      - name: Verify packages and mobile builds
-        if: github.event_name != 'workflow_dispatch' || !inputs.navigation_only
-        run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
-      - name: Test ${{ matrix.model }} simulator
+      - name: Test ${{ matrix.title }} on ${{ matrix.model }}
         env:
+          TITLE: ${{ matrix.title }}
+          MODEL: ${{ matrix.model }}
           NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
         run: |
-          arguments=()
+          arguments=(--title "$TITLE" --model "$MODEL")
           if [[ "$NAVIGATION_ONLY" == "true" ]]; then arguments+=(--navigation-only); fi
-          bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" --model "${{ matrix.model }}" "${arguments[@]}"
+          bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" "${arguments[@]}"
       - name: Retain validation evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-validation-evidence-${{ matrix.model }}
+          name: mobile-validation-evidence-${{ matrix.title }}-${{ matrix.model }}
           path: |
-            ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-ui/*.log
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*-restart.json
@@ -92,7 +144,7 @@ jobs:
             xcrun simctl list runtimes
             exit 1
           fi
-      - name: Test iphone12 on the minimum runtime
+      - name: Test every title on iphone12 on the minimum runtime
         run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model iphone12
       - name: Retain minimum-runtime evidence
         if: always()
@@ -100,13 +152,13 @@ jobs:
         with:
           name: mobile-minimum-runtime-evidence
           path: |
-            ${{ runner.temp }}/minimum-runtime-ui/*.log
+            ${{ runner.temp }}/minimum-runtime-ui/**/*.log
             ${{ runner.temp }}/minimum-runtime-ui/inventory.json
-            ${{ runner.temp }}/minimum-runtime-ui/*-restart.json
-            ${{ runner.temp }}/minimum-runtime-ui/*-retries.json
-            ${{ runner.temp }}/minimum-runtime-ui/*.xcresult
-            ${{ runner.temp }}/minimum-runtime-ui/*-diagnostics/
-            ${{ runner.temp }}/minimum-runtime-ui/action-journals/
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-restart.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-retries.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*.xcresult
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-diagnostics/
+            ${{ runner.temp }}/minimum-runtime-ui/**/action-journals/
           if-no-files-found: ignore
           retention-days: 30
   module-seam:

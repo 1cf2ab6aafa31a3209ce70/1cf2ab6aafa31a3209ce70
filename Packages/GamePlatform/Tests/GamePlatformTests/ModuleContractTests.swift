@@ -16,6 +16,7 @@ final class ModuleContractTests: XCTestCase {
         var settingsDeliveries = 0
         var outcomeHandler: ((ShellOutcome, LoadRequest) -> Void)?
         var failNextPreparation = false
+        private(set) var deliveredProgress: [SaveProgress] = []
         private(set) var prepared: [LoadRequest] = []
         private(set) var begun: [LoadRequest] = []
         private(set) var level: String?
@@ -36,6 +37,7 @@ final class ModuleContractTests: XCTestCase {
             guard let level else { return }
             _ = progress.recordCompletion(levelID: level, score: 3, unlocks: ["fake-level-02"])
         }
+        func progressDidChange(_ progress: SaveProgress) { deliveredProgress.append(progress) }
     }
 
     final class FakeModule: GameModule {
@@ -186,6 +188,22 @@ final class ModuleContractTests: XCTestCase {
         XCTAssertFalse(session.settings.hapticsEnabled)
         XCTAssertFalse(host.controller.updateSettings(language: "xx"), "Unsupported languages are refused")
         XCTAssertEqual(session.settingsDeliveries, 2)
+    }
+
+    func testSavedProgressReachesTheSessionAtLaunchAndOnChange() async throws {
+        let first = try host()
+        XCTAssertEqual(first.module.session.deliveredProgress, [SaveProgress()])
+        await launch(first)
+        await play(first)
+        first.module.session.succeed()
+        await first.controller.flushPersistence()
+        XCTAssertEqual(first.module.session.deliveredProgress.last?.completedLevels, ["fake-level-01"])
+        XCTAssertEqual(first.module.session.deliveredProgress.count, 2, "Equal progress is not redelivered")
+
+        let relaunched = try host()
+        await launch(relaunched)
+        XCTAssertEqual(relaunched.module.session.deliveredProgress.map(\.completedLevels), [[], ["fake-level-01"]],
+                       "A session can choose its level from restored progress before the first load")
     }
 
     func testAnotherTitlesSaveNamespaceIsRefusedBeforePlay() async throws {

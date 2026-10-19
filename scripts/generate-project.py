@@ -110,7 +110,7 @@ for title in TITLES:
 
     # Validate the exact copied SwiftPM resources before app compilation/packaging.
     # This is a host authoring tool; the app links only the title library product.
-    validation_script = f'set -eu\ncd "$SRCROOT"\n/usr/bin/env -u SDK_NAME -u SDK_DIR -u PLATFORM_NAME -u SWIFT_EXEC SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)" /usr/bin/xcrun --sdk macosx swift run --package-path {title.content_package} --scratch-path "$DERIVED_FILE_DIR/ContentValidation" content-validator {title.content_resources}\n'
+    validation_script = f'set -eu\ncd "$SRCROOT"\n/usr/bin/env -u SDK_NAME -u SDK_DIR -u PLATFORM_NAME -u SWIFT_EXEC SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)" /usr/bin/xcrun --sdk macosx swift run --package-path {title.content_package} --scratch-path "$DERIVED_FILE_DIR/ContentValidation" {title.content_product}Validator {title.content_resources}\n'
     validation_phase = add(f"{name}-content-validation", f"isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = (); runOnlyForDeploymentPostprocessing = 0; alwaysOutOfDate = 1; shellPath = /bin/sh; shellScript = {quoted(validation_script)};")
 
     app_settings = {

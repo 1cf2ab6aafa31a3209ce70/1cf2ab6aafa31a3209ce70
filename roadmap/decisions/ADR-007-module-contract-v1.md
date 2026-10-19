@@ -26,7 +26,7 @@ The epic's responsibilities map onto the contract as follows:
 | Level decoding | `ModuleSession.prepare(for:)` decodes and validates the selected level from the title's bundled content |
 | Rules factory | `ModuleSession.begin(for:)` creates fresh rule state for the prepared request |
 | Gameplay view factories | `makeGameplay()` and `makeControls(_:)` |
-| Lifecycle callbacks | `playing`, `settings`, `setReducedMotion(_:)`, `outcomeHandler`, `fail()`, `recordSuccess(in:)` |
+| Lifecycle callbacks | `playing`, `settings`, `progressDidChange(_:)`, `setReducedMotion(_:)`, `outcomeHandler`, `fail()`, `recordSuccess(in:)` |
 
 The promotion keeps ADR-006's demonstrated behavior: preparation is refused for an unsupported registration version before the session is touched, the bridge never dereferences the controller before initialization, settings arrive once at registration and again only when they change, and every outcome carries the request it belongs to, so the controller refuses late or duplicate results. A session must check cancellation before replacing staged state (ADR-006's S06-10).
 
@@ -35,6 +35,8 @@ Three things change from the experiment:
 - **Identity and copy come from the module.** The experiment hard-coded the `development-practice` title ID and shell copy in its host. A module now supplies its `TitleRegistration`, `ShellPresentation` and load-failure message.
 - **Play controls are title-owned.** The experiment's host added fixed Pause and End buttons around the module's controls. A module now lays out all of its play controls and receives `ModulePlayContext` for pause and reduced motion; it ends a session only through its own session, so outcomes stay request-bound.
 - **The controller builds on the package's macOS test host.** `ShellController` and `ModuleHost` no longer sit behind `#if os(iOS)`, so the contract tests run with `swift test` on every change. The applications remain iOS-only, and `SharedShellView` and `ModuleShellView` stay iOS-only.
+
+Saved progress reaches the session through `progressDidChange(_:)`: once at registration, after the store loads and after each change, never twice for equal values. The block reference slice uses it to choose the next level before preparation. The default implementation ignores progress, so a session without levels need not implement it. `TitleStorage` opens a title's store for its app, including the DEBUG UI-automation namespace, so no title carries its own storage code.
 
 The development practice now registers through the contract: `PracticeModule` owns the SpriteKit scene, `PracticeSession` validates the bundled catalog in `prepare(for:)` and records its synthetic progress, and `ShellModel` remains the composition root that opens storage and DEBUG diagnostics. Its controls, copy, identifiers and save namespace are unchanged.
 

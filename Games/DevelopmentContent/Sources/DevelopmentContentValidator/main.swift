@@ -4,7 +4,7 @@ import Foundation
 func validate() throws {
     let args = Array(CommandLine.arguments.dropFirst())
     guard args.count <= 1 else {
-        throw NSError(domain: "ContentValidator", code: 3, userInfo: [NSLocalizedDescriptionKey: "usage: content-validator [content-directory]; omitted directory validates bundled original samples"])
+        throw NSError(domain: "ContentValidator", code: 3, userInfo: [NSLocalizedDescriptionKey: "usage: DevelopmentContentValidator [content-directory]; omitted directory validates bundled original samples"])
     }
     let root = try (args.isEmpty ? BundledContent.resourceDirectory() : URL(fileURLWithPath: args[0], isDirectory: true)).standardizedFileURL.resolvingSymlinksInPath()
     let catalog = try BundledContent.load { relative in
