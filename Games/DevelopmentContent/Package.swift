@@ -3,11 +3,11 @@ import PackageDescription
 let package = Package(
     name: "DevelopmentContent", platforms: [.iOS("18.0")],
     products: [.library(name: "DevelopmentContent", targets: ["DevelopmentContent"]),
-               .executable(name: "content-validator", targets: ["ContentValidatorCLI"])],
+               .executable(name: "DevelopmentContentValidator", targets: ["DevelopmentContentValidator"])],
     dependencies: [.package(path: "../../Packages/GameCore")],
     targets: [
         .target(name: "DevelopmentContent", dependencies: [.product(name: "GameCore", package: "GameCore")], resources: [.copy("Resources")]),
-        .executableTarget(name: "ContentValidatorCLI", dependencies: ["DevelopmentContent"]),
+        .executableTarget(name: "DevelopmentContentValidator", dependencies: ["DevelopmentContent"]),
         .testTarget(name: "DevelopmentContentTests", dependencies: ["DevelopmentContent"]),
     ], swiftLanguageVersions: [.v5]
 )

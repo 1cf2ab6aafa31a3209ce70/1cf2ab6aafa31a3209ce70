@@ -12,7 +12,7 @@ public final class ModuleHost<Module: GameModule>: ObservableObject {
 
     public let module: Module
     public let controller: ShellController
-    private var settingsSubscription: AnyCancellable?
+    private var subscriptions: [AnyCancellable] = []
 
     /// A store must belong to `module.title.id`; the controller refuses another
     /// title's namespace before reading it.
@@ -48,9 +48,11 @@ public final class ModuleHost<Module: GameModule>: ObservableObject {
         session.outcomeHandler = { [weak controller] outcome, request in
             controller?.finish(outcome, for: request)
         }
-        // The published initial value delivers settings once; equal values are not resent.
-        settingsSubscription = controller.$flow.map(\.settings).removeDuplicates()
-            .sink { session.settings = $0 }
+        // Published initial values deliver settings and progress once; equal values are not resent.
+        subscriptions = [
+            controller.$flow.map(\.settings).removeDuplicates().sink { session.settings = $0 },
+            controller.$progress.removeDuplicates().sink { session.progressDidChange($0) },
+        ]
     }
 }
 

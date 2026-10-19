@@ -93,16 +93,17 @@ def check_content_package(title):
     require(set(dep) == {"fileSystem"} and Path(dep["fileSystem"][0]["path"]).resolve() == ROOT / "Packages/GameCore",
             f"{name}: title content may depend only on local GameCore")
     products = {product["name"]: product for product in content["products"]}
-    require(set(products) == {name, "content-validator"},
-            f"{name}: expected the title library and the content-validator executable")
+    require(set(products) == {name, f"{name}Validator"},
+            f"{name}: expected the title library and its {name}Validator executable")
     targets = {t["name"]: t for t in content["targets"]}
-    require(set(targets) == {name, "ContentValidatorCLI", f"{name}Tests"},
+    # Target names must be unique across every title's package in the project graph.
+    require(set(targets) == {name, f"{name}Validator", f"{name}Tests"},
             f"{name}: review title content target inventory")
     require(targets[name]["type"] == "regular" and target_dependencies(targets[name]) == [("product", "GameCore", "gamecore")],
             f"{name}: title content library must depend only on GameCore")
     require(targets[name].get("resources") == [{"path": "Resources", "rule": {"copy": {}}}],
             f"{name}: title package must copy the reviewed Resources directory")
-    require(targets["ContentValidatorCLI"]["type"] == "executable" and target_dependencies(targets["ContentValidatorCLI"]) == [("target", name)],
+    require(targets[f"{name}Validator"]["type"] == "executable" and target_dependencies(targets[f"{name}Validator"]) == [("target", name)],
             f"{name}: host validator must use the same title content library")
     require(targets[f"{name}Tests"]["type"] == "test" and target_dependencies(targets[f"{name}Tests"]) == [("target", name)],
             f"{name}: content tests must exercise the title content library")
@@ -152,7 +153,7 @@ def check_project():
         validation = [index for index, phase_id in enumerate(app["buildPhases"])
                       if objects[phase_id]["isa"] == "PBXShellScriptBuildPhase"
                       and f"swift run --package-path {title.content_package} " in objects[phase_id].get("shellScript", "")
-                      and f"content-validator {title.content_resources}" in objects[phase_id].get("shellScript", "")]
+                      and f"{title.content_product}Validator {title.content_resources}" in objects[phase_id].get("shellScript", "")]
         require(validation == [0], f"{title.target}: native content validation must precede app compilation and packaging")
         linked = []
         for phase_id in app["buildPhases"]:
@@ -220,7 +221,7 @@ def check_sources():
     filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
     fixture_diagnostics = ROOT / "Packages/GamePlatform/Sources/GamePlatform/ShellActionJournal.swift"
     platform_test_root = ROOT / "Packages/GamePlatform/Tests"
-    authoring_clis = {ROOT / title.content_package / "Sources/ContentValidatorCLI/main.swift" for title in TITLES}
+    authoring_clis = {ROOT / title.content_package / f"Sources/{title.content_product}Validator/main.swift" for title in TITLES}
     content_test_roots = [ROOT / title.content_package / "Tests" for title in TITLES]
     title_imports = {title.target: set() for title in TITLES}
     registrations = {title.target: set() for title in TITLES}

@@ -17,10 +17,10 @@ for package in $content_packages; do
   name="$(basename "$package")"
   scratch="$output_dir/content-$name"
   swift test --package-path "$package" --scratch-path "$scratch" 2>&1 | tee "$output_dir/$name-tests.log"
-  swift run --package-path "$package" --scratch-path "$scratch" content-validator "$package/Sources/$name/Resources" 2>&1 | tee "$output_dir/$name-validation.log"
+  swift run --package-path "$package" --scratch-path "$scratch" "${name}Validator" "$package/Sources/$name/Resources" 2>&1 | tee "$output_dir/$name-validation.log"
   # A content package may add its own adversarial checks of the real validator binary.
   if [ -f "$package/test-content-cli.py" ]; then
-    python3 "$package/test-content-cli.py" "$scratch/debug/content-validator" | tee "$output_dir/$name-invalid-fixtures.log"
+    python3 "$package/test-content-cli.py" "$scratch/debug/${name}Validator" | tee "$output_dir/$name-invalid-fixtures.log"
   fi
 done
 for target in $targets; do

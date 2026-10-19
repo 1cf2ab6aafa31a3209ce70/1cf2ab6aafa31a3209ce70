@@ -9,8 +9,8 @@ The development title links the local `Games/DevelopmentContent` package. Its co
 From the repository root:
 
 ```sh
-swift run --package-path Games/DevelopmentContent content-validator
-swift run --package-path Games/DevelopmentContent content-validator /absolute/path/to/Resources
+swift run --package-path Games/DevelopmentContent DevelopmentContentValidator
+swift run --package-path Games/DevelopmentContent DevelopmentContentValidator /absolute/path/to/Resources
 swift test --package-path Games/DevelopmentContent
 ```
 

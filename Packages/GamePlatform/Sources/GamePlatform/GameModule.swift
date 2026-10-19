@@ -72,4 +72,11 @@ public protocol ModuleSession: AnyObject {
     func fail()
     /// Record a success in title-scoped progress, by stable level ID.
     func recordSuccess(in progress: inout SaveProgress)
+    /// Saved progress, delivered at registration, after loading and after each
+    /// change, so the session can choose a level. Optional.
+    func progressDidChange(_ progress: SaveProgress)
+}
+
+extension ModuleSession {
+    public func progressDidChange(_ progress: SaveProgress) {}
 }
