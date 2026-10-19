@@ -14,6 +14,10 @@ on:
         description: Also run the iOS 18 minimum-runtime job
         type: boolean
         default: false
+      module_seam:
+        description: Run only the Spike 06 module-seam checks on both geometries
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -21,6 +25,7 @@ concurrency:
   cancel-in-progress: true
 jobs:
   foundation:
+    if: github.event_name != 'workflow_dispatch' || !inputs.module_seam
     strategy:
       fail-fast: false
       matrix:
@@ -102,5 +107,34 @@ jobs:
             ${{ runner.temp }}/minimum-runtime-ui/*.xcresult
             ${{ runner.temp }}/minimum-runtime-ui/*-diagnostics/
             ${{ runner.temp }}/minimum-runtime-ui/action-journals/
+          if-no-files-found: ignore
+          retention-days: 30
+  module-seam:
+    # ADR-006's focused seam checks, run on demand; Epic 07 promotes the seam into production.
+    if: github.event_name == 'workflow_dispatch' && inputs.module_seam
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Check verifier orchestration
+        run: python3 experiments/module-seam/scripts/test-verifier.py
+      - name: Run focused seam checks on iphone12 and ipad9
+        run: python3 experiments/module-seam/scripts/verify.py "$RUNNER_TEMP/module-seam"
+      - name: Retain seam evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: module-seam-evidence
+          path: |
+            ${{ runner.temp }}/module-seam/receipt.json
+            ${{ runner.temp }}/module-seam/*.log
+            ${{ runner.temp }}/module-seam/*.xcresult
           if-no-files-found: ignore
           retention-days: 30

@@ -2,7 +2,7 @@
 
 This disposable [Spike 06](../../roadmap/spikes/06-module-seam.md) registers two small mobile modules with the existing shared shell: a SpriteKit block grid and a RealityKit terrain placeholder. It tests whether shell services can remain shared while each module retains its simulation, renderer, hit testing and controls. The [decision](../../roadmap/decisions/ADR-006-game-module-seam.md) records the contract and its limits.
 
-**Verification status:** the initial run passed seven focused checks per target (six app-hosted tests and one native interaction/relaunch test), using one disposable iPhone 12 on iOS 26.0 with Xcode 27.0. Each target built with the other module removed; owned-device shutdown and deletion succeeded. See the [receipt](evidence/focused-receipt.json) and [audit](../../roadmap/audits/spike-06-module-seam.md). This is not a full device matrix, hosted mobile acceptance, macOS work or a promoted production module API.
+**Verification status:** at the promoted revision `284dc23`, the seven focused checks per target (six app-hosted tests and one native interaction/relaunch test) passed on an owned iPhone 12 and an owned iPad (9th generation), 28 in all, both locally (Xcode 27.1, iOS 26.0) and in hosted CI (Xcode 26.6, iOS 26.5). Each target built with the other module removed; owned-device shutdown and deletion succeeded. See the [local](evidence/promoted-local-receipt.json) and [hosted](evidence/promoted-hosted-receipt.json) receipts, the original single-iPhone [receipt](evidence/focused-receipt.json) and the [audit](../../roadmap/audits/spike-06-module-seam.md). This is not a full device matrix, macOS work or a promoted production module API.
 
 ## Registration and ownership
 
@@ -53,9 +53,14 @@ python3 experiments/module-seam/scripts/test-verifier.py
 
 # Focused serial verification; choose a new evidence directory.
 python3 experiments/module-seam/scripts/verify.py /private/tmp/gamecore-module-seam-evidence
+
+# One geometry only.
+python3 experiments/module-seam/scripts/verify.py /private/tmp/gamecore-module-seam-ipad --model ipad9
 ```
 
-The verifier selects the newest available iOS runtime, creates one owned iPhone 12, generates and builds each module separately, and runs its app-hosted contract tests plus one native renderer-input/relaunch smoke test. It retains logs, result summaries, project hashes and experiment Swift/Python source hashes, restores the two-target project and attempts owned-device shutdown/deletion. Inspect the resulting receipt and cleanup logs before treating a run as passed. It does not rerun the repository's full foundation matrix. Future runs must confirm their actual runtime from the receipt; runtime selection is not pinned by the script.
+The verifier selects the newest available iOS runtime, or the version named by `GAMECORE_SIM_RUNTIME_VERSION`, and creates one owned simulator at a time: an iPhone 12, then an iPad (9th generation). On each it generates and builds each module separately and runs its app-hosted contract tests plus one native renderer-input/relaunch smoke test. A failed case runs once more. The result summary reports a retried case as passed, so the verifier reads repetitions from the test tree, names every retry in the receipt and classifies it with the collector's check for the simulator input fault behind N06. It retains logs, result summaries, project hashes and experiment Swift/Python source hashes, restores the two-target project and attempts owned-device shutdown/deletion. A command that times out stays in the receipt. Inspect the resulting receipt and cleanup logs before treating a run as passed. It does not rerun the repository's full foundation matrix. Confirm the actual runtime from the receipt.
+
+Hosted CI runs the same verifier on demand, with the pinned CI toolchain and runtime: dispatch the Mobile validation workflow with `module_seam` set (`gh workflow run mobile.yml --ref <branch> -f module_seam=true`). That run skips the foundation matrix.
 
 Tests cover sample identity, paused/background input gating, settings and reduced-motion delivery, failure without completion, superseded preparation, unsupported registration, stale outcome rejection, selected-level progress and preference restoration. The UI smoke routes one real renderer contact through the session and completes the selected sample before relaunch. These are tiny fixture studies, not full puzzle or terrain games, renderer performance benchmarks or save crash-durability tests.
 
