@@ -15,7 +15,9 @@ import tempfile
 import time
 import uuid
 
-import titles as title_manifests
+# The seam verifier loads this file by path to reuse its input-fault scan.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import titles as title_manifests  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
@@ -235,13 +237,17 @@ def collect_action_journals(device, model, output, bundle_identifier):
 
 
 def scan_input_faults(result_bundle):
-    """Find simulator input-injection faults (N06) in the bundle's failure diagnostics.
+    """Find simulator input-injection faults in the bundle's failure diagnostics.
 
-    XCTest plays each synthesized gesture through a new virtual digitizer, and
-    backboardd registers it while the first events arrive. Under load it either
-    builds a second touch state for the same digitizer, so the touch-up is
-    skipped and the contact is canceled ("unknown digitizer"), or initializes
-    the state late and replays the queued gesture compressed.
+    N06: XCTest plays each synthesized gesture through a new virtual digitizer,
+    and backboardd registers it while the first events arrive. Under load it
+    either builds a second touch state for the same digitizer, so the touch-up
+    is skipped and the contact is canceled ("unknown digitizer"), or
+    initializes the state late and replays the queued gesture compressed.
+
+    N09: a synthesized hardware button press reaches SpringBoard with its
+    release seconds late, so a click reads as a hold, and testmanagerd times
+    out waiting for ButtonEventsCompleted.
     """
     faults = []
     archives = 0
@@ -252,10 +258,15 @@ def scan_input_faults(result_bundle):
             archives += 1
             lines = run(["/usr/bin/log", "show", "--archive", str(archive), "--info", "--debug",
                          "--style", "compact", "--predicate",
-                         'process == "backboardd" AND category == "TouchEvents"'], timeout=300).splitlines()
+                         '(process == "backboardd" AND category == "TouchEvents") OR '
+                         '(process == "testmanagerd" AND eventMessage CONTAINS "Timed out" '
+                         'AND eventMessage CONTAINS "ButtonEventsCompleted")'], timeout=300).splitlines()
             attached = {}
             for line in lines:
                 stamp = line[:23]
+                if "ButtonEventsCompleted" in line:
+                    faults.append({"time": stamp, "kind": "button release delivered late; press read as a hold"})
+                    continue
                 sender = re.search(r"sender(?:ID)?:? (?:0x)?([0-9A-Fa-f]+)", line)
                 sender = sender.group(1).upper() if sender else None
                 if "digitizer attached" in line and sender:
