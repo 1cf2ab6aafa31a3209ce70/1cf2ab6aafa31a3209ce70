@@ -1,8 +1,8 @@
 # Epic 07 — Multi-title integration evidence
 
-**Date:** 2026-10-19. **Status:** In progress.
+**Date:** 2026-10-19. **Status:** Complete for mobile simulator acceptance.
 
-## Scope so far
+## Scope
 
 | Task | State |
 | --- | --- |
@@ -50,10 +50,33 @@ The first UI run found that `LazyVGrid` creates block buttons only near the visi
 | `scripts/test-mobile.sh` | Same, iOS Simulator 26.0 (`23A5287g`) | 22 app-hosted and 6 UI tests passed on each geometry, with no retry; both restart proofs passed |
 | Seam verifier against the production contract | Clean `f9118b4`, Xcode 27.1, iOS Simulator 26.0 | 28 of 28 passed on iPhone 12 and iPad (9th generation), with no retry or runtime warning ([receipt](../../experiments/module-seam/evidence/contract-local-receipt.json)) |
 | Same, hosted ([run 39269046205](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39269046205)) | `96888f1` (`f9118b4` merged with the PR 20 docs), Xcode 26.6 (`17F113`), iOS Simulator 26.5 (`23F77`) | 28 of 28 passed, no retry or runtime warning, inputs unchanged, owned devices cleaned up ([receipt](../../experiments/module-seam/evidence/contract-hosted-receipt.json)) |
-
 | `scripts/verify.sh` with both titles | `aef1447`, Xcode 27.1 | Core, platform and both content packages' tests; 11 CLI rejection cases; six builds |
 | `scripts/test-mobile.sh`, both titles | `aef1447`, iOS Simulator 26.0 | Practice title 28 of 28 and Block Match 6 of 6 on each geometry, no retries; both restart proofs |
 | `scripts/test-title-lifecycle.py` | Clean `8cf8c66`, Xcode 27.1 | Without Block Match, the practice title builds; without the practice title, Block Match builds; both with checks and core and platform tests; a scaffolded `ExampleTitle` passes its checks and content tests and builds with its tests |
 | Scaffolded `ExampleTitle` on simulators | `0d80a41` plus `new-title.py`, iOS Simulator 26.0 | Its app-hosted test (load, pause gating, completion, save, relaunch) and UI test passed on iPhone 12 and iPad (9th generation) without edits |
 
-Each pull request's hosted CI runs the foundation matrix on its final revision.
+### Hosted CI
+
+Every pull request below ran on Xcode 26.6 (`17F113`) and iOS Simulator 26.5 (`23F77`), on both geometries, and passed every job. Retried cases are listed with their investigation; each retry passed.
+
+| Pull request | Run | Jobs | Retries |
+| --- | --- | --- | --- |
+| [#20](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/20) ADR-006 validation | [39267936132](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39267936132) | Foundation, both geometries | None |
+| [#21](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/21) module contract | [39272690215](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39272690215) | Foundation, both geometries | iPhone: N06 input fault; iPad: N08 query stall |
+| [#22](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/22) title manifests | [39276014905](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39276014905) | Foundation, both geometries | iPad: N08 query stall |
+| [#24](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/24) Block Match | [39282005184](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39282005184) | Plan, verify (7 minutes, six builds), and each title on each geometry (9–18 minutes) | None |
+| [#25](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/25) scaffold | [39288330535](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39288330535) | As #24, plus `title-lifecycle` (7 minutes: both removals and the scaffold) | iPhone: N09 Home press read as a hold |
+
+The [navigation-contact audit](mobile-navigation-contact.md) records N08 and N09. Both lie outside the app: N08 is a single accessibility query outlasting a wait, and N09 is a Home release delivered late. [#23](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/23) gave every UI-test wait 30 seconds. [#26](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/pull/26) taught the collector's input-fault scan the button form. Every title job stayed well inside the 45-minute timeout.
+
+## Acceptance
+
+| Criterion | Evidence |
+| --- | --- |
+| Both app targets build and launch using one shared source of core behavior | Both titles register through `ModuleHost` and `ShellController` from `GamePlatform`; their app-hosted and UI tests pass on both geometries, locally and hosted |
+| ADR-006's seam checks pass on both geometries and in hosted CI at the promoted revision | 28 of 28 on the promoted experiment sources and again on the production contract, locally and hosted ([Spike 06 audit](spike-06-module-seam.md#promoted-revision-validation-epic-07)) |
+| Changing one title's rules, art, levels or bundle metadata does not require editing another title | Each title's identity lives in its manifest and its rules, levels and art in its own directories. Checks refuse imports of another title's content and mismatched catalog or registration IDs. CI selects only the titles a change touches |
+| Removing a title target leaves core tests and the other title building | `title-lifecycle`, locally and hosted: without either title, the checks and core and platform tests pass and the other title builds |
+| A contributor can create a third skeletal title using documented steps without copying core source files | [Adding a title](../../docs/adding-a-title.md) and `scripts/new-title.py`; the scaffolded title builds with its tests in `title-lifecycle` and passed its app-hosted and UI tests on both geometries locally |
+
+Limits: simulator evidence only, under ADR-003. Contract version 1 is provisional until Spike 11. The Block Match slice carries only the rules the contract needs. Shell copy is not yet localized. The privacy manifest's required-reason declaration still needs confirming against the built bundle at the release baseline (Epic 08).
