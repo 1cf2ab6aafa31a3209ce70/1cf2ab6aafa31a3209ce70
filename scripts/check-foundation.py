@@ -114,14 +114,12 @@ def check_content_package(title):
 
 # Every title ships exactly these reviewed resources from its directory.
 TITLE_RESOURCES = {"Assets.xcassets", "Localizable.xcstrings", "PrivacyInfo.xcprivacy"}
-# The apps do not track or collect data. The one required-reason API is the
-# save store's attributesOfItem, whose result includes file timestamps: C617.1
-# covers metadata of files inside the app container. A change here needs a
-# privacy review of the built bundle (docs/privacy-contract.md).
-REVIEWED_PRIVACY_MANIFEST = {
-    "NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [], "NSPrivacyCollectedDataTypes": [],
-    "NSPrivacyAccessedAPITypes": [{"NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
-                                   "NSPrivacyAccessedAPITypeReasons": ["C617.1"]}]}
+# The apps do not track, collect data or reference a required-reason API.
+# scripts/check-required-reason-apis.py confirms the API declarations against
+# each Release build; a change here needs a privacy review of the built bundle
+# (docs/privacy-contract.md).
+REVIEWED_PRIVACY_MANIFEST = {"NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [],
+                             "NSPrivacyCollectedDataTypes": [], "NSPrivacyAccessedAPITypes": []}
 
 
 def check_title_resources(title):

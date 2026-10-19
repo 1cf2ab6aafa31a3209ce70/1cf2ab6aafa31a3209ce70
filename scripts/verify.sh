@@ -23,6 +23,7 @@ for package in $content_packages; do
     python3 "$package/test-content-cli.py" "$scratch/debug/${name}Validator" | tee "$output_dir/$name-invalid-fixtures.log"
   fi
 done
+python3 scripts/test-required-reason-check.py | tee "$output_dir/required-reason-check-tests.log"
 for target in $targets; do
   for configuration in Debug Release; do
     xcodebuild -workspace GameCore.xcworkspace -scheme "$target" \
@@ -38,6 +39,10 @@ for target in $targets; do
     -derivedDataPath "$output_dir/ios-Release" CODE_SIGNING_ALLOWED=NO build \
     > "$output_dir/$target-ios-Release.log" 2>&1 || { tail -60 "$output_dir/$target-ios-Release.log"; exit 1; }
   echo "$target Release iOS SDK build passed (unsigned; no physical-device run)"
+  # The shipped binary's required-reason API references must match its privacy manifest.
+  python3 scripts/check-required-reason-apis.py "$output_dir/ios-Release/Build/Products/Release-iphoneos/$target.app" \
+    > "$output_dir/$target-required-reason-apis.log" || { cat "$output_dir/$target-required-reason-apis.log"; exit 1; }
+  tail -1 "$output_dir/$target-required-reason-apis.log"
 done
 echo "Verification passed: $output_dir"
 echo 'Package logic tests passed; app-hosted and UI tests run via scripts/test-mobile.sh.'
