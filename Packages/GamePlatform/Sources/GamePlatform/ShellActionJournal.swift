@@ -4,6 +4,7 @@ import Darwin
 import Foundation
 import GameCore
 import SwiftUI
+import UIKit
 
 /// Bounded, fixture-only diagnostics. Missing events never prove non-delivery:
 /// an interrupted process or failed writer can leave an incomplete tail.
@@ -26,7 +27,7 @@ public final class ShellActionJournal {
         "audio.routeDisconnected.entered", "audio.routeDisconnected.returned",
         "audio.mediaServicesReset.entered", "audio.mediaServicesReset.returned",
         "scroll.idle", "scroll.tracking", "scroll.interacting", "scroll.decelerating", "scroll.animating",
-        "scroll.unknown"
+        "scroll.unknown", "touch.began", "touch.ended", "touch.cancelled"
     ]
     private let fixtureID: UUID
     private let launchID = UUID()
@@ -123,6 +124,10 @@ public final class ShellActionJournal {
             self.record(kind: kind, flow: flow, persistenceReady: controller.persistenceReady,
                         recoveryRequired: controller.recoveryRequired, resumeMessagePresent: controller.resumeMessage != nil)
         }
+        ShellTouchObserver.install { [weak self, weak controller] phase in
+            guard let self, let controller else { return }
+            self.recordTouchPhase(phase, controller: controller)
+        }
         subscription = controller.$flow.sink { [weak self, weak controller] flow in
             guard let self, let controller else { return }
             self.record(kind: "flow.published", flow: flow, persistenceReady: controller.persistenceReady,
@@ -169,6 +174,21 @@ public final class ShellActionJournal {
         case .decelerating: kind = "scroll.decelerating"
         case .animating: kind = "scroll.animating"
         @unknown default: kind = "scroll.unknown"
+        }
+        record(kind: kind, flow: controller.flow,
+               persistenceReady: controller.persistenceReady, recoveryRequired: controller.recoveryRequired,
+               resumeMessagePresent: controller.resumeMessage != nil)
+    }
+
+    /// Window-level touch arrival: began, ended or cancelled, without location.
+    /// Distinguishes a canceled touch from an ended touch that ran no action.
+    public func recordTouchPhase(_ phase: UITouch.Phase, controller: ShellController) {
+        let kind: String
+        switch phase {
+        case .began: kind = "touch.began"
+        case .ended: kind = "touch.ended"
+        case .cancelled: kind = "touch.cancelled"
+        default: return
         }
         record(kind: kind, flow: controller.flow,
                persistenceReady: controller.persistenceReady, recoveryRequired: controller.recoveryRequired,
