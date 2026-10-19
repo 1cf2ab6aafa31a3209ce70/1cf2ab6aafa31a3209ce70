@@ -21,7 +21,7 @@ The script copies [scripts/title-template](../scripts/title-template), renders a
 | `Games/TileTitle/TileTitleModule.swift` | The module, its session, its gameplay view and its play controls |
 | `Games/TileTitle/Assets.xcassets` | The app icon, one opaque 1024-pixel PNG |
 | `Games/TileTitle/Localizable.xcstrings` | The title's String Catalog, English source |
-| `Games/TileTitle/PrivacyInfo.xcprivacy` | The reviewed privacy manifest: no tracking or collected data; file metadata inside the app container (`C617.1`) for local saves |
+| `Games/TileTitle/PrivacyInfo.xcprivacy` | The reviewed privacy manifest: no tracking, collected data or required-reason APIs. `verify.sh` checks it against the Release build |
 | `Games/TileTitle/Info.plist`, `CONTENT.md` | Single-window scene configuration; the content record to keep current |
 | `Games/TileContent` | The content package: catalog, levels, payload validation, `TileContentValidator` and package tests |
 | `Tests/TileTitleTests`, `Tests/TileTitleUITests` | App-hosted tests through the real host and save store, and a native UI test |

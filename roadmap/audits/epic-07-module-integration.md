@@ -37,7 +37,7 @@ The first UI run found that `LazyVGrid` creates block buttons only near the visi
 
 ## Scaffold, resources and lifecycle
 
-`scripts/new-title.py` copies `scripts/title-template` into a skeletal title and regenerates the project. The skeleton includes the manifest, module, session, content package and validator, package, app-hosted and UI tests, a String Catalog, the privacy manifest and a placeholder icon rendered by `scripts/app-icon.py`. It builds and passes its tests before any gameplay, and no core source is copied. Both titles now have distinct original icons. Every title bundles exactly its asset catalog, `Localizable.xcstrings` and `PrivacyInfo.xcprivacy`, which `check-foundation.py` reviews. The manifest declares no tracking and no collected data, plus one required-reason API: the save store's `attributesOfItem` on its own files, reason `C617.1`.
+`scripts/new-title.py` copies `scripts/title-template` into a skeletal title and regenerates the project. The skeleton includes the manifest, module, session, content package and validator, package, app-hosted and UI tests, a String Catalog, the privacy manifest and a placeholder icon rendered by `scripts/app-icon.py`. It builds and passes its tests before any gameplay, and no core source is copied. Both titles now have distinct original icons. Every title bundles exactly its asset catalog, `Localizable.xcstrings` and `PrivacyInfo.xcprivacy`, which `check-foundation.py` reviews. The manifest declares no tracking, no collected data and, after the review below, no required-reason APIs.
 
 `scripts/test-title-lifecycle.py` works on disposable copies. It removes each title in turn, then regenerates, checks, runs the core and platform tests, and builds the remaining title. It then scaffolds a third title, checks it, tests its content and builds it with its tests. CI runs it when the tooling, workflow or shared packages change.
 
@@ -79,4 +79,16 @@ The [navigation-contact audit](mobile-navigation-contact.md) records N08 and N09
 | Removing a title target leaves core tests and the other title building | `title-lifecycle`, locally and hosted: without either title, the checks and core and platform tests pass and the other title builds |
 | A contributor can create a third skeletal title using documented steps without copying core source files | [Adding a title](../../docs/adding-a-title.md) and `scripts/new-title.py`; the scaffolded title builds with its tests in `title-lifecycle` and passed its app-hosted and UI tests on both geometries locally |
 
-Limits: simulator evidence only, under ADR-003. Contract version 1 is provisional until Spike 11. The Block Match slice carries only the rules the contract needs. Shell copy is not yet localized. The privacy manifest's required-reason declaration still needs confirming against the built bundle at the release baseline (Epic 08).
+Limits: simulator evidence only, under ADR-003. Contract version 1 is provisional until Spike 11. The Block Match slice carries only the rules the contract needs. Shell copy is not yet localized.
+
+## Privacy manifest review against the built bundles
+
+The first manifests declared the file-timestamp category with reason `C617.1`, on the reasoning that the save store's `attributesOfItem` result includes timestamps. On 2026-10-19 that declaration was checked against Apple's current `NSPrivacyAccessedAPIType` list and the Release iOS builds of both titles at `5d2d0a9` (Xcode 27.1). Each app has a single Mach-O executable, with the packages linked statically.
+
+- **Imported C and Objective-C symbols:** the file attributes the code uses are `NSFileType`, `NSFileSize`, `NSFileProtectionKey` and `NSURLIsExcludedFromBackupKey`, and the system calls include `write`, `fsync`, `rename`, `close`, `fopen` and `fread`. None is on the list.
+- **Selectors:** the only file-metadata selector is `attributesOfItemAtPath:error:`, which Apple does not list.
+- **Swift references:** the only file-metadata reference is `URL.resourceValues(forKeys:)`, for the backup-exclusion key.
+- **Other categories:** neither title references a boot-time, disk-space, keyboard or user-defaults API.
+
+The declaration was speculative, which the privacy contract forbids, so every title now declares no required-reason APIs. `scripts/check-required-reason-apis.py` makes this a standing check: `verify.sh` runs it on each title's Release iOS build and fails on an undeclared listed API or an unused declaration. `scripts/test-required-reason-check.py` compiles a fixture that references one API from each of the five categories and confirms the scanner reports all five and refuses missing, absent and speculative declarations. The scan sees static references, as App Store Connect's report does; App Store Connect's response to the first upload remains the final confirmation, at the release baseline.
+
