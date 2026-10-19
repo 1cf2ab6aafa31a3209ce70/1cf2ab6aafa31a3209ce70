@@ -1,11 +1,21 @@
 name: Mobile validation
 on:
+  # Pull requests cover feature branches; pushes run only on the shared branches.
   push:
+    branches: [main, integration/first-party-foundation]
   pull_request:
   workflow_dispatch:
     inputs:
       navigation_only:
-        description: Run only the three navigation UI diagnostics
+        description: Run only the three DevelopmentTitle navigation UI diagnostics
+        type: boolean
+        default: false
+      minimum_runtime:
+        description: Also run the iOS 18 minimum-runtime job
+        type: boolean
+        default: false
+      module_seam:
+        description: Run only the Spike 06 module-seam checks on both geometries
         type: boolean
         default: false
 permissions:
@@ -14,10 +24,71 @@ concurrency:
   group: mobile-${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 jobs:
+  plan:
+    # Titles come from Games/*/title.json. A pull request tests the titles its
+    # changes touch, and every title when a shared path changes; pushes and
+    # manual runs test every title.
+    if: github.event_name != 'workflow_dispatch' || !inputs.module_seam
+    runs-on: ubuntu-latest
+    outputs:
+      titles: ${{ steps.select.outputs.titles }}
+      lifecycle: ${{ steps.select.outputs.lifecycle }}
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+        with:
+          fetch-depth: 0
+      - name: Select titles to test
+        id: select
+        env:
+          EVENT: ${{ github.event_name }}
+          BASE_SHA: ${{ github.event.pull_request.base.sha }}
+          NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
+        run: |
+          # Adding and removing titles is rechecked when the tooling or shared packages change.
+          lifecycle=true
+          if [[ "$NAVIGATION_ONLY" == "true" ]]; then
+            titles='["DevelopmentTitle"]'
+            lifecycle=false
+          elif [[ "$EVENT" == "pull_request" ]]; then
+            git diff --name-only "$BASE_SHA" "$GITHUB_SHA" > "$RUNNER_TEMP/changed.txt"
+            titles="$(python3 scripts/titles.py affected "$RUNNER_TEMP/changed.txt")"
+            grep -qE '^(scripts/|\.github/|Packages/)' "$RUNNER_TEMP/changed.txt" || lifecycle=false
+          else
+            titles="$(python3 scripts/titles.py targets | python3 -c 'import json, sys; print(json.dumps(sys.stdin.read().split()))')"
+          fi
+          echo "Titles to test: $titles; title lifecycle check: $lifecycle"
+          echo "titles=$titles" >> "$GITHUB_OUTPUT"
+          echo "lifecycle=$lifecycle" >> "$GITHUB_OUTPUT"
+  verify:
+    # Shared packages, every title's content and every build, on every change.
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only)
+    runs-on: macos-26
+    timeout-minutes: 45
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Verify packages and mobile builds
+        run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
+      - name: Retain verification logs
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: mobile-verification-logs
+          path: ${{ runner.temp }}/foundation-verification/*.log
+          if-no-files-found: ignore
+          retention-days: 30
   foundation:
+    needs: plan
+    if: needs.plan.outputs.titles != '[]'
     strategy:
       fail-fast: false
       matrix:
+        title: ${{ fromJSON(needs.plan.outputs.titles) }}
         model: [iphone12, ipad9]
     runs-on: macos-26
     timeout-minutes: 45
@@ -30,28 +101,125 @@ jobs:
         run: |
           toolchain_version="$(xcodebuild -version)"
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
-      - name: Verify packages and mobile builds
-        if: github.event_name != 'workflow_dispatch' || !inputs.navigation_only
-        run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
-      - name: Test ${{ matrix.model }} simulator
+      - name: Test ${{ matrix.title }} on ${{ matrix.model }}
         env:
+          TITLE: ${{ matrix.title }}
+          MODEL: ${{ matrix.model }}
           NAVIGATION_ONLY: ${{ github.event_name == 'workflow_dispatch' && inputs.navigation_only }}
         run: |
-          arguments=()
+          arguments=(--title "$TITLE" --model "$MODEL")
           if [[ "$NAVIGATION_ONLY" == "true" ]]; then arguments+=(--navigation-only); fi
-          bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" --model "${{ matrix.model }}" "${arguments[@]}"
+          bash scripts/test-mobile.sh "$RUNNER_TEMP/foundation-ui" "${arguments[@]}"
       - name: Retain validation evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-validation-evidence-${{ matrix.model }}
+          name: mobile-validation-evidence-${{ matrix.title }}-${{ matrix.model }}
           path: |
-            ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-ui/*.log
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*-restart.json
+            ${{ runner.temp }}/foundation-ui/*-retries.json
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
             ${{ runner.temp }}/foundation-ui/action-journals/
           if-no-files-found: ignore
-          retention-days: 7
+          retention-days: 30
+  title-lifecycle:
+    # Removing each title leaves the checks, core tests and other titles
+    # building; a scaffolded third title builds before any gameplay.
+    needs: plan
+    if: needs.plan.outputs.lifecycle == 'true'
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Remove each title and scaffold a third
+        run: python3 scripts/test-title-lifecycle.py "$RUNNER_TEMP/title-lifecycle"
+      - name: Retain lifecycle evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: title-lifecycle-evidence
+          path: |
+            ${{ runner.temp }}/title-lifecycle/receipt.json
+            ${{ runner.temp }}/title-lifecycle/*.log
+          if-no-files-found: ignore
+          retention-days: 30
+  minimum-runtime:
+    # The deployment floor is iOS 18.0; ADR-003 keeps minimum-runtime execution explicit.
+    if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.minimum_runtime)
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '18.0'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Install the iOS 18.0 simulator runtime when absent
+        run: |
+          runtime="com.apple.CoreSimulator.SimRuntime.iOS-${GAMECORE_SIM_RUNTIME_VERSION//./-}"
+          if ! xcrun simctl list runtimes | grep -q "$runtime"; then
+            xcodebuild -downloadPlatform iOS -buildVersion "$GAMECORE_SIM_RUNTIME_VERSION"
+          fi
+          if ! xcrun simctl list runtimes | grep -q "$runtime"; then
+            echo "::error::iOS $GAMECORE_SIM_RUNTIME_VERSION simulator runtime is unavailable on this runner"
+            xcrun simctl list runtimes
+            exit 1
+          fi
+      - name: Test every title on iphone12 on the minimum runtime
+        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model iphone12
+      - name: Retain minimum-runtime evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: mobile-minimum-runtime-evidence
+          path: |
+            ${{ runner.temp }}/minimum-runtime-ui/**/*.log
+            ${{ runner.temp }}/minimum-runtime-ui/inventory.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-restart.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-retries.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*.xcresult
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-diagnostics/
+            ${{ runner.temp }}/minimum-runtime-ui/**/action-journals/
+          if-no-files-found: ignore
+          retention-days: 30
+  module-seam:
+    # ADR-006's focused seam checks, run on demand; Epic 07 promotes the seam into production.
+    if: github.event_name == 'workflow_dispatch' && inputs.module_seam
+    runs-on: macos-26
+    timeout-minutes: 60
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Check verifier orchestration
+        run: python3 experiments/module-seam/scripts/test-verifier.py
+      - name: Run focused seam checks on iphone12 and ipad9
+        run: python3 experiments/module-seam/scripts/verify.py "$RUNNER_TEMP/module-seam"
+      - name: Retain seam evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: module-seam-evidence
+          path: |
+            ${{ runner.temp }}/module-seam/receipt.json
+            ${{ runner.temp }}/module-seam/*.log
+            ${{ runner.temp }}/module-seam/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 30

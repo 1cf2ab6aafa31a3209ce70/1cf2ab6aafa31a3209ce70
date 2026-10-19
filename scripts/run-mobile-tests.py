@@ -1,10 +1,12 @@
 #!/usr/bin/env python3
 """Run mobile app and UI tests on owned disposable simulators; never touch other devices."""
 import argparse
+from datetime import datetime
 import hashlib
 import json
 import os
 from pathlib import Path
+import re
 import signal
 import stat
 import subprocess
@@ -12,6 +14,10 @@ import sys
 import tempfile
 import time
 import uuid
+
+# The seam verifier loads this file by path to reuse its input-fault scan.
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import titles as title_manifests  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
 MODELS = (
@@ -120,15 +126,16 @@ def collect_boot_diagnostics(device, model, output):
         print(message, file=sys.stderr)
 
 
-def collect_action_journals(device, model, output):
+def collect_action_journals(device, model, output, bundle_identifier):
     """Copy only bounded diagnostic journals from this owned app's UUID fixtures."""
     destination = output / "action-journals" / model
-    receipt = {"device": device, "model": model, "byteLimit": 128 * 1024,
+    # Each journal caps itself at 128 KiB, and a retried case adds a journal.
+    receipt = {"device": device, "model": model, "byteLimit": 1024 * 1024,
                "files": [], "missing": False, "truncated": False, "errors": []}
     try:
         destination.mkdir(parents=True, exist_ok=True)
         container = Path(run(["xcrun", "simctl", "get_app_container", device,
-                              "local.gamecore.DevelopmentTitle", "data"], timeout=30))
+                              bundle_identifier, "data"], timeout=30))
         if not container.is_absolute() or container.resolve() != container:
             raise ValueError("App container is not an absolute path without symlinks")
         fixtures = container / "Library/Application Support/GameCoreSaves/UIAutomationFixtures"
@@ -229,6 +236,110 @@ def collect_action_journals(device, model, output):
             print(f"Action journal receipt warning ({model}): {error}", file=sys.stderr)
 
 
+def scan_input_faults(result_bundle):
+    """Find simulator input-injection faults in the bundle's failure diagnostics.
+
+    N06: XCTest plays each synthesized gesture through a new virtual digitizer,
+    and backboardd registers it while the first events arrive. Under load it
+    either builds a second touch state for the same digitizer, so the touch-up
+    is skipped and the contact is canceled ("unknown digitizer"), or
+    initializes the state late and replays the queued gesture compressed.
+
+    N09: a synthesized hardware button press reaches SpringBoard with its
+    release seconds late, so a click reads as a hold, and testmanagerd times
+    out waiting for ButtonEventsCompleted.
+    """
+    faults = []
+    archives = 0
+    with tempfile.TemporaryDirectory(prefix="gamecore-diagnostics-") as directory:
+        run(["xcrun", "xcresulttool", "export", "diagnostics", "--path", str(result_bundle),
+             "--output-path", directory], timeout=300)
+        for archive in sorted(Path(directory).rglob("system.logarchive")):
+            archives += 1
+            lines = run(["/usr/bin/log", "show", "--archive", str(archive), "--info", "--debug",
+                         "--style", "compact", "--predicate",
+                         '(process == "backboardd" AND category == "TouchEvents") OR '
+                         '(process == "testmanagerd" AND eventMessage CONTAINS "Timed out" '
+                         'AND eventMessage CONTAINS "ButtonEventsCompleted")'], timeout=300).splitlines()
+            attached = {}
+            for line in lines:
+                stamp = line[:23]
+                if "ButtonEventsCompleted" in line:
+                    faults.append({"time": stamp, "kind": "button release delivered late; press read as a hold"})
+                    continue
+                sender = re.search(r"sender(?:ID)?:? (?:0x)?([0-9A-Fa-f]+)", line)
+                sender = sender.group(1).upper() if sender else None
+                if "digitizer attached" in line and sender:
+                    attached[sender] = stamp
+                elif "unknown digitizer" in line:
+                    faults.append({"time": stamp, "kind": "duplicate touch state; touch-up skipped"})
+                elif "init: <BKDirectTouchState" in line and sender in attached:
+                    delay = (datetime.strptime(stamp, "%Y-%m-%d %H:%M:%S.%f")
+                             - datetime.strptime(attached.pop(sender), "%Y-%m-%d %H:%M:%S.%f")).total_seconds()
+                    # Normal registration takes 2-10 ms; the observed fault took 357 ms.
+                    if delay > 0.1:
+                        faults.append({"time": stamp, "kind": "late touch state; gesture replayed compressed",
+                                       "delaySeconds": round(delay, 3)})
+    return {"archives": archives, "faults": faults}
+
+
+def report_retries(model, output):
+    """Name every case that failed before passing or failing again; never hide a retry."""
+    result_bundle = output / f"{model}.xcresult"
+    report = {"model": model, "cases": [], "inputFaults": None, "errors": []}
+    try:
+        if not result_bundle.exists():
+            raise ValueError("No result bundle")
+        tree = json.loads(run(["xcrun", "xcresulttool", "get", "test-results", "tests",
+                               "--path", str(result_bundle)], timeout=120))
+
+        def visit(node):
+            repetitions = [child for child in node.get("children", [])
+                           if child.get("nodeType") == "Repetition"]
+            if node.get("nodeType") == "Test Case" and any(r.get("result") == "Failed" for r in repetitions):
+                report["cases"].append({
+                    "test": node.get("nodeIdentifier") or node.get("name"),
+                    "result": node.get("result"),
+                    "repetitions": [{"name": r.get("name"), "result": r.get("result"),
+                                     "failures": [c.get("name") for c in r.get("children", [])
+                                                  if c.get("nodeType") == "Failure Message"]}
+                                    for r in repetitions]})
+            for child in node.get("children", []):
+                visit(child)
+
+        for node in tree.get("testNodes", []):
+            visit(node)
+        if report["cases"]:
+            report["inputFaults"] = scan_input_faults(result_bundle)
+    except Exception as error:
+        report["errors"].append(str(error))
+        print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    try:
+        (output / f"{model}-retries.json").write_text(json.dumps(report, indent=2) + "\n")
+    except OSError as error:
+        print(f"Retry report warning ({model}): {error}", file=sys.stderr)
+    failed_runs = sum(r["result"] == "Failed" for case in report["cases"] for r in case["repetitions"])
+    faults = len((report["inputFaults"] or {}).get("faults", []))
+    for case in report["cases"]:
+        first = next((r for r in case["repetitions"] if r["result"] == "Failed"), {})
+        failures = "; ".join(first.get("failures", [])).replace("\n", " ")
+        message = f"{model} {case['test']} {case['result']} after retry; first failure: {failures}"
+        print(f"RETRIED {message}", flush=True)
+        if os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=UI test retried::{message}", flush=True)
+    if report["cases"]:
+        # A failure without a matching injection fault may be an app defect.
+        if not (report["inputFaults"] or {}).get("archives"):
+            verdict = "no simulator log in the result bundle; cannot classify, investigate"
+        elif faults >= failed_runs:
+            verdict = "each failed run has a matching simulator input fault"
+        else:
+            verdict = f"{failed_runs - faults} failed run(s) lack a simulator input fault; investigate"
+        print(f"INPUT FAULTS {model}: {faults} for {failed_runs} failed run(s); {verdict}", flush=True)
+        if faults < failed_runs and os.environ.get("GITHUB_ACTIONS") == "true":
+            print(f"::warning title=Unexplained UI failure::{model}: {verdict}", flush=True)
+
+
 def source_identity():
     # HEAD alone does not identify an uncommitted implementation. Hash the actual
     # build and verification inputs, using paths relative to the repository.
@@ -245,9 +356,9 @@ def source_identity():
             "sourceSHA256": sources}
 
 
-def verify_restart(xcode, device, model, output, runtime_identifier):
+def verify_restart(xcode, device, model, output, runtime_identifier, title):
     """Validate test-reported paths; never delete an inferred sandbox location."""
-    restart_test = "DevelopmentTitleTests/SavePersistenceTests/testSimulatorRestartPersistence"
+    restart_test = title.restart_proof
     receipt_prefix = "GAMECORE_RESTART_RECEIPT "
 
     def invoke(label):
@@ -273,7 +384,7 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
         # xcodebuild can refresh a data container. Discover it after the test,
         # then validate the exact Foundation path emitted by that known test.
         container = Path(run(["xcrun", "simctl", "get_app_container", device,
-                              "local.gamecore.DevelopmentTitle", "data"])).resolve()
+                              title.bundle_identifier, "data"])).resolve()
         root = Path(receipt["root"])
         sandbox = Path(receipt["sandboxRoot"])
         if (not root.is_absolute() or not sandbox.is_absolute()
@@ -320,15 +431,83 @@ def verify_restart(xcode, device, model, output, runtime_identifier):
     print(f"PASS {model}: settings/progress restored after simulator restart", flush=True)
 
 
+def test_title(title, selected_models, output, runtime, record_device, navigation_only):
+    """Build one title's scheme, then run its app-hosted and UI tests on each owned device."""
+    xcode = ["xcodebuild", "-workspace", "GameCore.xcworkspace", "-scheme", title.target,
+             "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
+    run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
+                 "build-for-testing"], log=output / "build.log", timeout=600)
+    for model, device_type in selected_models:
+        device = None
+        journal_collected = False
+        try:
+            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
+                          device_type, runtime["identifier"]])
+            record_device({"title": title.target, "model": model, "type": device_type, "id": device})
+            run(["xcrun", "simctl", "boot", device])
+            try:
+                run(["xcrun", "simctl", "bootstatus", device, "-b"],
+                    log=output / f"{model}-boot.log", timeout=600)
+            except RuntimeError:
+                collect_boot_diagnostics(device, model, output)
+                raise
+            # Hosted accessibility queries can exceed 120 seconds for a passing
+            # multi-step UI case. Each case gets 180 seconds; the separate
+            # 900-second whole-suite cap remains the aggregate failure bound.
+            # A failed case runs once more (N06 in the navigation-contact audit:
+            # XCTest's synthesized touches race backboardd on loaded simulators).
+            # Every retry is reported by name, and a second failure still fails.
+            selectors = []
+            if navigation_only:
+                selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
+                             for name in ("testNavigationSuccessFailureResumeAndRestart",
+                                          "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+                                          "testLargeTextAndReducedMotionKeepControlsReachable")]
+            try:
+                run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
+                             "-resultBundlePath", str(output / f"{model}.xcresult"),
+                             "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
+                             "-maximum-test-execution-time-allowance", "180",
+                             "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
+                    log=output / f"{model}.log", timeout=900)
+            finally:
+                collect_action_journals(device, model, output, title.bundle_identifier)
+                journal_collected = True
+                report_retries(model, output)
+            print(f"PASS {title.target} {model}: {output / (model + '.xcresult')}", flush=True)
+            if not navigation_only and title.restart_proof:
+                verify_restart(xcode, device, model, output, runtime["identifier"], title)
+        finally:
+            if device:
+                if not journal_collected:
+                    collect_action_journals(device, model, output, title.bundle_identifier)
+                # Only UUIDs returned by create in this invocation are cleaned up.
+                for operation in ("shutdown", "delete"):
+                    try:
+                        run(["xcrun", "simctl", operation, device],
+                            log=output / f"{model}-{operation}.log", timeout=90)
+                    except RuntimeError as error:
+                        print(f"Cleanup warning ({title.target} {model}): {error}", file=sys.stderr)
+
+
 def main():
+    titles = title_manifests.load()
+    targets = [title.target for title in titles]
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("output", nargs="?", help="New absolute output directory (default: temporary)")
     parser.add_argument("--model", choices=[model for model, _ in MODELS],
                         help="Run only this simulator geometry (default: both)")
+    parser.add_argument("--title", action="append", choices=targets,
+                        help="Run only this title; repeat to select several (default: every title)")
     parser.add_argument("--navigation-only", action="store_true",
-                        help="Run three navigation UI diagnostics only; omit restart proof")
+                        help="Run three DevelopmentTitle navigation UI diagnostics only; omit restart proof")
     args = parser.parse_args()
     selected_models = tuple(item for item in MODELS if args.model is None or item[0] == args.model)
+    selected_titles = [title for title in titles if args.title is None or title.target in args.title]
+    if args.navigation_only:
+        if any(title.target != "DevelopmentTitle" for title in selected_titles if args.title):
+            parser.error("--navigation-only applies to DevelopmentTitle only")
+        selected_titles = [title for title in selected_titles if title.target == "DevelopmentTitle"]
     if args.output:
         output = Path(args.output)
         if not output.is_absolute():
@@ -351,63 +530,23 @@ def main():
     metadata = {"xcode": run(["xcodebuild", "-version"]), "runtime": runtime["identifier"],
                 "runtimeVersion": runtime["version"], "runtimeBuild": runtime.get("buildversion"),
                 "selectedModels": [model for model, _ in selected_models],
+                "selectedTitles": [title.target for title in selected_titles],
                 "navigationOnly": args.navigation_only,
                 **source_identity(), "devices": []}
+
+    def record_device(device):
+        metadata["devices"].append(device)
+        (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
+
     (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
     run(["python3", "scripts/generate-project.py", "--check"])
-    xcode = ["xcodebuild", "-workspace", "GameCore.xcworkspace", "-scheme", "DevelopmentTitle",
-             "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
-    run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
-                 "build-for-testing"], log=output / "build.log", timeout=600)
-    for model, device_type in selected_models:
-        device = None
-        journal_collected = False
-        try:
-            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
-                          device_type, runtime["identifier"]])
-            metadata["devices"].append({"model": model, "type": device_type, "id": device})
-            (output / "inventory.json").write_text(json.dumps(metadata, indent=2) + "\n")
-            run(["xcrun", "simctl", "boot", device])
-            try:
-                run(["xcrun", "simctl", "bootstatus", device, "-b"],
-                    log=output / f"{model}-boot.log", timeout=600)
-            except RuntimeError:
-                collect_boot_diagnostics(device, model, output)
-                raise
-            # Hosted accessibility queries can exceed 120 seconds for a passing
-            # multi-step UI case. Each case gets 180 seconds; the separate
-            # 900-second whole-suite cap remains the aggregate failure bound.
-            selectors = []
-            if args.navigation_only:
-                selectors = ["-only-testing:DevelopmentTitleUITests/DevelopmentTitleUITests/" + name
-                             for name in ("testNavigationSuccessFailureResumeAndRestart",
-                                          "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
-                                          "testLargeTextAndReducedMotionKeepControlsReachable")]
-            try:
-                run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
-                             "-resultBundlePath", str(output / f"{model}.xcresult"),
-                             "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                             "-maximum-test-execution-time-allowance", "180"] + selectors + ["test-without-building"],
-                    log=output / f"{model}.log", timeout=900)
-            finally:
-                collect_action_journals(device, model, output)
-                journal_collected = True
-            print(f"PASS {model}: {output / (model + '.xcresult')}", flush=True)
-            if not args.navigation_only:
-                verify_restart(xcode, device, model, output, runtime["identifier"])
-        finally:
-            if device:
-                if not journal_collected:
-                    collect_action_journals(device, model, output)
-                # Only UUIDs returned by create in this invocation are cleaned up.
-                for operation in ("shutdown", "delete"):
-                    try:
-                        run(["xcrun", "simctl", operation, device],
-                            log=output / f"{model}-{operation}.log", timeout=90)
-                    except RuntimeError as error:
-                        print(f"Cleanup warning ({model}): {error}", file=sys.stderr)
+    for title in selected_titles:
+        # One title keeps the established flat layout; several get one directory each.
+        title_output = output if len(selected_titles) == 1 else output / title.target
+        title_output.mkdir(exist_ok=True)
+        test_title(title, selected_models, title_output, runtime, record_device, args.navigation_only)
     scope = "Navigation diagnostics" if args.navigation_only else "Mobile app and UI tests"
-    print(f"{scope} passed; no physical performance claim", flush=True)
+    print(f"{scope} passed for {', '.join(title.target for title in selected_titles)}; no physical performance claim", flush=True)
 
 
 if __name__ == "__main__":

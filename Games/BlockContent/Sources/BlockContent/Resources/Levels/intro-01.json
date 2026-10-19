@@ -1,0 +1,15 @@
+{
+  "schemaVersion": 1,
+  "id": "intro-01",
+  "gameType": "block",
+  "contentVersion": 1,
+  "seed": 201,
+  "payload": {
+    "columns": 3,
+    "rows": 3,
+    "cells": [0, 0, 0,
+              1, 2, 1,
+              1, 2, 1],
+    "nextLevelIDs": ["intro-02"]
+  }
+}

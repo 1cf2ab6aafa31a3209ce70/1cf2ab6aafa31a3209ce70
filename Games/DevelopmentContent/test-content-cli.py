@@ -7,13 +7,12 @@ import subprocess
 import sys
 import tempfile
 
-ROOT = Path(__file__).resolve().parents[1]
-SAMPLES = ROOT / "Games/DevelopmentContent/Sources/DevelopmentContent/Resources"
+SAMPLES = Path(__file__).resolve().parent / "Sources/DevelopmentContent/Resources"
 
 
 def main():
     if len(sys.argv) != 2:
-        raise SystemExit("Usage: test-content-cli.py /absolute/path/to/content-validator")
+        raise SystemExit("Usage: test-content-cli.py /absolute/path/to/DevelopmentContentValidator")
     binary = str(Path(sys.argv[1]).resolve())
     cases = [("duplicate IDs", "catalog.json", "duplicate level ID"),
              ("missing asset", None, "marker.svg"),

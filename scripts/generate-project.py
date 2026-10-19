@@ -1,9 +1,15 @@
 #!/usr/bin/env python3
-"""Generate the mobile foundation's Xcode project using the Python standard library."""
+"""Generate the mobile foundation's Xcode project using the Python standard library.
+
+Every title manifest (Games/<Target>/title.json) yields an app target, its
+app-hosted unit tests, its UI tests and a shared scheme of the same name.
+"""
 import argparse
 from hashlib import sha1
 import json
 from pathlib import Path
+
+import titles as title_manifests
 
 ROOT = Path(__file__).resolve().parents[1]
 PROJECT = ROOT / "GameCore.xcodeproj"
@@ -13,6 +19,7 @@ outputs = {}
 parser = argparse.ArgumentParser(description=__doc__)
 parser.add_argument("--check", action="store_true", help="Check generated files without modifying them")
 args = parser.parse_args()
+TITLES = title_manifests.load()
 
 
 def ident(name):
@@ -61,79 +68,111 @@ def configs(name, extra):
     return add(f"{name}-config-list", f"isa = XCConfigurationList; buildConfigurations = {array(ids)}; defaultConfigurationIsVisible = 0; defaultConfigurationName = Release;")
 
 
-app_ref = add("app-product", "isa = PBXFileReference; explicitFileType = wrapper.application; path = DevelopmentTitle.app; sourceTree = BUILT_PRODUCTS_DIR;")
-test_ref = add("test-product", "isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DevelopmentTitleUITests.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
-unit_ref = add("unit-product", "isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = DevelopmentTitleTests.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
+# Title resources the generator bundles when present; scripts/check-foundation.py reviews them.
+TITLE_RESOURCES = [("Assets.xcassets", "folder.assetcatalog"), ("Localizable.xcstrings", "text.json.xcstrings"),
+                   ("PrivacyInfo.xcprivacy", "text.xml")]
+
+# Shared foundation packages first, then each title's own content package.
+package_paths = {"GameCore": "Packages/GameCore", "GamePlatform": "Packages/GamePlatform"}
+for title in TITLES:
+    package_paths[title.content_product] = title.content_package
 package_refs = []
-package_products = []
-package_builds = []
-for name in ["GameCore", "GamePlatform", "DevelopmentContent"]:
-    package_path = f'Games/{name}' if name == 'DevelopmentContent' else f'Packages/{name}'
+package_products = {}
+for name, package_path in package_paths.items():
     ref = add(f"package-{name}", f"isa = XCLocalSwiftPackageReference; relativePath = {quoted(package_path)};")
-    product = add(f"package-product-{name}", f"isa = XCSwiftPackageProductDependency; package = {ref}; productName = {name};")
     package_refs.append(ref)
-    package_products.append(product)
-    package_builds.append(add(f"link-{name}", f"isa = PBXBuildFile; productRef = {product};"))
+    package_products[name] = add(f"package-product-{name}", f"isa = XCSwiftPackageProductDependency; package = {ref}; productName = {name};")
 
-refs = []
-phases = {}
-for name, directory in [("app", "Games/DevelopmentTitle"), ("ui", "Tests/DevelopmentTitleUITests"), ("unit", "Tests/DevelopmentTitleTests")]:
-    builds = []
-    for file in sorted((ROOT / directory).rglob("*.swift")):
-        path = str(file.relative_to(ROOT))
-        ref = add(f"ref-{path}", f"isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {quoted(path)}; sourceTree = SOURCE_ROOT;")
-        refs.append(ref)
-        builds.append(add(f"build-{path}", f"isa = PBXBuildFile; fileRef = {ref};"))
-    phases[name] = add(f"{name}-sources", f"isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = {array(builds)}; runOnlyForDeploymentPostprocessing = 0;")
-    framework_builds = package_builds if name == "app" else []
-    if name == "unit":
-        framework_builds = [add(f"unit-link-{index}", f"isa = PBXBuildFile; productRef = {product};")
-                            for index, product in enumerate(package_products)]
-    phases[f"{name}-frameworks"] = add(f"{name}-frameworks", f"isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = {array(framework_builds)}; runOnlyForDeploymentPostprocessing = 0;")
-    phases[f"{name}-resources"] = add(f"{name}-resources", "isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = (); runOnlyForDeploymentPostprocessing = 0;")
-
-# Validate the exact copied SwiftPM resources before app compilation/packaging.
-# This is a host authoring tool; the app links only the title library product.
-validation_script = 'set -eu\ncd "$SRCROOT"\n/usr/bin/env -u SDK_NAME -u SDK_DIR -u PLATFORM_NAME -u SWIFT_EXEC SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)" /usr/bin/xcrun --sdk macosx swift run --package-path Games/DevelopmentContent --scratch-path "$DERIVED_FILE_DIR/ContentValidation" content-validator Games/DevelopmentContent/Sources/DevelopmentContent/Resources\n'
-validation_phase = add("content-validation", f"isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = (); runOnlyForDeploymentPostprocessing = 0; alwaysOutOfDate = 1; shellPath = /bin/sh; shellScript = {quoted(validation_script)};")
-
-refs.append(add("app-info", f"isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = {quoted('Games/DevelopmentTitle/Info.plist')}; sourceTree = SOURCE_ROOT;"))
-products = add("products", f"isa = PBXGroup; name = Products; sourceTree = {quoted('<group>')}; children = {array([app_ref, test_ref, unit_ref])};")
-group = add("main-group", f"isa = PBXGroup; sourceTree = {quoted('<group>')}; children = {array(refs + [products])};")
-app_config = configs("app", {
-    "PRODUCT_NAME": "$(TARGET_NAME)",
-    "PRODUCT_BUNDLE_IDENTIFIER": "local.gamecore.DevelopmentTitle",
-    "GENERATE_INFOPLIST_FILE": "YES",
-    "INFOPLIST_FILE": "Games/DevelopmentTitle/Info.plist",
-    "INFOPLIST_KEY_CFBundleDisplayName": "Development Title",
-    "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
-    "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
-    "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
-    "MARKETING_VERSION": "0.0.1",
-    "CURRENT_PROJECT_VERSION": "1",
-    "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
-})
-app = add("app-target", f"isa = PBXNativeTarget; name = DevelopmentTitle; productName = DevelopmentTitle; productReference = {app_ref}; productType = {quoted('com.apple.product-type.application')}; buildConfigurationList = {app_config}; buildPhases = {array([validation_phase, phases['app'], phases['app-frameworks'], phases['app-resources']])}; buildRules = (); dependencies = (); packageProductDependencies = {array(package_products)};")
 project_id = ident("project")
-proxy = add("app-proxy", f"isa = PBXContainerItemProxy; containerPortal = {project_id}; proxyType = 1; remoteGlobalIDString = {app}; remoteInfo = DevelopmentTitle;")
-dependency = add("app-dependency", f"isa = PBXTargetDependency; target = {app}; targetProxy = {proxy};")
-ui_config = configs("ui", {
-    "PRODUCT_NAME": "$(TARGET_NAME)",
-    "PRODUCT_BUNDLE_IDENTIFIER": "local.gamecore.DevelopmentTitleUITests",
-    "GENERATE_INFOPLIST_FILE": "YES",
-    "TEST_TARGET_NAME": "DevelopmentTitle",
-})
-ui = add("ui-target", f"isa = PBXNativeTarget; name = DevelopmentTitleUITests; productName = DevelopmentTitleUITests; productReference = {test_ref}; productType = {quoted('com.apple.product-type.bundle.ui-testing')}; buildConfigurationList = {ui_config}; buildPhases = {array([phases['ui'], phases['ui-frameworks'], phases['ui-resources']])}; buildRules = (); dependencies = {array([dependency])};")
-unit_config = configs("unit", {
-    "PRODUCT_NAME": "$(TARGET_NAME)",
-    "PRODUCT_BUNDLE_IDENTIFIER": "local.gamecore.DevelopmentTitleTests",
-    "GENERATE_INFOPLIST_FILE": "YES",
-    "TEST_HOST": "$(BUILT_PRODUCTS_DIR)/DevelopmentTitle.app/DevelopmentTitle",
-    "BUNDLE_LOADER": "$(TEST_HOST)",
-})
-unit = add("unit-target", f"isa = PBXNativeTarget; name = DevelopmentTitleTests; productName = DevelopmentTitleTests; productReference = {unit_ref}; productType = {quoted('com.apple.product-type.bundle.unit-test')}; buildConfigurationList = {unit_config}; buildPhases = {array([phases['unit'], phases['unit-frameworks'], phases['unit-resources']])}; buildRules = (); dependencies = {array([dependency])}; packageProductDependencies = {array(package_products)};")
+refs = []
+product_refs = []
+targets = []
+target_attributes = []
+for title in TITLES:
+    name = title.target
+    # A title links the shared foundation and only its own content.
+    linked = [package_products["GameCore"], package_products["GamePlatform"], package_products[title.content_product]]
+    app_ref = add(f"{name}-app-product", f"isa = PBXFileReference; explicitFileType = wrapper.application; path = {name}.app; sourceTree = BUILT_PRODUCTS_DIR;")
+    ui_name = Path(title.ui_tests).name
+    unit_name = Path(title.unit_tests).name
+    ui_ref = add(f"{name}-ui-product", f"isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = {ui_name}.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
+    unit_ref = add(f"{name}-unit-product", f"isa = PBXFileReference; explicitFileType = wrapper.cfbundle; path = {unit_name}.xctest; sourceTree = BUILT_PRODUCTS_DIR;")
+    product_refs += [app_ref, ui_ref, unit_ref]
+    phases = {}
+    for kind, directory in [("app", title.source_directory), ("ui", title.ui_tests), ("unit", title.unit_tests)]:
+        builds = []
+        for file in sorted((ROOT / directory).rglob("*.swift")):
+            path = str(file.relative_to(ROOT))
+            ref = add(f"ref-{path}", f"isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = {quoted(path)}; sourceTree = SOURCE_ROOT;")
+            refs.append(ref)
+            builds.append(add(f"build-{path}", f"isa = PBXBuildFile; fileRef = {ref};"))
+        phases[kind] = add(f"{name}-{kind}-sources", f"isa = PBXSourcesBuildPhase; buildActionMask = 2147483647; files = {array(builds)}; runOnlyForDeploymentPostprocessing = 0;")
+        framework_builds = [add(f"{name}-{kind}-link-{index}", f"isa = PBXBuildFile; productRef = {product};")
+                            for index, product in enumerate(linked)] if kind != "ui" else []
+        phases[f"{kind}-frameworks"] = add(f"{name}-{kind}-frameworks", f"isa = PBXFrameworksBuildPhase; buildActionMask = 2147483647; files = {array(framework_builds)}; runOnlyForDeploymentPostprocessing = 0;")
+        resource_builds = []
+        for resource, file_type in (TITLE_RESOURCES if kind == "app" else []):
+            if (title.directory / resource).exists():
+                path = f"{title.source_directory}/{resource}"
+                ref = add(f"ref-{path}", f"isa = PBXFileReference; lastKnownFileType = {file_type}; path = {quoted(path)}; sourceTree = SOURCE_ROOT;")
+                refs.append(ref)
+                resource_builds.append(add(f"build-{path}", f"isa = PBXBuildFile; fileRef = {ref};"))
+        phases[f"{kind}-resources"] = add(f"{name}-{kind}-resources", f"isa = PBXResourcesBuildPhase; buildActionMask = 2147483647; files = {array(resource_builds)}; runOnlyForDeploymentPostprocessing = 0;")
+
+    # Validate the exact copied SwiftPM resources before app compilation/packaging.
+    # This is a host authoring tool; the app links only the title library product.
+    validation_script = f'set -eu\ncd "$SRCROOT"\n/usr/bin/env -u SDK_NAME -u SDK_DIR -u PLATFORM_NAME -u SWIFT_EXEC SDKROOT="$(/usr/bin/xcrun --sdk macosx --show-sdk-path)" /usr/bin/xcrun --sdk macosx swift run --package-path {title.content_package} --scratch-path "$DERIVED_FILE_DIR/ContentValidation" {title.content_product}Validator {title.content_resources}\n'
+    validation_phase = add(f"{name}-content-validation", f"isa = PBXShellScriptBuildPhase; buildActionMask = 2147483647; files = (); inputPaths = (); outputPaths = (); runOnlyForDeploymentPostprocessing = 0; alwaysOutOfDate = 1; shellPath = /bin/sh; shellScript = {quoted(validation_script)};")
+
+    app_settings = {
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "PRODUCT_BUNDLE_IDENTIFIER": title.bundle_identifier,
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "INFOPLIST_KEY_CFBundleDisplayName": title.app_display_name,
+        "INFOPLIST_KEY_UILaunchScreen_Generation": "YES",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations": "UIInterfaceOrientationPortrait UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
+        "INFOPLIST_KEY_UISupportedInterfaceOrientations_iPad": "UIInterfaceOrientationPortrait UIInterfaceOrientationPortraitUpsideDown UIInterfaceOrientationLandscapeLeft UIInterfaceOrientationLandscapeRight",
+        "MARKETING_VERSION": "0.0.1",
+        "CURRENT_PROJECT_VERSION": "1",
+        "ENABLE_USER_SCRIPT_SANDBOXING": "NO",
+    }
+    if (title.directory / "Assets.xcassets/AppIcon.appiconset").is_dir():
+        app_settings["ASSETCATALOG_COMPILER_APPICON_NAME"] = "AppIcon"
+    if (title.directory / "Localizable.xcstrings").is_file():
+        app_settings["LOCALIZATION_PREFERS_STRING_CATALOGS"] = "YES"
+        app_settings["SWIFT_EMIT_LOC_STRINGS"] = "YES"
+    info_plist = title.directory / "Info.plist"
+    if info_plist.is_file():
+        info_path = str(info_plist.relative_to(ROOT))
+        app_settings["INFOPLIST_FILE"] = info_path
+        refs.append(add(f"{name}-app-info", f"isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = {quoted(info_path)}; sourceTree = SOURCE_ROOT;"))
+    app_config = configs(f"{name}-app", app_settings)
+    app = add(f"{name}-app-target", f"isa = PBXNativeTarget; name = {name}; productName = {name}; productReference = {app_ref}; productType = {quoted('com.apple.product-type.application')}; buildConfigurationList = {app_config}; buildPhases = {array([validation_phase, phases['app'], phases['app-frameworks'], phases['app-resources']])}; buildRules = (); dependencies = (); packageProductDependencies = {array(linked)};")
+    proxy = add(f"{name}-app-proxy", f"isa = PBXContainerItemProxy; containerPortal = {project_id}; proxyType = 1; remoteGlobalIDString = {app}; remoteInfo = {name};")
+    dependency = add(f"{name}-app-dependency", f"isa = PBXTargetDependency; target = {app}; targetProxy = {proxy};")
+    ui_config = configs(f"{name}-ui", {
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "PRODUCT_BUNDLE_IDENTIFIER": f"{title.bundle_identifier}UITests",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "TEST_TARGET_NAME": name,
+    })
+    ui = add(f"{name}-ui-target", f"isa = PBXNativeTarget; name = {ui_name}; productName = {ui_name}; productReference = {ui_ref}; productType = {quoted('com.apple.product-type.bundle.ui-testing')}; buildConfigurationList = {ui_config}; buildPhases = {array([phases['ui'], phases['ui-frameworks'], phases['ui-resources']])}; buildRules = (); dependencies = {array([dependency])};")
+    unit_config = configs(f"{name}-unit", {
+        "PRODUCT_NAME": "$(TARGET_NAME)",
+        "PRODUCT_BUNDLE_IDENTIFIER": f"{title.bundle_identifier}Tests",
+        "GENERATE_INFOPLIST_FILE": "YES",
+        "TEST_HOST": f"$(BUILT_PRODUCTS_DIR)/{name}.app/{name}",
+        "BUNDLE_LOADER": "$(TEST_HOST)",
+    })
+    unit = add(f"{name}-unit-target", f"isa = PBXNativeTarget; name = {unit_name}; productName = {unit_name}; productReference = {unit_ref}; productType = {quoted('com.apple.product-type.bundle.unit-test')}; buildConfigurationList = {unit_config}; buildPhases = {array([phases['unit'], phases['unit-frameworks'], phases['unit-resources']])}; buildRules = (); dependencies = {array([dependency])}; packageProductDependencies = {array(linked)};")
+    targets += [app, ui, unit]
+    target_attributes += [f"{ui} = {{ TestTargetID = {app}; }};", f"{unit} = {{ TestTargetID = {app}; }};"]
+    title.generated = {"app": app, "ui": ui, "unit": unit, "ui_name": ui_name, "unit_name": unit_name}
+
+products = add("products", f"isa = PBXGroup; name = Products; sourceTree = {quoted('<group>')}; children = {array(product_refs)};")
+group = add("main-group", f"isa = PBXGroup; sourceTree = {quoted('<group>')}; children = {array(refs + [products])};")
 project_config = configs("project", {})
-add("project", f"isa = PBXProject; attributes = {{ BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700; TargetAttributes = {{ {ui} = {{ TestTargetID = {app}; }}; {unit} = {{ TestTargetID = {app}; }}; }}; }}; buildConfigurationList = {project_config}; compatibilityVersion = {quoted('Xcode 14.0')}; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = {group}; productRefGroup = {products}; projectDirPath = {quoted('')}; projectRoot = {quoted('')}; packageReferences = {array(package_refs)}; targets = {array([app, ui, unit])};")
+add("project", f"isa = PBXProject; attributes = {{ BuildIndependentTargetsInParallel = YES; LastUpgradeCheck = 2700; TargetAttributes = {{ {' '.join(target_attributes)} }}; }}; buildConfigurationList = {project_config}; compatibilityVersion = {quoted('Xcode 14.0')}; developmentRegion = en; hasScannedForEncodings = 0; knownRegions = (en, Base); mainGroup = {group}; productRefGroup = {products}; projectDirPath = {quoted('')}; projectRoot = {quoted('')}; packageReferences = {array(package_refs)}; targets = {array(targets)};")
 body = "// !$*UTF8*$!\n{ archiveVersion = 1; classes = {}; objectVersion = 56; objects = {\n"
 body += "\n".join(f"{key} = {{ {value} }};" for key, value in sorted(objects.items()))
 body += f"\n}}; rootObject = {project_id}; }}\n"
@@ -145,10 +184,12 @@ def buildable(target, name, product):
     return f'<BuildableReference BuildableIdentifier="primary" BlueprintIdentifier="{target}" BuildableName="{product}" BlueprintName="{name}" ReferencedContainer="container:GameCore.xcodeproj"/>'
 
 
-app_xml = buildable(app, "DevelopmentTitle", "DevelopmentTitle.app")
-ui_xml = buildable(ui, "DevelopmentTitleUITests", "DevelopmentTitleUITests.xctest")
-unit_xml = buildable(unit, "DevelopmentTitleTests", "DevelopmentTitleTests.xctest")
-outputs[scheme_dir / "DevelopmentTitle.xcscheme"] = f'''<?xml version="1.0" encoding="UTF-8"?>
+for title in TITLES:
+    generated = title.generated
+    app_xml = buildable(generated["app"], title.target, f"{title.target}.app")
+    ui_xml = buildable(generated["ui"], generated["ui_name"], f"{generated['ui_name']}.xctest")
+    unit_xml = buildable(generated["unit"], generated["unit_name"], f"{generated['unit_name']}.xctest")
+    outputs[scheme_dir / f"{title.target}.xcscheme"] = f'''<?xml version="1.0" encoding="UTF-8"?>
 <Scheme LastUpgradeVersion="2700" version="1.3">
   <BuildAction parallelizeBuildables="YES" buildImplicitDependencies="YES"><BuildActionEntries>
     <BuildActionEntry buildForTesting="YES" buildForRunning="YES" buildForProfiling="YES" buildForArchiving="YES" buildForAnalyzing="YES">{app_xml}</BuildActionEntry>
@@ -166,16 +207,20 @@ outputs[WORKSPACE / "contents.xcworkspacedata"] = '''<?xml version="1.0" encodin
   <FileRef location="group:GameCore.xcodeproj"/>
 </Workspace>
 '''
+# A removed title's scheme is stale too; the generator owns every shared scheme.
+stale_schemes = [path for path in scheme_dir.glob("*.xcscheme") if path not in outputs] if scheme_dir.is_dir() else []
 if args.check:
     stale = [path for path, content in outputs.items() if not path.is_file() or path.read_bytes() != content.encode("utf-8")]
-    if stale:
-        for path in stale:
-            print(f"Missing or stale generated file: {path.relative_to(ROOT)}")
+    if stale or stale_schemes:
+        for path in stale + stale_schemes:
+            print(f"Missing, stale or orphaned generated file: {path.relative_to(ROOT)}")
         print("Run python3 scripts/generate-project.py to regenerate the project.")
         raise SystemExit(1)
-    print("Generated project, scheme, and workspace are current")
+    print("Generated project, schemes, and workspace are current")
 else:
+    for path in stale_schemes:
+        path.unlink()
     for path, content in outputs.items():
         path.parent.mkdir(parents=True, exist_ok=True)
         path.write_bytes(content.encode("utf-8"))
-    print(f"Generated {PROJECT.name} and {WORKSPACE.name} with {len(refs)} app/test sources and three local package products")
+    print(f"Generated {PROJECT.name} and {WORKSPACE.name}: {len(TITLES)} title(s), {len(refs)} app/test files and {len(package_paths)} local package products")

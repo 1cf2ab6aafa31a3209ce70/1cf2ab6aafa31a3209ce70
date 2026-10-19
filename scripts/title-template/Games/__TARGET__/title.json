@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "target": "__TARGET__",
+  "titleID": "__TITLE_ID__",
+  "appDisplayName": "__DISPLAY_NAME__",
+  "bundleIdentifier": "__BUNDLE_ID__",
+  "contentPackage": "Games/__CONTENT__",
+  "unitTests": "Tests/__TARGET__Tests",
+  "uiTests": "Tests/__TARGET__UITests"
+}

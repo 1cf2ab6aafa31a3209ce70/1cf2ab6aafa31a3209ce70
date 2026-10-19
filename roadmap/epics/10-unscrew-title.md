@@ -2,7 +2,7 @@
 
 **Outcome:** Ship an original panel-removal puzzle title using the established offline shell, local progression, bundled levels, and release gates.
 
-**Entry:** Epic 09 proved multiple production titles; all earlier core work is complete. **Next:** Spike 11. This epic depends on all earlier ordered work.
+**Entry:** Epics 09A and 09B proved multiple production titles; all earlier core work is complete. **Next:** Epic 12. This epic depends on all earlier ordered work.
 
 ## Scope and tasks
 

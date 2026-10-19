@@ -9,15 +9,15 @@ final class UITestFixtureTests: XCTestCase {
     func testAbsentFlagKeepsDefaultRootAndUUIDSelectsCanonicalOwnedRoot() throws {
         let root = FileManager.default.temporaryDirectory.appendingPathComponent(UUID().uuidString)
         defer { try? FileManager.default.removeItem(at: root) }
-        XCTAssertEqual(try ShellUITestFixture.storageRoot(defaultRoot: root, arguments: []), root)
-        XCTAssertEqual(try ShellUITestFixture.storageRoot(defaultRoot: root,
+        XCTAssertEqual(try UITestFixture.storageRoot(defaultRoot: root, arguments: []), root)
+        XCTAssertEqual(try UITestFixture.storageRoot(defaultRoot: root,
                          arguments: ["--shell-large-text", "--shell-reduced-motion"]), root)
 
         let identity = try XCTUnwrap(UUID(uuidString: "01234567-89AB-4CDE-8123-456789ABCDEF"))
         let expected = root.appendingPathComponent("UIAutomationFixtures", isDirectory: true)
             .appendingPathComponent(identity.uuidString, isDirectory: true)
         for value in [identity.uuidString, identity.uuidString.lowercased()] {
-            let selected = try ShellUITestFixture.storageRoot(defaultRoot: root,
+            let selected = try UITestFixture.storageRoot(defaultRoot: root,
                                arguments: ["--ui-test-fixture", value])
             XCTAssertEqual(selected, expected)
             XCTAssertEqual(selected.lastPathComponent, identity.uuidString)
@@ -41,8 +41,8 @@ final class UITestFixtureTests: XCTestCase {
             ["--ui-test-fixture", identity, "--ui-test-fixture", UUID().uuidString]
         ]
         for arguments in invalid {
-            XCTAssertThrowsError(try ShellUITestFixture.storageRoot(defaultRoot: root, arguments: arguments)) {
-                XCTAssertTrue($0 is ShellUITestFixture.InvalidArguments)
+            XCTAssertThrowsError(try UITestFixture.storageRoot(defaultRoot: root, arguments: arguments)) {
+                XCTAssertTrue($0 is UITestFixture.InvalidArguments)
             }
             XCTAssertFalse(FileManager.default.fileExists(atPath: root.path),
                            "Rejected arguments must not create directories: \(arguments)")
@@ -66,13 +66,13 @@ final class UITestFixtureTests: XCTestCase {
 
         for invalid in [["--ui-test-fixture"], ["--ui-test-fixture", root.path],
                         ["--ui-test-fixture", UUID().uuidString, "--ui-test-fixture", UUID().uuidString]] {
-            XCTAssertThrowsError(try ShellUITestFixture.storageRoot(defaultRoot: root, arguments: invalid))
+            XCTAssertThrowsError(try UITestFixture.storageRoot(defaultRoot: root, arguments: invalid))
         }
         XCTAssertEqual(try Data(contentsOf: current), originalCurrent)
         XCTAssertEqual(try Data(contentsOf: backup), originalBackup)
 
         let arguments = ["--ui-test-fixture", UUID().uuidString]
-        let fixtureRoot = try ShellUITestFixture.storageRoot(defaultRoot: root, arguments: arguments)
+        let fixtureRoot = try UITestFixture.storageRoot(defaultRoot: root, arguments: arguments)
         let fixture = try LocalSaveStore(titleID: "development-practice", root: fixtureRoot)
         let initial = try await fixture.load()
         let settings = ShellSettings(soundEnabled: false, musicEnabled: false, hapticsEnabled: false)
@@ -80,14 +80,14 @@ final class UITestFixtureTests: XCTestCase {
                                     unlockedLevels: ["fixture-next"])
         _ = try await fixture.save(settings: settings, progress: progress, generation: initial.generation)
 
-        let relaunchedRoot = try ShellUITestFixture.storageRoot(defaultRoot: root, arguments: arguments)
+        let relaunchedRoot = try UITestFixture.storageRoot(defaultRoot: root, arguments: arguments)
         XCTAssertEqual(relaunchedRoot, fixtureRoot)
         let relaunched = try LocalSaveStore(titleID: "development-practice", root: relaunchedRoot)
         let restored = try await relaunched.load()
         XCTAssertEqual(restored.snapshot.settings, settings)
         XCTAssertEqual(restored.snapshot.progress, progress)
 
-        let otherRoot = try ShellUITestFixture.storageRoot(defaultRoot: root,
+        let otherRoot = try UITestFixture.storageRoot(defaultRoot: root,
                             arguments: ["--ui-test-fixture", UUID().uuidString])
         XCTAssertNotEqual(otherRoot, fixtureRoot)
         let other = try LocalSaveStore(titleID: "development-practice", root: otherRoot)

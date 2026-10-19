@@ -11,7 +11,10 @@ import re
 import subprocess
 import sys
 
+import titles as title_manifests
+
 ROOT = Path(__file__).resolve().parents[1]
+TITLES = []
 
 
 def require(condition, message):
@@ -76,33 +79,79 @@ def check_packages():
             and target_dependencies(platform_targets["GamePlatformTests"]) == [("target", "GamePlatform")],
             "GamePlatformTests must depend only on GamePlatform")
 
-    content = command_json(["swift", "package", "--package-path", "Games/DevelopmentContent", "dump-package"])
-    require(content["name"] == "DevelopmentContent" and len(content["dependencies"]) == 1,
-            "Title content must have one local core dependency")
+    for title in TITLES:
+        check_content_package(title)
+
+
+def check_content_package(title):
+    """Each title's content depends only on GameCore and ships one reviewed Resources copy."""
+    name = title.content_product
+    content = command_json(["swift", "package", "--package-path", title.content_package, "dump-package"])
+    require(content["name"] == name and len(content["dependencies"]) == 1,
+            f"{name}: title content must have one local core dependency")
     dep = content["dependencies"][0]
     require(set(dep) == {"fileSystem"} and Path(dep["fileSystem"][0]["path"]).resolve() == ROOT / "Packages/GameCore",
-            "Title content may depend only on local GameCore")
+            f"{name}: title content may depend only on local GameCore")
+    products = {product["name"]: product for product in content["products"]}
+    require(set(products) == {name, f"{name}Validator"},
+            f"{name}: expected the title library and its {name}Validator executable")
     targets = {t["name"]: t for t in content["targets"]}
-    require(set(targets) == {"DevelopmentContent", "ContentValidatorCLI", "DevelopmentContentTests"},
-            "Review title content target inventory")
-    require(targets["DevelopmentContent"]["type"] == "regular" and target_dependencies(targets["DevelopmentContent"]) == [("product", "GameCore", "gamecore")],
-            "Title content library must depend only on GameCore")
-    require(targets["ContentValidatorCLI"]["type"] == "executable" and target_dependencies(targets["ContentValidatorCLI"]) == [("target", "DevelopmentContent")],
-            "Host validator must use the same title content library")
-    require(targets["DevelopmentContentTests"]["type"] == "test" and target_dependencies(targets["DevelopmentContentTests"]) == [("target", "DevelopmentContent")],
-            "Content tests must exercise the title content library")
+    # Target names must be unique across every title's package in the project graph.
+    require(set(targets) == {name, f"{name}Validator", f"{name}Tests"},
+            f"{name}: review title content target inventory")
+    require(targets[name]["type"] == "regular" and target_dependencies(targets[name]) == [("product", "GameCore", "gamecore")],
+            f"{name}: title content library must depend only on GameCore")
+    require(targets[name].get("resources") == [{"path": "Resources", "rule": {"copy": {}}}],
+            f"{name}: title package must copy the reviewed Resources directory")
+    require(targets[f"{name}Validator"]["type"] == "executable" and target_dependencies(targets[f"{name}Validator"]) == [("target", name)],
+            f"{name}: host validator must use the same title content library")
+    require(targets[f"{name}Tests"]["type"] == "test" and target_dependencies(targets[f"{name}Tests"]) == [("target", name)],
+            f"{name}: content tests must exercise the title content library")
+    catalog = json.loads((ROOT / title.content_resources / "catalog.json").read_text())
+    require(catalog.get("titleID") == title.title_id,
+            f"{name}: catalog titleID must match the {title.target} manifest's titleID")
 
 
-def targets_resources_reviewed():
-    content = command_json(["swift", "package", "--package-path", "Games/DevelopmentContent", "dump-package"])
-    target = next(t for t in content["targets"] if t["name"] == "DevelopmentContent")
-    return target.get("resources") == [{"path": "Resources", "rule": {"copy": {}}}]
+# Every title ships exactly these reviewed resources from its directory.
+TITLE_RESOURCES = {"Assets.xcassets", "Localizable.xcstrings", "PrivacyInfo.xcprivacy"}
+# The apps do not track or collect data. The one required-reason API is the
+# save store's attributesOfItem, whose result includes file timestamps: C617.1
+# covers metadata of files inside the app container. A change here needs a
+# privacy review of the built bundle (docs/privacy-contract.md).
+REVIEWED_PRIVACY_MANIFEST = {
+    "NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [], "NSPrivacyCollectedDataTypes": [],
+    "NSPrivacyAccessedAPITypes": [{"NSPrivacyAccessedAPIType": "NSPrivacyAccessedAPICategoryFileTimestamp",
+                                   "NSPrivacyAccessedAPITypeReasons": ["C617.1"]}]}
+
+
+def check_title_resources(title):
+    """Icon, string catalog and privacy manifest for one title."""
+    directory = title.directory
+    privacy = plistlib.loads((directory / "PrivacyInfo.xcprivacy").read_bytes())
+    require(privacy == REVIEWED_PRIVACY_MANIFEST, f"{title.target}: privacy manifest differs from the reviewed declaration")
+    strings = json.loads((directory / "Localizable.xcstrings").read_text())
+    require(strings.get("sourceLanguage") == "en" and isinstance(strings.get("strings"), dict),
+            f"{title.target}: string catalog must use English as its source language")
+    catalog = directory / "Assets.xcassets"
+    entries = sorted(path.name for path in catalog.iterdir() if path.name != ".DS_Store")
+    require(entries == ["AppIcon.appiconset", "Contents.json"], f"{title.target}: asset catalog holds only the app icon")
+    icon_set = catalog / "AppIcon.appiconset"
+    images = json.loads((icon_set / "Contents.json").read_text())["images"]
+    require(len(images) == 1 and images[0].get("idiom") == "universal" and images[0].get("size") == "1024x1024",
+            f"{title.target}: one universal 1024-point app icon")
+    require(sorted(path.name for path in icon_set.iterdir() if path.name != ".DS_Store") == sorted(["Contents.json", images[0]["filename"]]),
+            f"{title.target}: app icon set holds only its declared image")
+    data = (icon_set / images[0]["filename"]).read_bytes()
+    width, height, depth, color_type = int.from_bytes(data[16:20], "big"), int.from_bytes(data[20:24], "big"), data[24], data[25]
+    require(data[:8] == b"\x89PNG\r\n\x1a\n" and data[12:16] == b"IHDR" and (width, height, depth, color_type) == (1024, 1024, 8, 2),
+            f"{title.target}: app icon must be an opaque 8-bit RGB 1024x1024 PNG")
 
 
 def check_project():
     project = command_json(["plutil", "-convert", "json", "-o", "-", "GameCore.xcodeproj/project.pbxproj"])
     objects = project["objects"]
-    expected = {"Packages/GameCore": "GameCore", "Packages/GamePlatform": "GamePlatform", "Games/DevelopmentContent": "DevelopmentContent"}
+    expected = {"Packages/GameCore": "GameCore", "Packages/GamePlatform": "GamePlatform"}
+    expected.update({title.content_package: title.content_product for title in TITLES})
     local_refs = {}
     products = {}
     for identifier, item in objects.items():
@@ -114,38 +163,55 @@ def check_project():
             local_refs[identifier] = path
         if kind == "XCSwiftPackageProductDependency":
             products[identifier] = item
-    require(len(local_refs) == 3 and set(local_refs.values()) == set(expected),
-            "Project must reference exactly the two foundation packages and title content package")
-    require(len(products) == 3, "Project must declare exactly the reviewed foundation and title package products")
-    for product in products.values():
+    require(len(local_refs) == len(expected) and set(local_refs.values()) == set(expected),
+            "Project must reference exactly the two foundation packages and each title's content package")
+    require(len(products) == len(expected), "Project must declare exactly the reviewed foundation and title package products")
+    product_by_name = {}
+    for identifier, product in products.items():
         require(product.get("package") in local_refs
                 and product["productName"] == expected[local_refs[product["package"]]],
                 "Package product must match its local package reference")
+        product_by_name[product["productName"]] = identifier
     project_root = objects[project["rootObject"]]
     require(set(project_root.get("packageReferences", [])) == set(local_refs),
             "Project packageReferences must include all reviewed local packages")
-    apps = [item for item in objects.values()
-            if item["isa"] == "PBXNativeTarget" and item.get("productType") == "com.apple.product-type.application"]
-    require(len(apps) == 1 and apps[0]["name"] == "DevelopmentTitle", "Expected one DevelopmentTitle app target")
-    app = apps[0]
-    require(set(app.get("packageProductDependencies", [])) == set(products),
-            "DevelopmentTitle must depend on the reviewed core, platform and title content products")
-    validation = [index for index, phase_id in enumerate(app["buildPhases"])
-                  if objects[phase_id]["isa"] == "PBXShellScriptBuildPhase"
-                  and "swift run --package-path Games/DevelopmentContent" in objects[phase_id].get("shellScript", "")
-                  and "content-validator Games/DevelopmentContent/Sources/DevelopmentContent/Resources" in objects[phase_id].get("shellScript", "")]
-    require(validation == [0], "Native content validation must precede app compilation and packaging")
-    require(targets_resources_reviewed(), "Title package must copy the reviewed Resources directory")
-    linked = []
-    for phase_id in app["buildPhases"]:
-        phase = objects[phase_id]
-        if phase["isa"] == "PBXFrameworksBuildPhase":
-            for build_id in phase["files"]:
-                build = objects[build_id]
-                require(build.get("productRef") in products,
-                        "Unexpected linked framework; review foundation dependency policy")
-                linked.append(build["productRef"])
-    require(len(linked) == 3 and set(linked) == set(products), "Core, platform and title content products must be linked by the app")
+    apps = {item["name"]: item for item in objects.values()
+            if item["isa"] == "PBXNativeTarget" and item.get("productType") == "com.apple.product-type.application"}
+    require(set(apps) == {title.target for title in TITLES}, "Expected exactly one app target per title manifest")
+    reviewed_info = {f"{title.source_directory}/Info.plist" for title in TITLES}
+    for title in TITLES:
+        app = apps[title.target]
+        # A title links the shared foundation and its own content, never another title's.
+        own = {product_by_name["GameCore"], product_by_name["GamePlatform"], product_by_name[title.content_product]}
+        require(set(app.get("packageProductDependencies", [])) == own,
+                f"{title.target} must depend on the core, platform and its own content products only")
+        validation = [index for index, phase_id in enumerate(app["buildPhases"])
+                      if objects[phase_id]["isa"] == "PBXShellScriptBuildPhase"
+                      and f"swift run --package-path {title.content_package} " in objects[phase_id].get("shellScript", "")
+                      and f"{title.content_product}Validator {title.content_resources}" in objects[phase_id].get("shellScript", "")]
+        require(validation == [0], f"{title.target}: native content validation must precede app compilation and packaging")
+        linked = []
+        for phase_id in app["buildPhases"]:
+            phase = objects[phase_id]
+            if phase["isa"] == "PBXFrameworksBuildPhase":
+                for build_id in phase["files"]:
+                    build = objects[build_id]
+                    require(build.get("productRef") in products,
+                            "Unexpected linked framework; review foundation dependency policy")
+                    linked.append(build["productRef"])
+        require(len(linked) == 3 and set(linked) == own, f"{title.target}: core, platform and its own content products must be linked")
+        resources = []
+        for phase_id in app["buildPhases"]:
+            if objects[phase_id]["isa"] == "PBXResourcesBuildPhase":
+                resources += [objects[objects[build_id]["fileRef"]]["path"] for build_id in objects[phase_id]["files"]]
+        require(sorted(resources) == sorted(f"{title.source_directory}/{name}" for name in TITLE_RESOURCES),
+                f"{title.target}: the app bundles exactly its icon, string catalog and privacy manifest")
+        check_title_resources(title)
+        configurations = objects[app["buildConfigurationList"]]["buildConfigurations"]
+        for configuration in configurations:
+            settings = objects[configuration]["buildSettings"]
+            require(settings.get("PRODUCT_BUNDLE_IDENTIFIER") == title.bundle_identifier,
+                    f"{title.target}: bundle identifier must match its manifest")
     allowed_info = {
         "CFBundleDisplayName", "UIApplicationSceneManifest_Generation", "UILaunchScreen_Generation",
         "UISupportedInterfaceOrientations", "UISupportedInterfaceOrientations_iPad",
@@ -155,7 +221,7 @@ def check_project():
             continue
         settings = item["buildSettings"]
         require(not settings.get("CODE_SIGN_ENTITLEMENTS"), "Foundation must not add signing entitlements")
-        require(settings.get("INFOPLIST_FILE") in {None, "Games/DevelopmentTitle/Info.plist"},
+        require(settings.get("INFOPLIST_FILE") in {None} | reviewed_info,
                 "Review any additional custom Info.plist")
         for key in settings:
             if key.startswith("INFOPLIST_KEY_"):
@@ -164,10 +230,12 @@ def check_project():
     attributes = project_root.get("attributes", {}).get("TargetAttributes", {})
     for target in attributes.values():
         require(not target.get("SystemCapabilities"), "Review added project capabilities")
-    info = plistlib.loads((ROOT / "Games/DevelopmentTitle/Info.plist").read_bytes())
-    require(info == {"UIApplicationSceneManifest": {
-        "UIApplicationSupportsMultipleScenes": False, "UISceneConfigurations": {}}},
-        "Development title must retain its reviewed single-window scene configuration")
+    for path in sorted(reviewed_info):
+        if (ROOT / path).is_file():
+            info = plistlib.loads((ROOT / path).read_bytes())
+            require(info == {"UIApplicationSceneManifest": {
+                "UIApplicationSupportsMultipleScenes": False, "UISceneConfigurations": {}}},
+                f"{path} must retain the reviewed single-window scene configuration")
 
 
 def source_without_comments(source):
@@ -195,9 +263,11 @@ def check_sources():
     filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
     fixture_diagnostics = ROOT / "Packages/GamePlatform/Sources/GamePlatform/ShellActionJournal.swift"
     platform_test_root = ROOT / "Packages/GamePlatform/Tests"
-    authoring_cli = ROOT / "Games/DevelopmentContent/Sources/ContentValidatorCLI/main.swift"
-    content_fixture_tests = ROOT / "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift"
-    title_imports = set()
+    authoring_clis = {ROOT / title.content_package / f"Sources/{title.content_product}Validator/main.swift" for title in TITLES}
+    content_test_roots = [ROOT / title.content_package / "Tests" for title in TITLES]
+    title_imports = {title.target: set() for title in TITLES}
+    registrations = {title.target: set() for title in TITLES}
+    content_products = {title.content_product for title in TITLES}
     for directory in [ROOT / "Packages", ROOT / "Games"]:
         for path in sorted(directory.rglob("*.swift")):
             if ".build" in path.parts or path.name == "Package.swift":
@@ -207,15 +277,18 @@ def check_sources():
             require(not any(module in blocked_imports or module.startswith("Firebase") for module in imports),
                     f"Disallowed privacy-related import in {path.relative_to(ROOT)}")
             require(not re.search(r"\bFileManager\b", source)
-                    or path == filesystem_adapter or path == fixture_diagnostics or path == authoring_cli or path == content_fixture_tests or path.is_relative_to(platform_test_root),
+                    or path in {filesystem_adapter, fixture_diagnostics} | authoring_clis
+                    or any(path.is_relative_to(root) for root in content_test_roots + [platform_test_root]),
                     f"Filesystem access belongs in the reviewed save adapter or host authoring CLI: {path.relative_to(ROOT)}")
             match = blocked_apis.search(source)
             require(match is None, f"Disallowed network/cloud/commerce/storage API in {path.relative_to(ROOT)}: {match.group() if match else ''}")
             if path.is_relative_to(ROOT / "Packages/GameCore/Sources"):
                 require(imports <= {"Foundation", "Swift", "_Concurrency"},
                         f"GameCore imports outside Foundation/standard library: {sorted(imports)}")
-            if path.is_relative_to(ROOT / "Games/DevelopmentTitle"):
-                title_imports.update(imports)
+            for title in TITLES:
+                if path.is_relative_to(title.directory):
+                    title_imports[title.target].update(imports)
+                    registrations[title.target].update(re.findall(r'TitleRegistration\(\s*id:\s*"([^"]*)"', source))
         for path in sorted(directory.rglob("*.entitlements")):
             if ".build" in path.parts:
                 continue
@@ -226,11 +299,20 @@ def check_sources():
             info = plistlib.loads(path.read_bytes())
             require(not any(key.endswith("UsageDescription") or key in {"UIBackgroundModes", "NSAppTransportSecurity"}
                             for key in info), f"Review permission/background/network keys in {path.relative_to(ROOT)}")
-    require({"GameCore", "GamePlatform"} <= title_imports, "DevelopmentTitle must import both foundation products")
+    for title in TITLES:
+        imports = title_imports[title.target]
+        require({"GameCore", "GamePlatform"} <= imports, f"{title.target} must import both foundation products")
+        others = imports & (content_products - {title.content_product})
+        require(not others, f"{title.target} must not import another title's content: {sorted(others)}")
+        # The registered ID names the save namespace; it must be the manifest's.
+        require(registrations[title.target] == {title.title_id},
+                f"{title.target} must register only its manifest titleID {title.title_id!r}, found {sorted(registrations[title.target])}")
 
 
 def main():
+    global TITLES
     try:
+        TITLES = title_manifests.load()
         check_packages()
         check_project()
         check_sources()

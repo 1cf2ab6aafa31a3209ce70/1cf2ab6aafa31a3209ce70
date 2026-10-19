@@ -1,6 +1,11 @@
 import XCTest
 
 final class DevelopmentTitleUITests: XCTestCase {
+    /// A single accessibility query on a loaded hosted runner has taken 9.4
+    /// seconds while the app already showed the awaited state (N08). Waits
+    /// bound only failures, so each allows for a stalled query.
+    private let queryAllowance: TimeInterval = 30
+
     @MainActor
     func testNavigationSuccessFailureResumeAndRestart() {
         continueAfterFailure = false
@@ -59,7 +64,7 @@ final class DevelopmentTitleUITests: XCTestCase {
         tap(app, "shell.settings")
         for id in ["settings.sound", "settings.music", "settings.haptics"] {
             let toggle = app.switches[id]
-            XCTAssertTrue(toggle.waitForExistence(timeout: 10))
+            XCTAssertTrue(toggle.waitForExistence(timeout: queryAllowance))
             waitForSwitchValue(toggle, "1")
             reveal(app, toggle)
             // SwiftUI exposes the whole labeled row as the Switch frame. Its
@@ -84,7 +89,7 @@ final class DevelopmentTitleUITests: XCTestCase {
         app.terminate()
         app.launch()
         waitForHeading(app, "shell.menu")
-        XCTAssertTrue(app.staticTexts["save.progress"].waitForExistence(timeout: 10))
+        XCTAssertTrue(app.staticTexts["save.progress"].waitForExistence(timeout: queryAllowance))
         tap(app, "shell.settings")
         for id in ["settings.sound", "settings.music", "settings.haptics"] {
             waitForSwitchValue(app.switches[id], "0")
@@ -161,7 +166,9 @@ final class DevelopmentTitleUITests: XCTestCase {
         tap(app, "shell.settings")
         tap(app, "save.export")
         let picker = app.navigationBars["FullDocumentManagerViewControllerNavigationBar"]
-        XCTAssertTrue(picker.waitForExistence(timeout: 10), "Native Files exporter was not presented")
+        // Files is an out-of-process view service. Its first launch on a fresh
+        // hosted simulator took 24 seconds after Export ran (run 39166098886).
+        XCTAssertTrue(picker.waitForExistence(timeout: 60), "Native Files exporter was not presented")
         attachScreen("native-files-export")
         let sidebar = app.navigationBars.matching(NSPredicate(format: "identifier IN %@", [
             "com_apple_DocumentManager_Service.DOCSidebarView", "DOCSidebarView"
@@ -223,7 +230,7 @@ final class DevelopmentTitleUITests: XCTestCase {
             // still open. Require the underlying Settings control reachable.
             return !picker.exists && !sidebar.exists && done.exists && done.isHittable
         }, object: app)
-        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: 10), .completed,
+        XCTAssertEqual(XCTWaiter.wait(for: [dismissed], timeout: queryAllowance), .completed,
                        "Files cancellation did not return to reachable Settings")
         tap(app, "settings.done")
         XCTAssertTrue(app.staticTexts["save.progress"].exists)
@@ -233,7 +240,7 @@ final class DevelopmentTitleUITests: XCTestCase {
     private func waitForSaved(_ app: XCUIApplication) {
         let saved = app.staticTexts["save.status"]
         let expected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "label == %@", "Local data saved"), object: saved)
-        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 10), .completed)
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: queryAllowance), .completed)
     }
 
     @MainActor
@@ -254,7 +261,7 @@ final class DevelopmentTitleUITests: XCTestCase {
     @MainActor
     private func waitForHeading(_ app: XCUIApplication, _ id: String) {
         let heading = app.staticTexts[id]
-        XCTAssertTrue(heading.waitForExistence(timeout: 15), "Missing heading \(id)")
+        XCTAssertTrue(heading.waitForExistence(timeout: queryAllowance), "Missing heading \(id)")
     }
 
     @MainActor
@@ -262,7 +269,7 @@ final class DevelopmentTitleUITests: XCTestCase {
         let button = app.buttons[id]
         // Form rows are virtualized; discover them by scrolling before waiting.
         if id.hasPrefix("save.") { reveal(app, button) }
-        XCTAssertTrue(button.waitForExistence(timeout: 10), "Missing control \(id)")
+        XCTAssertTrue(button.waitForExistence(timeout: queryAllowance), "Missing control \(id)")
         reveal(app, button)
         XCTAssertTrue(button.isHittable, "Unreachable control \(id)")
         // Hosted navigation evidence retained a centered 50 ms tap without
@@ -305,7 +312,7 @@ final class DevelopmentTitleUITests: XCTestCase {
     @MainActor
     private func waitForSwitchValue(_ toggle: XCUIElement, _ value: String) {
         let expected = XCTNSPredicateExpectation(predicate: NSPredicate(format: "value == %@", value), object: toggle)
-        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 5), .completed)
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: queryAllowance), .completed)
         XCTAssertEqual(toggle.value as? String, value)
     }
 
@@ -316,7 +323,7 @@ final class DevelopmentTitleUITests: XCTestCase {
             return window.width > 0 && window.height > 0
                 && (landscape ? window.width > window.height : window.height > window.width)
         }, object: app)
-        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: 10), .completed)
+        XCTAssertEqual(XCTWaiter.wait(for: [expected], timeout: queryAllowance), .completed)
     }
 
     @MainActor

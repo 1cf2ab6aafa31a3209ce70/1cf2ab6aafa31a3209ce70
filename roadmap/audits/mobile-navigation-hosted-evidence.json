@@ -1968,5 +1968,547 @@
   "sourceRevisions": [
     "e8158f2fedd85372f5881be0203b73ae55502b55",
     "0b85d518394ab51df9580aaa46d74a4a1c93731c"
-  ]
+  ],
+  "postAcceptanceRecurrence": {
+    "runID": 38865714337,
+    "event": "push",
+    "headBranch": "wip/foundation-main-promotion-2",
+    "status": "completed",
+    "conclusion": "failure",
+    "sourceRevision": "2dc849ed2d33894e86a3f8ae0feb42fd1ac2f490",
+    "navigationOnly": false,
+    "toolchain": {
+      "xcode": "Xcode 26.6 (17F113)",
+      "runtime": "iOS 26.5 (23F77)"
+    },
+    "inventory": {
+      "inputs": 60,
+      "worktreeDirty": false,
+      "matchesSourceRevision": true,
+      "differsFromAcceptedRevision": false,
+      "note": "2dc849e differs from 0b85d51 only in six roadmap/audits files, none inventoried; its tree is identical to d57d81c"
+    },
+    "models": {
+      "iphone12": {
+        "conclusion": "success"
+      },
+      "ipad9": {
+        "conclusion": "failure",
+        "packageAndBuildChecks": "passed",
+        "appAndUITests": {
+          "executed": 28,
+          "passed": 27,
+          "failed": 1
+        },
+        "restartProof": "not reached"
+      }
+    },
+    "failure": {
+      "model": "ipad9",
+      "case": "testNavigationSuccessFailureResumeAndRestart",
+      "assertion": "Missing heading shell.paused",
+      "helperLine": 257,
+      "caseSeconds": 162.095,
+      "stage": "Second Pause, after a complete first cycle and a second accepted Start",
+      "pauseContact": [
+        405,
+        616
+      ],
+      "pauseContactDurationSeconds": 0.15,
+      "pauseFrame": [
+        85,
+        583,
+        640,
+        66
+      ],
+      "window": [
+        810,
+        1080
+      ],
+      "contactRecordWallTime": 1792135647.321,
+      "finalHierarchyState": "playing",
+      "finalSavedStatus": "Local data saved",
+      "fixtureUUID": "82124D54-9EF5-44CA-A0CA-9072E987EC6C"
+    },
+    "journal": {
+      "records": 67,
+      "launches": 1,
+      "contiguousSequence": [
+        1,
+        67
+      ],
+      "missing": false,
+      "truncated": false,
+      "parsePartial": false,
+      "collectorErrors": [],
+      "firstPause": "sequence 19-23: button.pause, pause.entered, paused published, pause.accepted, pause.returned",
+      "secondStart": "sequence 42-47: button.start, start.entered, loading published, start.accepted, start.returned, playing published",
+      "afterSecondStart": "sequence 48-67: state.checkpoint only; playing, inputActive true, no pause reasons",
+      "bracketingCheckpoints": [
+        {
+          "sequence": 62,
+          "wallTime": 1792135644.74
+        },
+        {
+          "sequence": 63,
+          "wallTime": 1792135649.98
+        }
+      ],
+      "laterCheckpoints": 4,
+      "pauseRecordsAfterContact": 0
+    },
+    "video": {
+      "recordingStartWallTime": 1792135501.979,
+      "pressedAppearanceSeconds": [
+        145.2,
+        145.433
+      ],
+      "samplingFPS": 30,
+      "observation": "Pause showed its pressed appearance for about 0.13 s at the contact time, then a normal release fade; the playing screen remained. No pressed frame was sampled before the successful first Pause transition in the same launch."
+    },
+    "sameTreeRuns": [
+      {
+        "runID": 38865722682,
+        "event": "pull_request",
+        "sourceRevision": "2dc849ed2d33894e86a3f8ae0feb42fd1ac2f490",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38867373659,
+        "event": "push",
+        "ref": "main",
+        "sourceRevision": "d57d81c0a7b90be7a9807366d20d1c3e109d96b5",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38867431544,
+        "event": "push",
+        "ref": "integration/first-party-foundation",
+        "sourceRevision": "d57d81c0a7b90be7a9807366d20d1c3e109d96b5",
+        "conclusion": "success"
+      },
+      {
+        "runID": 38865389607,
+        "event": "push",
+        "ref": "integration/first-party-foundation",
+        "sourceRevision": "3217ffb",
+        "conclusion": "cancelled",
+        "note": "Canceled by the workflow concurrency group when d57d81c was pushed to the same ref; supplies no result"
+      }
+    ],
+    "rawEvidencePath": "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/45b5aaa0-19a3-40df-82f0-5b6ccba90890/scratchpad/run-38865714337",
+    "interpretation": "Later committed same-launch checkpoints bracket the on-target contact with no writer, collection, truncation or tail-loss uncertainty, so the Pause ShellActionButton action was not entered for this contact. The button rendered its pressed state. Controller refusal and lifecycle/audio pause are excluded for this failure. The mechanism between press recognition and action dispatch is unobserved; frequency, hardware behavior and hosted load as a cause are not established."
+  },
+  "scrollPhaseRecurrence": {
+    "runID": 39160850417,
+    "event": "pull_request",
+    "pullRequest": 12,
+    "conclusion": "failure",
+    "checkoutRevision": "4945d0cd8cacdfcf57a2abfb0c2cb9ce24e5c05b",
+    "treeEquals": "e0b61a369a5f0c249c511b8f6795e2056726d0ac",
+    "toolchain": {
+      "xcode": "Xcode 26.6 (17F113)",
+      "runtime": "iOS 26.5 (23F77)"
+    },
+    "inventory": {
+      "inputs": 60,
+      "worktreeDirty": false,
+      "matchesCheckoutRevision": true
+    },
+    "models": {
+      "ipad9": {
+        "conclusion": "success"
+      },
+      "iphone12": {
+        "conclusion": "failure",
+        "appAndUITests": {
+          "executed": 28,
+          "passed": 27,
+          "failed": 1
+        },
+        "restartProof": "not reached"
+      }
+    },
+    "failure": {
+      "model": "iphone12",
+      "case": "testNavigationSuccessFailureResumeAndRestart",
+      "assertion": "Missing heading shell.play",
+      "helperLine": 257,
+      "caseSeconds": 95.474,
+      "stage": "Practice again on the success result, after accepted Start, Pause, Resume and Complete",
+      "retryContact": [
+        195,
+        374
+      ],
+      "retryContactDurationSeconds": 0.15,
+      "retryFrame": [
+        24,
+        341,
+        342,
+        66
+      ],
+      "window": [
+        390,
+        844
+      ],
+      "contactRecordWallTime": 1792353790.036,
+      "finalHierarchyState": "result.success",
+      "fixtureUUID": "9025051C-28C1-41A3-A741-19A8BF6AB0EB"
+    },
+    "journal": {
+      "records": 45,
+      "launches": 1,
+      "contiguousSequence": [
+        1,
+        45
+      ],
+      "missing": false,
+      "truncated": false,
+      "parsePartial": false,
+      "collectorErrors": [],
+      "scrollRows": [
+        "sequence 3: scroll.idle at launch"
+      ],
+      "afterResult": "sequence 38-45: result.success published, then checkpoints only; persistence ready, no recovery, same current request",
+      "bracketingCheckpoints": [
+        {
+          "sequence": 41,
+          "wallTime": 1792353785.113
+        },
+        {
+          "sequence": 42,
+          "wallTime": 1792353790.197
+        }
+      ],
+      "laterCheckpoints": 3,
+      "restartEvidence": "restart() has no journal tag; its guard cannot refuse with a current request, persistence ready and no recovery, and no loading state was published"
+    },
+    "video": {
+      "recordingStartWallTime": 1792353710.65,
+      "observation": "Practice again showed its pressed appearance at the contact time, then a normal release; the result screen remained."
+    },
+    "rawEvidencePath": "run artifact mobile-validation-evidence-iphone12 (30-day retention not yet in effect for this run)",
+    "interpretation": "Second instrumented occurrence of the N06 signature, on iPhone and a different shell button. Scroll phases show no tracking or interaction around the contact, so the scroll view claiming the touch is not supported for this failure. The remaining gap is between touch delivery to the app and SwiftUI Button action dispatch."
+  },
+  "laterHostedFailures": [
+    {
+      "runID": 39162857338,
+      "event": "pull_request",
+      "pullRequest": 12,
+      "checkoutRevision": "3e10bc66e734d95a32a9542ceea4da114e6dcecd",
+      "containsScrollPhaseCode": true,
+      "inventory": {
+        "inputs": 60,
+        "matchesCheckoutRevision": true
+      },
+      "model": "iphone12",
+      "case": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+      "assertion": "Missing heading shell.play",
+      "caseSeconds": 76.346,
+      "stage": "First Start",
+      "contact": [
+        195,
+        321.6667
+      ],
+      "frame": [
+        24,
+        288.7,
+        342,
+        66
+      ],
+      "contactRecordWallTime": 1792356233.523,
+      "fixtureUUID": "27F4A2E3-8B62-4283-982B-0BB79F701B90",
+      "journal": {
+        "records": 22,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          22
+        ],
+        "collectorErrors": [],
+        "buttonStartRows": 0,
+        "scrollRows": [
+          "sequence 3: scroll.idle at launch"
+        ],
+        "checkpointGapSeconds": 14.9,
+        "bracketingCheckpoints": [
+          {
+            "sequence": 18,
+            "wallTime": 1792356228.256
+          },
+          {
+            "sequence": 19,
+            "wallTime": 1792356233.272
+          },
+          {
+            "sequence": 20,
+            "wallTime": 1792356238.566
+          }
+        ]
+      },
+      "preContactQueryStallSeconds": 42,
+      "otherModel": "ipad9 success",
+      "sameCommitPushRun": {
+        "runID": 39162852799,
+        "conclusion": "success"
+      },
+      "interpretation": "Instrumented Start not entered; no scroll claim."
+    },
+    {
+      "runID": 39166098886,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "75b21777566396df63f574eaed8ad1b7d3cb6801",
+      "containsScrollPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "ipad9",
+      "case": "testPlayerExportPresentsFilesAndCancellationKeepsProgress",
+      "assertion": "Native Files exporter was not presented",
+      "caseSeconds": 131.752,
+      "contact": [
+        405,
+        752.5
+      ],
+      "frame": [
+        135,
+        726.5,
+        540,
+        52
+      ],
+      "contactRecordWallTime": 1792358237.994,
+      "finalHierarchy": "Settings form, Export enabled, no exporter, about 11.7 s after the contact record",
+      "preContactQueryStallSeconds": 67,
+      "otherJobs": {
+        "iphone12": "success",
+        "minimum-runtime": "success"
+      },
+      "interpretation": "Same outcome on an uninstrumented Form button; action non-entry not established.",
+      "reclassified": {
+        "finding": "N07",
+        "touchDelivery": "intact: one touch state, 150 ms down to up",
+        "actionRan": true,
+        "filesViewServiceReadySeconds": 24.1,
+        "previousWaitSeconds": 10,
+        "newWaitSeconds": 60
+      }
+    },
+    {
+      "runID": 39191221739,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "b161617a2ecd415295109ea26128d373a87850ed",
+      "containsScrollPhaseCode": true,
+      "containsTouchPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "iphone12",
+      "runtime": "26.5 (23F77)",
+      "case": "testForegroundRequiresExplicitResumeAndRotationPreservesPlay",
+      "assertion": "Missing heading shell.result.success",
+      "caseSeconds": 60.032,
+      "stage": "Complete practice after rotation",
+      "contact": [
+        195,
+        667
+      ],
+      "frame": [
+        24,
+        634,
+        342,
+        66
+      ],
+      "contactDurationSeconds": 0.15,
+      "contactRecordWallTime": 1792378120.24,
+      "fixtureUUID": "5362DE39-2CB8-4C7E-B926-5C79BDBAF007",
+      "journal": {
+        "records": 47,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          47
+        ],
+        "collectorErrors": [],
+        "buttonCompleteRows": 0,
+        "scrollRows": [
+          "sequence 37-40: reveal drag interacting, decelerating, idle; idle at 1792378098.252"
+        ],
+        "bracketingCheckpoints": [
+          {
+            "sequence": 44,
+            "wallTime": 1792378118.564
+          },
+          {
+            "sequence": 45,
+            "wallTime": 1792378123.736
+          }
+        ]
+      },
+      "recording": "Pressed for about 0.27 s, then normal release; playing screen remained",
+      "preContactQueryStallSeconds": 14,
+      "interpretation": "Instrumented Complete not entered; no scroll claim."
+    },
+    {
+      "runID": 39191221739,
+      "event": "push",
+      "ref": "integration/first-party-foundation",
+      "sourceRevision": "b161617a2ecd415295109ea26128d373a87850ed",
+      "containsScrollPhaseCode": true,
+      "containsTouchPhaseCode": false,
+      "inventory": {
+        "inputs": 60,
+        "matchesSourceRevision": true
+      },
+      "model": "iphone12",
+      "job": "minimum-runtime",
+      "runtime": "18.0 (22A3351)",
+      "case": "testSettingsAndProgressPersistOnRelaunch",
+      "assertion": "waitForSwitchValue timed out at line 308: Haptics stayed 1",
+      "caseSeconds": 32.192,
+      "stage": "Haptics toggle in Settings",
+      "contact": [
+        345,
+        313.67
+      ],
+      "frame": [
+        20,
+        291.7,
+        350,
+        44
+      ],
+      "contactDurationSeconds": 0.05,
+      "contactRecordWallTime": 1792378665.763,
+      "fixtureUUID": "9F55C354-86B7-470A-B1E7-EE821298F135",
+      "journal": {
+        "records": 17,
+        "launches": 1,
+        "contiguousSequence": [
+          1,
+          17
+        ],
+        "collectorErrors": [],
+        "precedingToggleFlowUpdates": [
+          {
+            "sequence": 13,
+            "wallTime": 1792378655.457
+          },
+          {
+            "sequence": 15,
+            "wallTime": 1792378660.306
+          }
+        ],
+        "bracketingCheckpoints": [
+          {
+            "sequence": 16,
+            "wallTime": 1792378662.412
+          },
+          {
+            "sequence": 17,
+            "wallTime": 1792378667.72
+          }
+        ]
+      },
+      "preContactQueryStallSeconds": 0,
+      "interpretation": "Native Toggle binding not set on iOS 18.0; no long stall."
+    }
+  ],
+  "ciRetry": {
+    "introducedBy": "collector -retry-tests-on-failure -test-iterations 2",
+    "scope": "App and UI test invocation; restart proof unchanged",
+    "reporting": [
+      "<model>-retries.json",
+      "RETRIED stdout line",
+      "GitHub Actions warning annotation"
+    ],
+    "journalCollectionBudgetBytes": {
+      "before": 131072,
+      "after": 1048576
+    },
+    "budgetEvidence": {
+      "runID": 39192165136,
+      "iphone12JournalBytes": 129523,
+      "ipad9JournalBytes": 129180,
+      "journals": 6
+    },
+    "localProbe": "Xcode 27.1: fail-then-pass case exits 0; result bundle records First Run failed, Retry 1 passed",
+    "status": "N06 cause identified outside the app; retry is the mitigation",
+    "inputFaultScan": "When a case failed, export diagnostics and count unknown-digitizer or >100 ms touch-state faults; warn when failed runs exceed faults"
+  },
+  "inputInjectionFaults": {
+    "source": "result bundle diagnostics: simctl_diagnostics/<device>/system.logarchive, backboardd TouchEvents",
+    "mechanism": "XCTest plays each synthesized gesture through a new virtual digitizer; backboardd registers it while the first events arrive",
+    "runs": [
+      {
+        "runID": 38865714337,
+        "model": "ipad9",
+        "contact": "Pause",
+        "runtime": "26.5",
+        "synthesizedGestures": 62,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-16 07:27:26.934",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39160850417,
+        "model": "iphone12",
+        "contact": "Practice again",
+        "runtime": "26.5",
+        "synthesizedGestures": 59,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-18 20:03:09.676",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39162857338,
+        "model": "iphone12",
+        "contact": "Start",
+        "runtime": "26.5",
+        "synthesizedGestures": 62,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-18 20:43:53.159",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39191221739,
+        "model": "iphone12",
+        "contact": "Complete practice",
+        "runtime": "26.5",
+        "synthesizedGestures": 65,
+        "fault": "duplicate touch state; touch-up skipped",
+        "faultTime": "2026-10-19 02:48:39.889",
+        "skippedEvents": 12
+      },
+      {
+        "runID": 39191221739,
+        "model": "iphone12",
+        "job": "minimum-runtime",
+        "contact": "Haptics toggle",
+        "runtime": "18.0",
+        "synthesizedGestures": 57,
+        "fault": "late touch state; gesture replayed compressed",
+        "faultTime": "2026-10-19 02:57:45.736",
+        "touchStateDelaySeconds": 0.357,
+        "otherGesturesDelaySeconds": [
+          0.002,
+          0.01
+        ],
+        "replayedDownToUpSeconds": 0.005
+      },
+      {
+        "runID": 39166098886,
+        "model": "ipad9",
+        "contact": "Export local data",
+        "runtime": "26.5",
+        "synthesizedGestures": 61,
+        "fault": null,
+        "note": "Not N06; see N07"
+      }
+    ],
+    "faultsPerN06Run": 1,
+    "faultsOutsideFailedContacts": 0
+  }
 }

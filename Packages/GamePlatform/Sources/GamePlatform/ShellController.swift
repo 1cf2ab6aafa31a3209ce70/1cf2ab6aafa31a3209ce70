@@ -1,4 +1,3 @@
-#if os(iOS)
 import Combine
 import Foundation
 import GameCore
@@ -366,4 +365,3 @@ public final class ShellController: ObservableObject {
         feedback?.setPlaying(flow.inputIsActive)
     }
 }
-#endif

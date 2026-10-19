@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "id": "level-01",
+  "gameType": "__GAME_TYPE__",
+  "contentVersion": 1,
+  "seed": 1,
+  "payload": {
+    "steps": 2,
+    "nextLevelIDs": []
+  }
+}

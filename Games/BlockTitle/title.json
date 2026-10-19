@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "target": "BlockTitle",
+  "titleID": "block-match",
+  "appDisplayName": "Block Match",
+  "bundleIdentifier": "local.gamecore.BlockTitle",
+  "contentPackage": "Games/BlockContent",
+  "unitTests": "Tests/BlockTitleTests",
+  "uiTests": "Tests/BlockTitleUITests"
+}

@@ -1,6 +1,6 @@
 # Later spike test preparation
 
-**Status:** Spike 03 executed; [decision and evidence](../audits/spike-03-save-durability.md) record its scope and results. [Epic 05 acceptance](../audits/epic-05-bundled-content.md) establishes the level contract, so Spike 06’s entry gate is met. Spike 06 and Spike 11 remain preparation only; neither investigation has started, and Spike 11 still waits for Epic 10.
+**Status:** Spike 03 executed; [decision and evidence](../audits/spike-03-save-durability.md) record its scope and results. [Epic 05 acceptance](../audits/epic-05-bundled-content.md) establishes the level contract, so Spike 06’s entry gate is met. Spike 06 is complete; see its [evidence](../audits/spike-06-module-seam.md). Spike 11 remains preparation only and follows Epic 07.
 
 These plans make future investigations reproducible. Execute each only after its entry gate is met; the roadmap remains ordered. [ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md) accepts simulator-only mobile foundation development with an iOS/iPadOS 18.0 deployment floor. Use iPhone 12 and iPad (9th generation) simulator geometry; physical hardware is unavailable and macOS is outside current scope. Retained simulator timings are diagnostic observations, not physical performance or minimum-runtime certification.
 
@@ -44,7 +44,7 @@ Stop at two days with compiling prototypes, registration documentation, dependen
 
 ## Spike 11 — Dig feasibility
 
-**Entry:** [Epic 10](../epics/10-unscrew-title.md) must be complete, including the established production module contract and earlier release gates. **Brief:** [Spike 11](../spikes/11-dig-feasibility.md). **Timebox:** Three developer days.
+**Entry:** [Epic 07](../epics/07-module-integration.md) must be complete with the production module contract (version 1, provisional). Release gates and production titles are not prerequisites. **Brief:** [Spike 11](../spikes/11-dig-feasibility.md). **Timebox:** Three developer days.
 
 Inputs are the accepted mobile platform matrix and simulator Spike 00 evidence, a fixed arena/workload, deterministic input fixtures, the existing `GameModule` interface, and the two selected mobile simulator geometries. Recheck current Apple guidance and the brief's two external examples at execution time; any candidate dependency requires pinned-source/license review before adoption. No external code or adoption decision is included in this preparation.
 

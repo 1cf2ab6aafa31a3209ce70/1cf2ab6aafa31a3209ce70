@@ -1,0 +1,11 @@
+{
+  "schemaVersion": 1,
+  "titleID": "block-match",
+  "contentVersion": 1,
+  "levels": [
+    {"id": "intro-01", "file": "Levels/intro-01.json", "gameType": "block"},
+    {"id": "intro-02", "file": "Levels/intro-02.json", "gameType": "block"}
+  ],
+  "assets": [],
+  "localizationKeys": []
+}
