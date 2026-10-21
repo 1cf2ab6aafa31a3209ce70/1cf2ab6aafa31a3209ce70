@@ -24,6 +24,23 @@ for package in $content_packages; do
   fi
 done
 python3 scripts/test-required-reason-check.py | tee "$output_dir/required-reason-check-tests.log"
+# Each release gate proves it refuses seeded violations before it judges the real builds.
+for gate_test in foundation-check app-bundle-check app-capabilities-check localization-check \
+                 asset-provenance-check reproducible-build-check; do
+  python3 "scripts/test-$gate_test.py" | tee "$output_dir/$gate_test-tests.log"
+done
+# Release gates on the built bundles report every failure, then fail verification at the end.
+gate_failures=""
+release_gate() {
+  local name="$1" log="$2"
+  shift 2
+  if "$@" > "$log" 2> "$log.err"; then
+    tail -1 "$log"
+  else
+    cat "$log.err"
+    gate_failures="$gate_failures $name"
+  fi
+}
 for target in $targets; do
   for configuration in Debug Release; do
     xcodebuild -workspace GameCore.xcworkspace -scheme "$target" \
@@ -43,6 +60,31 @@ for target in $targets; do
   python3 scripts/check-required-reason-apis.py "$output_dir/ios-Release/Build/Products/Release-iphoneos/$target.app" \
     > "$output_dir/$target-required-reason-apis.log" || { cat "$output_dir/$target-required-reason-apis.log"; exit 1; }
   tail -1 "$output_dir/$target-required-reason-apis.log"
+  app="$output_dir/ios-Release/Build/Products/Release-iphoneos/$target.app"
+  release_gate "$target-bundle" "$output_dir/$target-app-bundle.log" python3 scripts/check-app-bundle.py "$app"
+  release_gate "$target-capabilities" "$output_dir/$target-app-capabilities.log" \
+    python3 scripts/check-app-capabilities.py "$app"
+  release_gate "$target-localization" "$output_dir/$target-localization.log" \
+    python3 scripts/check-localization.py "Games/$target" --app "$app" \
+    --stringsdata "$output_dir/ios-Release/Build/Intermediates.noindex/GameCore.build/Release-iphoneos/$target.build"
+  release_gate "$target-provenance" "$output_dir/$target-asset-provenance.log" \
+    python3 scripts/check-asset-provenance.py "$app"
 done
+# Reproducibility: rebuild every Release iOS app from a second clean derived-data directory. Its path
+# has the same length as ios-Release because debug-map path lengths change the linker's LC_UUID.
+rm -rf "$output_dir/ios-Rebuild"
+for target in $targets; do
+  xcodebuild -workspace GameCore.xcworkspace -scheme "$target" \
+    -configuration Release -destination 'generic/platform=iOS' \
+    -derivedDataPath "$output_dir/ios-Rebuild" CODE_SIGNING_ALLOWED=NO build \
+    > "$output_dir/$target-ios-Rebuild.log" 2>&1 || { tail -60 "$output_dir/$target-ios-Rebuild.log"; exit 1; }
+  release_gate "$target-reproducible" "$output_dir/$target-reproducible-build.log" \
+    python3 scripts/check-reproducible-build.py "$output_dir/ios-Release/Build/Products/Release-iphoneos/$target.app" \
+    "$output_dir/ios-Rebuild/Build/Products/Release-iphoneos/$target.app"
+done
+if [ -n "$gate_failures" ]; then
+  echo "Release gates failed:$gate_failures (logs in $output_dir)" >&2
+  exit 1
+fi
 echo "Verification passed: $output_dir"
 echo 'Package logic tests passed; app-hosted and UI tests run via scripts/test-mobile.sh.'
