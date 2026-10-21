@@ -115,4 +115,44 @@ final class BlockModuleTests: XCTestCase {
         await waitUntil { host.controller.flow.inputIsActive }
         XCTAssertEqual(session.game?.levelID, "intro-01")
     }
+
+    /// Reduced motion reaches the session through the shell, and the board
+    /// redraws without SpriteKit actions in either mode, so there is no
+    /// motion for the trait to remove. A title animation must fail this test
+    /// until it honours `session.reducedMotion`.
+    func testReducedMotionReachesTheSessionAndTheBoardRunsNoActions() async throws {
+        let host = try host()
+        await launchAndPlay(host)
+        let session = host.module.session
+        let scene = host.module.scene
+        func actionCount() -> Int {
+            var count = 0
+            scene.enumerateChildNodes(withName: "//*") { node, _ in if node.hasActions() { count += 1 } }
+            return count + (scene.hasActions() ? 1 : 0)
+        }
+        XCTAssertFalse(session.reducedMotion)
+        scene.synchronize()
+        XCTAssertEqual(actionCount(), 0)
+        host.controller.setReducedMotion(true)
+        XCTAssertTrue(session.reducedMotion, "The shell forwards the trait to the module")
+        session.select(3)
+        scene.synchronize()
+        XCTAssertEqual(scene.children.count, 4, "Cleared blocks disappear in one redraw")
+        XCTAssertEqual(actionCount(), 0)
+        host.controller.setReducedMotion(false)
+        XCTAssertFalse(session.reducedMotion)
+    }
+
+    /// Every block color has its own name and shape, so the board, the
+    /// buttons and VoiceOver never depend on color perception alone.
+    func testEveryBlockColorHasADistinctShapeAndName() {
+        let colors = 1...4
+        XCTAssertEqual(Set(colors.map(BlockStyle.name)).count, colors.count)
+        XCTAssertEqual(Set(colors.map(BlockStyle.symbol)).count, colors.count)
+        for color in colors {
+            XCTAssertFalse(BlockStyle.symbol(color).isEmpty)
+            XCTAssertNotNil(UIImage(systemName: BlockStyle.symbol(color)), "SF Symbol for color \(color) exists")
+            XCTAssertNotNil(UIImage(systemName: BlockStyle.outline(color)), "Outline for color \(color) exists")
+        }
+    }
 }
