@@ -34,7 +34,8 @@ Each step names the measurement, the method and what passes. The budgets are [AD
    - Make 20 deliberate taps on board cells, including every corner and edge cell. Each must select the cell under the finger. Record misses.
    - Tap two cells in quick succession, rest a second finger on the board while tapping with another, and drag across the board. None may select a cell the player did not tap, and none may crash or stall.
    - Pause, rotate, resume and play on. Background the app with the Home gesture or button, return, and resume.
-   - Turn on VoiceOver and play a board using only swipes and double taps. Turn on Voice Control and play a board by saying the block names or numbers.
+   - Turn on VoiceOver and play a board using only swipes and double taps. After each page change (start, pause, resume, both results, back to menu), VoiceOver focus must be on the new page, not on a control that disappeared. Turn on Voice Control and play a board by saying the block names or numbers.
+   - Turn on Settings > Accessibility > Display & Text Size > Color Filters > Grayscale and open every page. Every block kind must stay distinguishable. The simulator has no Color Filters setting.
    - With the ring/silent switch on and off, and with headphones connected and then removed, confirm sound effects, music and haptics follow the Settings toggles, and that removing headphones pauses play.
 
 ## Record
@@ -52,7 +53,7 @@ Add the result to the title's audit, for example `roadmap/audits/<title>-hardwar
 | Frame pacing | p95, p99, hitch-time ratio, longest hitch, instrument and template |
 | Memory | Peak footprint, per-restart footprints, memory-warning result |
 | Thermal | States at 0, 5, 10, 15 and 20 minutes; battery drop; first and last 5 minutes p95 and p99 |
-| Touch | Misses out of 20, multi-touch and drag results, rotation and background results, VoiceOver, Voice Control and audio/haptic results |
+| Touch | Misses out of 20, multi-touch and drag results, rotation and background results, VoiceOver (focus after page changes included), Voice Control, Grayscale and audio/haptic results |
 | Verdict per step | Pass, fail or not tested, with the reason |
 | Evidence | Paths to traces, screen recordings and notes |
 
