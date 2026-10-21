@@ -1,0 +1,715 @@
+{
+  "budgets": {
+    "intervalP95": 20.0,
+    "intervalP99": 25.0,
+    "over33Share": 0.5,
+    "worstFlag": 100.0,
+    "meshP95": 4.0,
+    "collisionChunkP95": 25.0,
+    "collisionLagP95": 100.0,
+    "collisionLagMax": 250.0,
+    "visualLagP95": 33.4,
+    "footprintGrowth": 8.0,
+    "footprintStep": 1.0,
+    "footprintFlag": 133.0,
+    "reloadMax": 500.0
+  },
+  "results": {
+    "iphone12": {
+      "lowlevel": [
+        {
+          "geometry": "iphone12",
+          "run": 1,
+          "attempts": 2,
+          "void": false,
+          "testsPassed": true,
+          "missing": false,
+          "rows": [
+            {
+              "row": "I p95 ms",
+              "value": 16.88,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "I p99 ms",
+              "value": 22.686,
+              "budget": "<= 25.0",
+              "pass": true
+            },
+            {
+              "row": "I share > 33.3 ms %",
+              "value": 0.167,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "I worst ms (reported)",
+              "value": 34.921,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "S p95 ms",
+              "value": 17.232,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "S p99 ms",
+              "value": 25.988,
+              "budget": "<= 25.0",
+              "pass": false
+            },
+            {
+              "row": "S share > 33.3 ms %",
+              "value": 0.112,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "S worst ms (reported)",
+              "value": 35.286,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "mesh total p95 ms (S)",
+              "value": 0.506,
+              "budget": "<= 4.0",
+              "pass": true,
+              "note": "main actor p95 0.464 ms, extraction p95 0.045 ms, 600 jobs, max 4 chunks"
+            },
+            {
+              "row": "collision per chunk p95 ms (S)",
+              "value": 17.456,
+              "budget": "<= 25",
+              "pass": true,
+              "note": "max 34.186 ms over 1446 chunk jobs"
+            },
+            {
+              "row": "collision lag p95 ms (S)",
+              "value": 76.905,
+              "budget": "<= 100",
+              "pass": true
+            },
+            {
+              "row": "collision lag max ms (S)",
+              "value": 92.861,
+              "budget": "<= 250",
+              "pass": true
+            },
+            {
+              "row": "score after S / B",
+              "value": [
+                24,
+                28
+              ],
+              "budget": "24 / 28, controls untouched",
+              "pass": true,
+              "note": "controls collected []; live matches headless replay: True"
+            },
+            {
+              "row": "no accepted command lost",
+              "value": 0,
+              "budget": "0 refused, replay match",
+              "pass": true
+            },
+            {
+              "row": "footprint growth cycle 1 to 5 MiB",
+              "value": 2.734,
+              "budget": "<= 8",
+              "pass": true,
+              "note": "snapshots [69.097, 70.113, 71.019, 71.378, 71.831]; peak 72.066 MiB"
+            },
+            {
+              "row": "consecutive deltas > 1 MiB",
+              "value": 1,
+              "budget": "< 4",
+              "pass": true
+            },
+            {
+              "row": "entities and subscriptions equal to cycle 1",
+              "value": [
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ]
+              ],
+              "budget": "equal",
+              "pass": true
+            },
+            {
+              "row": "restored initial rule state each cycle",
+              "value": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "budget": "all true",
+              "pass": true
+            },
+            {
+              "row": "reload ms each cycle",
+              "value": [
+                175.725,
+                177.375,
+                176.294,
+                176.721,
+                175.735
+              ],
+              "budget": "<= 500",
+              "pass": true
+            }
+          ],
+          "reports": [
+            "dig-lowlevel-iphone12-run1-a2-prefix-prefix.json",
+            "dig-lowlevel-iphone12-run1-a2-timing-timing.json"
+          ]
+        },
+        {
+          "geometry": "iphone12",
+          "run": 2,
+          "attempts": 3,
+          "void": true,
+          "testsPassed": true,
+          "missing": false,
+          "rows": [
+            {
+              "row": "I p95 ms",
+              "value": 16.896,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "I p99 ms",
+              "value": 33.045,
+              "budget": "<= 25.0",
+              "pass": false
+            },
+            {
+              "row": "I share > 33.3 ms %",
+              "value": 0.505,
+              "budget": "<= 0.5",
+              "pass": false
+            },
+            {
+              "row": "I worst ms (reported)",
+              "value": 39.433,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "S p95 ms",
+              "value": 18.991,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "S p99 ms",
+              "value": 33.153,
+              "budget": "<= 25.0",
+              "pass": false
+            },
+            {
+              "row": "S share > 33.3 ms %",
+              "value": 0.885,
+              "budget": "<= 0.5",
+              "pass": false
+            },
+            {
+              "row": "S worst ms (reported)",
+              "value": 217.33,
+              "budget": "flag > 100",
+              "pass": true,
+              "note": "flagged"
+            },
+            {
+              "row": "mesh total p95 ms (S)",
+              "value": 0.489,
+              "budget": "<= 4.0",
+              "pass": true,
+              "note": "main actor p95 0.436 ms, extraction p95 0.074 ms, 599 jobs, max 4 chunks"
+            },
+            {
+              "row": "collision per chunk p95 ms (S)",
+              "value": 18.737,
+              "budget": "<= 25",
+              "pass": true,
+              "note": "max 131.258 ms over 1444 chunk jobs"
+            },
+            {
+              "row": "collision lag p95 ms (S)",
+              "value": 77.879,
+              "budget": "<= 100",
+              "pass": true
+            },
+            {
+              "row": "collision lag max ms (S)",
+              "value": 169.027,
+              "budget": "<= 250",
+              "pass": true
+            },
+            {
+              "row": "score after S / B",
+              "value": [
+                24,
+                28
+              ],
+              "budget": "24 / 28, controls untouched",
+              "pass": true,
+              "note": "controls collected []; live matches headless replay: True"
+            },
+            {
+              "row": "no accepted command lost",
+              "value": 0,
+              "budget": "0 refused, replay match",
+              "pass": true
+            },
+            {
+              "row": "footprint growth cycle 1 to 5 MiB",
+              "value": 3.032,
+              "budget": "<= 8",
+              "pass": true,
+              "note": "snapshots [69.784, 70.894, 71.363, 72.159, 72.816]; peak 72.956 MiB"
+            },
+            {
+              "row": "consecutive deltas > 1 MiB",
+              "value": 1,
+              "budget": "< 4",
+              "pass": true
+            },
+            {
+              "row": "entities and subscriptions equal to cycle 1",
+              "value": [
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ]
+              ],
+              "budget": "equal",
+              "pass": true
+            },
+            {
+              "row": "restored initial rule state each cycle",
+              "value": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "budget": "all true",
+              "pass": true
+            },
+            {
+              "row": "reload ms each cycle",
+              "value": [
+                205.605,
+                183.137,
+                163.161,
+                181.532,
+                176.051
+              ],
+              "budget": "<= 500",
+              "pass": true
+            }
+          ],
+          "reports": [
+            "dig-lowlevel-iphone12-run2-a3-prefix-prefix.json",
+            "dig-lowlevel-iphone12-run2-a3-timing-timing.json"
+          ]
+        }
+      ]
+    },
+    "ipad9": {
+      "lowlevel": [
+        {
+          "geometry": "ipad9",
+          "run": 1,
+          "attempts": 1,
+          "void": false,
+          "testsPassed": true,
+          "missing": false,
+          "rows": [
+            {
+              "row": "I p95 ms",
+              "value": 16.883,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "I p99 ms",
+              "value": 23.565,
+              "budget": "<= 25.0",
+              "pass": true
+            },
+            {
+              "row": "I share > 33.3 ms %",
+              "value": 0,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "I worst ms (reported)",
+              "value": 26.149,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "S p95 ms",
+              "value": 17.126,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "S p99 ms",
+              "value": 22.548,
+              "budget": "<= 25.0",
+              "pass": true
+            },
+            {
+              "row": "S share > 33.3 ms %",
+              "value": 0,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "S worst ms (reported)",
+              "value": 33.114,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "mesh total p95 ms (S)",
+              "value": 0.366,
+              "budget": "<= 4.0",
+              "pass": true,
+              "note": "main actor p95 0.333 ms, extraction p95 0.033 ms, 600 jobs, max 4 chunks"
+            },
+            {
+              "row": "collision per chunk p95 ms (S)",
+              "value": 17.064,
+              "budget": "<= 25",
+              "pass": true,
+              "note": "max 28.437 ms over 1446 chunk jobs"
+            },
+            {
+              "row": "collision lag p95 ms (S)",
+              "value": 75.987,
+              "budget": "<= 100",
+              "pass": true
+            },
+            {
+              "row": "collision lag max ms (S)",
+              "value": 80.851,
+              "budget": "<= 250",
+              "pass": true
+            },
+            {
+              "row": "score after S / B",
+              "value": [
+                24,
+                28
+              ],
+              "budget": "24 / 28, controls untouched",
+              "pass": true,
+              "note": "controls collected []; live matches headless replay: True"
+            },
+            {
+              "row": "no accepted command lost",
+              "value": 0,
+              "budget": "0 refused, replay match",
+              "pass": true
+            },
+            {
+              "row": "footprint growth cycle 1 to 5 MiB",
+              "value": 3.016,
+              "budget": "<= 8",
+              "pass": true,
+              "note": "snapshots [70.456, 71.753, 72.659, 73.347, 73.472]; peak 73.972 MiB"
+            },
+            {
+              "row": "consecutive deltas > 1 MiB",
+              "value": 1,
+              "budget": "< 4",
+              "pass": true
+            },
+            {
+              "row": "entities and subscriptions equal to cycle 1",
+              "value": [
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ]
+              ],
+              "budget": "equal",
+              "pass": true
+            },
+            {
+              "row": "restored initial rule state each cycle",
+              "value": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "budget": "all true",
+              "pass": true
+            },
+            {
+              "row": "reload ms each cycle",
+              "value": [
+                170.287,
+                175.85,
+                173.357,
+                178.995,
+                181.039
+              ],
+              "budget": "<= 500",
+              "pass": true
+            }
+          ],
+          "reports": [
+            "dig-lowlevel-ipad9-run1-a1-prefix-prefix.json",
+            "dig-lowlevel-ipad9-run1-a1-timing-timing.json"
+          ]
+        },
+        {
+          "geometry": "ipad9",
+          "run": 2,
+          "attempts": 1,
+          "void": false,
+          "testsPassed": true,
+          "missing": false,
+          "rows": [
+            {
+              "row": "I p95 ms",
+              "value": 16.846,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "I p99 ms",
+              "value": 21.235,
+              "budget": "<= 25.0",
+              "pass": true
+            },
+            {
+              "row": "I share > 33.3 ms %",
+              "value": 0,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "I worst ms (reported)",
+              "value": 25.908,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "S p95 ms",
+              "value": 17.212,
+              "budget": "<= 20.0",
+              "pass": true
+            },
+            {
+              "row": "S p99 ms",
+              "value": 23.883,
+              "budget": "<= 25.0",
+              "pass": true
+            },
+            {
+              "row": "S share > 33.3 ms %",
+              "value": 0.084,
+              "budget": "<= 0.5",
+              "pass": true
+            },
+            {
+              "row": "S worst ms (reported)",
+              "value": 49.516,
+              "budget": "flag > 100",
+              "pass": true
+            },
+            {
+              "row": "mesh total p95 ms (S)",
+              "value": 0.491,
+              "budget": "<= 4.0",
+              "pass": true,
+              "note": "main actor p95 0.406 ms, extraction p95 0.078 ms, 600 jobs, max 4 chunks"
+            },
+            {
+              "row": "collision per chunk p95 ms (S)",
+              "value": 17.152,
+              "budget": "<= 25",
+              "pass": true,
+              "note": "max 31.937 ms over 1446 chunk jobs"
+            },
+            {
+              "row": "collision lag p95 ms (S)",
+              "value": 77.045,
+              "budget": "<= 100",
+              "pass": true
+            },
+            {
+              "row": "collision lag max ms (S)",
+              "value": 92.741,
+              "budget": "<= 250",
+              "pass": true
+            },
+            {
+              "row": "score after S / B",
+              "value": [
+                24,
+                28
+              ],
+              "budget": "24 / 28, controls untouched",
+              "pass": true,
+              "note": "controls collected []; live matches headless replay: True"
+            },
+            {
+              "row": "no accepted command lost",
+              "value": 0,
+              "budget": "0 refused, replay match",
+              "pass": true
+            },
+            {
+              "row": "footprint growth cycle 1 to 5 MiB",
+              "value": 3.172,
+              "budget": "<= 8",
+              "pass": true,
+              "note": "snapshots [71.128, 72.128, 72.644, 73.363, 74.3]; peak 74.456 MiB"
+            },
+            {
+              "row": "consecutive deltas > 1 MiB",
+              "value": 0,
+              "budget": "< 4",
+              "pass": true
+            },
+            {
+              "row": "entities and subscriptions equal to cycle 1",
+              "value": [
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ],
+                [
+                  60,
+                  2
+                ]
+              ],
+              "budget": "equal",
+              "pass": true
+            },
+            {
+              "row": "restored initial rule state each cycle",
+              "value": [
+                true,
+                true,
+                true,
+                true,
+                true
+              ],
+              "budget": "all true",
+              "pass": true
+            },
+            {
+              "row": "reload ms each cycle",
+              "value": [
+                166.124,
+                176.012,
+                176.178,
+                175.169,
+                181.768
+              ],
+              "budget": "<= 500",
+              "pass": true
+            }
+          ],
+          "reports": [
+            "dig-lowlevel-ipad9-run2-a1-prefix-prefix.json",
+            "dig-lowlevel-ipad9-run2-a1-timing-timing.json"
+          ]
+        }
+      ]
+    }
+  },
+  "verdicts": {
+    "lowlevel": {
+      "runs": 4,
+      "countedRuns": 3,
+      "voidRuns": [
+        "iphone12 run 2"
+      ],
+      "status": "fail",
+      "pass": false,
+      "failedRows": [
+        "iphone12: S p99 ms"
+      ],
+      "missingReports": 0
+    }
+  }
+}

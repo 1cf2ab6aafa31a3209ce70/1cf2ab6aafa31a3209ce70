@@ -1,0 +1,1679 @@
+{
+  "scope": "Spike 11 dig feasibility: serial, one owned simulator at a time; simulator diagnostics, not device performance",
+  "models": [
+    "iphone12",
+    "ipad9"
+  ],
+  "candidates": [
+    "lowlevel"
+  ],
+  "runs": 2,
+  "geometries": {
+    "iphone12": {
+      "deviceUUID": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+      "tests": {
+        "behaviour": {
+          "bundle": "iphone12-behaviour.xcresult",
+          "summary": {
+            "devicesAndConfigurations": [
+              {
+                "device": {
+                  "architecture": "arm64",
+                  "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                  "deviceName": "GameCore Spike11 owned iphone12",
+                  "modelName": "iPhone 12",
+                  "osBuildNumber": "23A5287g",
+                  "osVersion": "26.0",
+                  "platform": "iOS Simulator"
+                },
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "passedTests": 7,
+                "skippedTests": 0,
+                "testPlanConfiguration": {
+                  "configurationId": "1",
+                  "configurationName": "Test Scheme Action"
+                }
+              }
+            ],
+            "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "finishTime": 1792542293.993,
+            "passedTests": 7,
+            "result": "Passed",
+            "runtimeWarnings": [],
+            "skippedTests": 0,
+            "startTime": 1792542234.214,
+            "statistics": [
+              {
+                "subtitle": "7 test runs",
+                "title": "1 configuration ran with test repetitions"
+              }
+            ],
+            "testFailures": [],
+            "title": "Test - DigFeasibility",
+            "topInsights": [],
+            "totalTestCount": 7
+          },
+          "passed": true,
+          "retries": {
+            "cases": [],
+            "inputFaults": null
+          }
+        },
+        "lowlevel-run1": [
+          {
+            "attempt": 1,
+            "test": {
+              "bundle": "iphone12-lowlevel-run1-a1.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                      "deviceName": "GameCore Spike11 owned iphone12",
+                      "modelName": "iPhone 12",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792542498.789,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792542297.917,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": true
+          },
+          {
+            "attempt": 2,
+            "test": {
+              "bundle": "iphone12-lowlevel-run1-a2.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                      "deviceName": "GameCore Spike11 owned iphone12",
+                      "modelName": "iPhone 12",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792542701.23,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792542501.885,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": false
+          }
+        ],
+        "lowlevel-run2": [
+          {
+            "attempt": 1,
+            "test": {
+              "bundle": "iphone12-lowlevel-run2-a1.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                      "deviceName": "GameCore Spike11 owned iphone12",
+                      "modelName": "iPhone 12",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792542902.718,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792542703.752,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": true
+          },
+          {
+            "attempt": 2,
+            "test": {
+              "bundle": "iphone12-lowlevel-run2-a2.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                      "deviceName": "GameCore Spike11 owned iphone12",
+                      "modelName": "iPhone 12",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792543105.669,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792542905.434,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": true
+          },
+          {
+            "attempt": 3,
+            "test": {
+              "bundle": "iphone12-lowlevel-run2-a3.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+                      "deviceName": "GameCore Spike11 owned iphone12",
+                      "modelName": "iPhone 12",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792543310.978,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792543108.513,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": true
+          }
+        ]
+      },
+      "behaviourReports": [
+        "dig-lowlevel-iphone12-behaviour-delayed-fast.json"
+      ]
+    },
+    "ipad9": {
+      "deviceUUID": "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+      "tests": {
+        "behaviour": {
+          "bundle": "ipad9-behaviour.xcresult",
+          "summary": {
+            "devicesAndConfigurations": [
+              {
+                "device": {
+                  "architecture": "arm64",
+                  "deviceId": "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+                  "deviceName": "GameCore Spike11 owned ipad9",
+                  "modelName": "iPad (9th generation)",
+                  "osBuildNumber": "23A5287g",
+                  "osVersion": "26.0",
+                  "platform": "iOS Simulator"
+                },
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "passedTests": 7,
+                "skippedTests": 0,
+                "testPlanConfiguration": {
+                  "configurationId": "1",
+                  "configurationName": "Test Scheme Action"
+                }
+              }
+            ],
+            "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+            "expectedFailures": 0,
+            "failedTests": 0,
+            "finishTime": 1792543433.353,
+            "passedTests": 7,
+            "result": "Passed",
+            "runtimeWarnings": [],
+            "skippedTests": 0,
+            "startTime": 1792543369.204,
+            "statistics": [
+              {
+                "subtitle": "7 test runs",
+                "title": "1 configuration ran with test repetitions"
+              }
+            ],
+            "testFailures": [],
+            "title": "Test - DigFeasibility",
+            "topInsights": [],
+            "totalTestCount": 7
+          },
+          "passed": true,
+          "retries": {
+            "cases": [],
+            "inputFaults": null
+          }
+        },
+        "lowlevel-run1": [
+          {
+            "attempt": 1,
+            "test": {
+              "bundle": "ipad9-lowlevel-run1-a1.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+                      "deviceName": "GameCore Spike11 owned ipad9",
+                      "modelName": "iPad (9th generation)",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792543632.29,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792543437.813,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": false
+          }
+        ],
+        "lowlevel-run2": [
+          {
+            "attempt": 1,
+            "test": {
+              "bundle": "ipad9-lowlevel-run2-a1.xcresult",
+              "summary": {
+                "devicesAndConfigurations": [
+                  {
+                    "device": {
+                      "architecture": "arm64",
+                      "deviceId": "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+                      "deviceName": "GameCore Spike11 owned ipad9",
+                      "modelName": "iPad (9th generation)",
+                      "osBuildNumber": "23A5287g",
+                      "osVersion": "26.0",
+                      "platform": "iOS Simulator"
+                    },
+                    "expectedFailures": 0,
+                    "failedTests": 0,
+                    "passedTests": 2,
+                    "skippedTests": 0,
+                    "testPlanConfiguration": {
+                      "configurationId": "1",
+                      "configurationName": "Test Scheme Action"
+                    }
+                  }
+                ],
+                "environmentDescription": "DigFeasibility \u00b7 Built with macOS 27.2",
+                "expectedFailures": 0,
+                "failedTests": 0,
+                "finishTime": 1792543833.35,
+                "passedTests": 2,
+                "result": "Passed",
+                "runtimeWarnings": [],
+                "skippedTests": 0,
+                "startTime": 1792543637.53,
+                "statistics": [
+                  {
+                    "subtitle": "2 test runs",
+                    "title": "1 configuration ran with test repetitions"
+                  }
+                ],
+                "testFailures": [],
+                "title": "Test - DigFeasibility",
+                "topInsights": [],
+                "totalTestCount": 2
+              },
+              "passed": true,
+              "retries": {
+                "cases": [],
+                "inputFaults": null
+              }
+            },
+            "void": false
+          }
+        ]
+      },
+      "behaviourReports": [
+        "dig-lowlevel-ipad9-behaviour-delayed-fast.json"
+      ]
+    }
+  },
+  "commands": [
+    {
+      "command": [
+        "git",
+        "rev-parse",
+        "HEAD"
+      ],
+      "log": "checkout.log",
+      "exitCode": 0,
+      "seconds": 0.021
+    },
+    {
+      "command": [
+        "git",
+        "status",
+        "--porcelain",
+        "--untracked-files=all"
+      ],
+      "log": "working-tree.log",
+      "exitCode": 0,
+      "seconds": 0.077
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-version"
+      ],
+      "log": "toolchain.log",
+      "exitCode": 0,
+      "seconds": 0.179
+    },
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "hw.model"
+      ],
+      "log": "host-model.log",
+      "exitCode": 0,
+      "seconds": 0.008
+    },
+    {
+      "command": [
+        "sysctl",
+        "-n",
+        "machdep.cpu.brand_string"
+      ],
+      "log": "host-cpu.log",
+      "exitCode": 0,
+      "seconds": 0.006
+    },
+    {
+      "command": [
+        "sw_vers"
+      ],
+      "log": "host-os.log",
+      "exitCode": 0,
+      "seconds": 0.021
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "list",
+        "runtimes",
+        "-j"
+      ],
+      "log": "runtimes.log",
+      "exitCode": 0,
+      "seconds": 0.277
+    },
+    {
+      "command": [
+        "/Users/d/.local/venv3.13/bin/python3",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/scripts/generate-project.py",
+        "--check"
+      ],
+      "log": "project-check.log",
+      "exitCode": 0,
+      "seconds": 0.078
+    },
+    {
+      "command": [
+        "swift",
+        "test",
+        "--package-path",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility"
+      ],
+      "log": "pure-tests.log",
+      "exitCode": 0,
+      "seconds": 23.827
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "-jobs",
+        "4",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "-configuration",
+        "Release",
+        "build"
+      ],
+      "log": "build-release.log",
+      "exitCode": 0,
+      "seconds": 21.665
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "-jobs",
+        "4",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "-destination",
+        "generic/platform=iOS Simulator",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "build-for-testing"
+      ],
+      "log": "build-debug.log",
+      "exitCode": 0,
+      "seconds": 16.183
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "create",
+        "GameCore Spike11 owned iphone12",
+        "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+        "com.apple.CoreSimulator.SimRuntime.iOS-26-0"
+      ],
+      "log": "iphone12-create.log",
+      "exitCode": 0,
+      "seconds": 0.29
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F"
+      ],
+      "log": "iphone12-boot.log",
+      "exitCode": 0,
+      "seconds": 1.084
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-b"
+      ],
+      "log": "iphone12-bootstatus.log",
+      "exitCode": 0,
+      "seconds": 34.425
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-behaviour.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityTests",
+        "-only-testing:DigFeasibilityUITests/LowLevelBehaviourTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-behaviour.log",
+      "exitCode": 0,
+      "seconds": 64.796
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-behaviour.xcresult"
+      ],
+      "log": "iphone12-behaviour-summary.log",
+      "exitCode": 0,
+      "seconds": 0.184
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-behaviour.xcresult"
+      ],
+      "log": "iphone12-behaviour-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.076
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-behaviour-container.log",
+      "exitCode": 0,
+      "seconds": 0.343
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a1.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-lowlevel-run1-a1.log",
+      "exitCode": 0,
+      "seconds": 204.161
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a1.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run1-a1-summary.log",
+      "exitCode": 0,
+      "seconds": 0.345
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a1.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run1-a1-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.075
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-run1-a1-container.log",
+      "exitCode": 0,
+      "seconds": 0.347
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a2.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-lowlevel-run1-a2.log",
+      "exitCode": 0,
+      "seconds": 201.701
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a2.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run1-a2-summary.log",
+      "exitCode": 0,
+      "seconds": 0.346
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run1-a2.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run1-a2-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.076
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-run1-a2-container.log",
+      "exitCode": 0,
+      "seconds": 0.345
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a1.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-lowlevel-run2-a1.log",
+      "exitCode": 0,
+      "seconds": 200.746
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a1.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a1-summary.log",
+      "exitCode": 0,
+      "seconds": 0.344
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a1.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a1-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.041
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-run2-a1-container.log",
+      "exitCode": 0,
+      "seconds": 0.393
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a2.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-lowlevel-run2-a2.log",
+      "exitCode": 0,
+      "seconds": 202.126
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a2.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a2-summary.log",
+      "exitCode": 0,
+      "seconds": 0.378
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a2.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a2-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.076
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-run2-a2-container.log",
+      "exitCode": 0,
+      "seconds": 0.343
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a3.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "iphone12-lowlevel-run2-a3.log",
+      "exitCode": 0,
+      "seconds": 204.682
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a3.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a3-summary.log",
+      "exitCode": 0,
+      "seconds": 0.398
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/iphone12-lowlevel-run2-a3.xcresult"
+      ],
+      "log": "iphone12-lowlevel-run2-a3-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.075
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "iphone12-iphone12-run2-a3-container.log",
+      "exitCode": 0,
+      "seconds": 0.626
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "shutdown",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F"
+      ],
+      "log": "iphone12-shutdown.log",
+      "exitCode": 0,
+      "seconds": 3.412
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "delete",
+        "CB81A0FA-30F3-42E9-925E-0131AF667C0F"
+      ],
+      "log": "iphone12-delete.log",
+      "exitCode": 0,
+      "seconds": 0.322
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "create",
+        "GameCore Spike11 owned ipad9",
+        "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation",
+        "com.apple.CoreSimulator.SimRuntime.iOS-26-0"
+      ],
+      "log": "ipad9-create.log",
+      "exitCode": 0,
+      "seconds": 0.29
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "boot",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122"
+      ],
+      "log": "ipad9-boot.log",
+      "exitCode": 0,
+      "seconds": 0.78
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "bootstatus",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "-b"
+      ],
+      "log": "ipad9-bootstatus.log",
+      "exitCode": 0,
+      "seconds": 44.674
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-behaviour.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityTests",
+        "-only-testing:DigFeasibilityUITests/LowLevelBehaviourTests",
+        "test-without-building"
+      ],
+      "log": "ipad9-behaviour.log",
+      "exitCode": 0,
+      "seconds": 71.643
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-behaviour.xcresult"
+      ],
+      "log": "ipad9-behaviour-summary.log",
+      "exitCode": 0,
+      "seconds": 0.181
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-behaviour.xcresult"
+      ],
+      "log": "ipad9-behaviour-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.073
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "ipad9-ipad9-behaviour-container.log",
+      "exitCode": 0,
+      "seconds": 0.445
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run1-a1.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "ipad9-lowlevel-run1-a1.log",
+      "exitCode": 0,
+      "seconds": 198.309
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run1-a1.xcresult"
+      ],
+      "log": "ipad9-lowlevel-run1-a1-summary.log",
+      "exitCode": 0,
+      "seconds": 0.347
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run1-a1.xcresult"
+      ],
+      "log": "ipad9-lowlevel-run1-a1-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.079
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "ipad9-ipad9-run1-a1-container.log",
+      "exitCode": 0,
+      "seconds": 0.444
+    },
+    {
+      "command": [
+        "xcodebuild",
+        "-project",
+        "/Users/d/Projects/dev/gamecore/gamecore-spike11/experiments/dig-feasibility/DigFeasibility.xcodeproj",
+        "-scheme",
+        "DigFeasibility",
+        "-derivedDataPath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/build",
+        "ARCHS=arm64",
+        "ONLY_ACTIVE_ARCH=YES",
+        "CODE_SIGNING_ALLOWED=NO",
+        "SWIFT_OPTIMIZATION_LEVEL=-O",
+        "-destination",
+        "platform=iOS Simulator,id=FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "-resultBundlePath",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run2-a1.xcresult",
+        "-parallel-testing-enabled",
+        "NO",
+        "-test-timeouts-enabled",
+        "YES",
+        "-maximum-test-execution-time-allowance",
+        "180",
+        "-retry-tests-on-failure",
+        "-test-iterations",
+        "2",
+        "-only-testing:DigFeasibilityUITests/LowLevelTimingTests",
+        "test-without-building"
+      ],
+      "log": "ipad9-lowlevel-run2-a1.log",
+      "exitCode": 0,
+      "seconds": 200.035
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "summary",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run2-a1.xcresult"
+      ],
+      "log": "ipad9-lowlevel-run2-a1-summary.log",
+      "exitCode": 0,
+      "seconds": 0.343
+    },
+    {
+      "command": [
+        "xcrun",
+        "xcresulttool",
+        "get",
+        "test-results",
+        "tests",
+        "--path",
+        "/private/tmp/claude-501/-Users-d-Projects-dev-gamecore-gamecore/2d1c12e8-5ed5-4d00-b62a-588ac37152ac/scratchpad/confirm/lowlevel/ipad9-lowlevel-run2-a1.xcresult"
+      ],
+      "log": "ipad9-lowlevel-run2-a1-tests-tree.log",
+      "exitCode": 0,
+      "seconds": 0.075
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "get_app_container",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122",
+        "local.gamecore.DigFeasibility",
+        "data"
+      ],
+      "log": "ipad9-ipad9-run2-a1-container.log",
+      "exitCode": 0,
+      "seconds": 0.393
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "shutdown",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122"
+      ],
+      "log": "ipad9-shutdown.log",
+      "exitCode": 0,
+      "seconds": 3.324
+    },
+    {
+      "command": [
+        "xcrun",
+        "simctl",
+        "delete",
+        "FF81B24E-CE7D-44AB-B6C2-36031FDA0122"
+      ],
+      "log": "ipad9-delete.log",
+      "exitCode": 0,
+      "seconds": 0.23
+    }
+  ],
+  "checkout": "edfd9362262ba898a771030ff12566536574f9e9",
+  "sourceIdentity": {
+    "head": "edfd9362262ba898a771030ff12566536574f9e9",
+    "dirty": true,
+    "experimentSourcesSHA256": "b21815d808be2d9bf88ba86b67e9ada53ae972f56ba23d46f7b62a735dfe6436",
+    "files": 75
+  },
+  "workingTree": [
+    "M .github/workflows/mobile.yml",
+    " M CONTRIBUTING.md",
+    " M ROADMAP.md",
+    " M docs/adding-a-title.md",
+    " M roadmap/decisions/ADR-007-module-contract-v1.md",
+    " M roadmap/plans/later-spike-test-plans.md",
+    "?? experiments/dig-feasibility/AppTests/DigSessionTests.swift",
+    "?? experiments/dig-feasibility/DigFeasibility.xcodeproj/project.pbxproj",
+    "?? experiments/dig-feasibility/DigFeasibility.xcodeproj/xcshareddata/xcschemes/DigFeasibility.xcscheme",
+    "?? experiments/dig-feasibility/Package.swift",
+    "?? experiments/dig-feasibility/README.md",
+    "?? experiments/dig-feasibility/Sources/App/DigFeasibilityApp.swift",
+    "?? experiments/dig-feasibility/Sources/App/DigModule.swift",
+    "?? experiments/dig-feasibility/Sources/App/DigOptions.swift",
+    "?? experiments/dig-feasibility/Sources/App/DigSession.swift",
+    "?? experiments/dig-feasibility/Sources/App/ModuleFixture.swift",
+    "?? experiments/dig-feasibility/Sources/Diagnostics/DigMetrics.swift",
+    "?? experiments/dig-feasibility/Sources/Diagnostics/TraceDriver.swift",
+    "?? experiments/dig-feasibility/Sources/DigBench/main.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/DigRules.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/ExcavationField.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/Geometry.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/GeometrySync.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/HeightfieldField.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/SideViewMask.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/Spike11Fixture.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/VoxelField.swift",
+    "?? experiments/dig-feasibility/Sources/DigCore/Workload.swift",
+    "?? experiments/dig-feasibility/Sources/Engine/DigEngine.swift",
+    "?? experiments/dig-feasibility/Sources/Engine/RealityDigEngine.swift",
+    "?? experiments/dig-feasibility/Sources/Engine/SpriteDigEngine.swift",
+    "?? experiments/dig-feasibility/Tests/DigCoreTests/FieldTests.swift",
+    "?? experiments/dig-feasibility/Tests/DigCoreTests/PendingGeometryTests.swift",
+    "?? experiments/dig-feasibility/Tests/DigCoreTests/RulesTests.swift",
+    "?? experiments/dig-feasibility/Tests/DigCoreTests/Spike11FixtureTests.swift",
+    "?? experiments/dig-feasibility/UITests/DigFeasibilityUITests.swift",
+    "?? experiments/dig-feasibility/evidence/local-idle-windows.txt",
+    "?? experiments/dig-feasibility/evidence/local-measurements.json",
+    "?? experiments/dig-feasibility/evidence/local-receipt.json",
+    "?? experiments/dig-feasibility/evidence/spike00-calibration.txt",
+    "?? experiments/dig-feasibility/scripts/generate-project.py",
+    "?? experiments/dig-feasibility/scripts/test-verifier.py",
+    "?? experiments/dig-feasibility/scripts/verify.py",
+    "?? roadmap/audits/spike-11-dig-feasibility.md",
+    "?? roadmap/decisions/ADR-008-dig-terrain-feasibility.md"
+  ],
+  "inputsBefore": {
+    "Games/DevelopmentContent/Package.swift": "ab60c51afd58a2ebb811d889ca6a81686210570a16ff9c64af84b00bd7319d08",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Games/DevelopmentContent/Sources/DevelopmentContentValidator/main.swift": "ed79f7673d421429122582584235c6f2ff7a9fa60d080dc8d029aae15791123b",
+    "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift": "a36419836043578ccd90a2fd984990660beebdb449ea489646c4109bbffcf355",
+    "Games/DevelopmentContent/test-content-cli.py": "2c1ae659fe3eb45f7ba64ec0ce6a6b6287a30a225fafb8afe2cfc6e3bb277d12",
+    "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GameCore/Tests/GameCoreTests/BundledContentTests.swift": "b354b88172d826fb5d6019ad52576f5dd8414784077bd09c6272fffeeacb7894",
+    "Packages/GameCore/Tests/GameCoreTests/DeterministicInputTests.swift": "7f2762ed2cea378458ee76cf1bc929c01c1cd4a4a77fbbaf411466a6f630cc74",
+    "Packages/GameCore/Tests/GameCoreTests/SaveSnapshotTests.swift": "3d396b2ceeb625d7307fee7889163a53c985e0c011f19541edd75bd223f4b87b",
+    "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+    "Packages/GamePlatform/Package.swift": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GameModule.swift": "f68e121ffee13a0089643bd423eb4b001700f098f5c2cb32592c36db9e8c6955",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleHost.swift": "e5a7807aba3dc668b868fa07886f4a43396a95b5b8c448614610ccbf247a4527",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleShellView.swift": "89e0421f1ef42c43e2bfff698e80f66fd863709123606c16a0a6a2b71e69eb7d",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "9a1a18dbd21d7b9a0e771ed4c7924825ec9287e3b5ce744040a13392405015b4",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellActionJournal.swift": "f3e567f98e0b1c89b0ad76407dab0cba43ca274915092b9f1c291f96a3ef6569",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "9bf8137929379d64ff0ca3bf4e78d9bdc6ba68f8bfef2c229183d04df870d587",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellPresentation.swift": "700f47ea1dedc28ddca46e56f3e061b80ac6900e43a2cc6b7833e1e3f4a6b787",
+    "Packages/GamePlatform/Sources/GamePlatform/TitleStorage.swift": "e9a0c215e61efdd94e86f31b591f7a1d4c4337a398c153f4e487b59c898ef1aa",
+    "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+    "Packages/GamePlatform/Tests/GamePlatformTests/LocalSaveStoreTests.swift": "582be8621810ef3ab516cf191405cf712ae38a428ec8e73a53395f6fc508f5da",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ModuleContractTests.swift": "4649ba7e8c80904534d7d58ae798f549bff4de443ed0c2854b7138347976d704",
+    "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+    "experiments/dig-feasibility/AppTests/DigSessionTests.swift": "e7fb8d8db8502d5bcfa6bd38a68260b752ded23d1652ffa633c373f2f5f4fee6",
+    "experiments/dig-feasibility/DigFeasibility.xcodeproj/project.pbxproj": "9c5989969178af93b96c442bd008bf25000715aee1c5fb06193fa9c3097fdf2e",
+    "experiments/dig-feasibility/DigFeasibility.xcodeproj/xcshareddata/xcschemes/DigFeasibility.xcscheme": "c8fbe711908643832a0e37cf67160915ec2c30c967ca9fbee16183aedca2dd1d",
+    "experiments/dig-feasibility/Package.swift": "819282d73f2394287a4db6deec4c2da280e00c99f1c342d3bd2873246c03299d",
+    "experiments/dig-feasibility/Sources/App/DigFeasibilityApp.swift": "5abb0388aefff44b0a7c99352517daca59c76175b6f3d98a2baa00a515e0eb3a",
+    "experiments/dig-feasibility/Sources/App/DigModule.swift": "ab0063247ab0d75734e5e50350c164b08ba1850c48fcee5459c401e4eac910b6",
+    "experiments/dig-feasibility/Sources/App/DigOptions.swift": "92fa3a0322a0dddeb21d62c8a9185c1b65459b812bfb59be18212c0908d5c6a0",
+    "experiments/dig-feasibility/Sources/App/DigSession.swift": "e433eab8ec70935136d46e93f8a569514d3689f375c89c986302760948148843",
+    "experiments/dig-feasibility/Sources/App/ModuleFixture.swift": "9cc6843d85d1ef8712d7db8464859cfe0590e38c76a134959c2a48f6afd558e8",
+    "experiments/dig-feasibility/Sources/Diagnostics/DigMetrics.swift": "c70af450c0842951ad6fa41069441161bf84786f78317aae64711f390027ddd0",
+    "experiments/dig-feasibility/Sources/Diagnostics/TraceDriver.swift": "8bf733b3a9b06e9a66dffb0c24edb989f82a4aa2424772ca57cdbb22ca93b768",
+    "experiments/dig-feasibility/Sources/DigBench/main.swift": "e820048474ed344d2bb3e453364acf05a92c144446a08198d3270f759e9e15e8",
+    "experiments/dig-feasibility/Sources/DigCore/DigRules.swift": "79e1e82d852b20ebf1dfbb123d30c59f5849ef65c518ee0e61f68947c7a96d82",
+    "experiments/dig-feasibility/Sources/DigCore/ExcavationField.swift": "5a52ada8319603be6e6756ab222cfaa8f3f79c716b6e0b23fcf556424cd1a5e1",
+    "experiments/dig-feasibility/Sources/DigCore/Geometry.swift": "7e69df5ac40e96cd9f8414972fc0d6e103b7da2790ab509f80b986b325c79cf6",
+    "experiments/dig-feasibility/Sources/DigCore/GeometrySync.swift": "c0c88a303e58230c9b51b066ed5d60f6e1ebe50bb9ae7fcbb8417e69120b3575",
+    "experiments/dig-feasibility/Sources/DigCore/HeightfieldField.swift": "e425aa91e626b28e1055cc2e8953b2e465555648210eb77783c8c51c479fccd3",
+    "experiments/dig-feasibility/Sources/DigCore/SideViewMask.swift": "73dfe97792519e2de0c0cbd87695c24ba05c443de798f56fa767ecc4e6dc726f",
+    "experiments/dig-feasibility/Sources/DigCore/Spike11Fixture.swift": "138dd91c4b01f56ac6aa8c7d01c10e4d94628567c7aff2f64a9ef33eab51bd20",
+    "experiments/dig-feasibility/Sources/DigCore/VoxelField.swift": "2081f32100a3c45408261500c68027fcce250138f9cf6e584d4a86ba7c8b05ab",
+    "experiments/dig-feasibility/Sources/DigCore/Workload.swift": "0704081f386d49e533a4e7f150bc006917cb4d5c73a056c5d0728832d6b449ca",
+    "experiments/dig-feasibility/Sources/Engine/DigEngine.swift": "442242cca4c385af6bd2a0661eba980e0176034d4218d9d8a7fd16b6e20edb26",
+    "experiments/dig-feasibility/Sources/Engine/RealityDigEngine.swift": "8168bc3711520264fe64497b826118f18e5eb25138223d9fbec5bfc96af214ea",
+    "experiments/dig-feasibility/Sources/Engine/SpriteDigEngine.swift": "c136b15c1cf7e308d9ba5a376b97f24dce400b3ae3375e3003bb3d0cc32fd91a",
+    "experiments/dig-feasibility/Tests/DigCoreTests/FieldTests.swift": "38910128ca59eed9d36cc926a22a97ea705fb11a6742d7f99e098c88c525327a",
+    "experiments/dig-feasibility/Tests/DigCoreTests/PendingGeometryTests.swift": "53341c1f435808e1667bcac5569df03dbf9d8219b156574290643a7cab27cfd1",
+    "experiments/dig-feasibility/Tests/DigCoreTests/RulesTests.swift": "e9dd239b4f428240dafc8e1efebfaad6a0c89973d84ba74a36bc5e2d67246973",
+    "experiments/dig-feasibility/Tests/DigCoreTests/Spike11FixtureTests.swift": "b8aa557b37edc5c676ebc06174d2b52955ed4b25d51f54b0999f71d8bb935fd7",
+    "experiments/dig-feasibility/UITests/DigFeasibilityUITests.swift": "102a2e69a1c85d3080e0353a28adfe0d8f65b2e15fd69c0082071ee0cb8db13f",
+    "experiments/dig-feasibility/scripts/generate-project.py": "bedfefb6affe34bd12760ea7c59db877f1a250e11e68a17d572591942f2c9764",
+    "experiments/dig-feasibility/scripts/test-verifier.py": "880a4f35e77865781ee0f1bd36945bece6d860dd7406ff5c5c0cdae2cb1fc4ed",
+    "experiments/dig-feasibility/scripts/verify.py": "85e6410512634feceb9a138a85ed595c060026f0f9517165477400f9c44ed778"
+  },
+  "toolchain": "Xcode 27.1\nBuild version 27A9275",
+  "host": {
+    "model": "Mac14,6",
+    "cpu": "Apple M2 Max",
+    "os": "ProductName:\t\tmacOS\nProductVersion:\t\t27.2\nBuildVersion:\t\t26B5112a"
+  },
+  "runtime": {
+    "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+    "version": "26.0",
+    "buildversion": "23A5287g"
+  },
+  "pureTests": [
+    "Executed 28 tests, with 0 failures (0 unexpected) in 19.181 (19.190) seconds"
+  ],
+  "configuration": "Debug (DEBUG instrumentation) with SWIFT_OPTIMIZATION_LEVEL=-O for every target, including packages; Release built separately",
+  "verdicts": {
+    "lowlevel": {
+      "runs": 4,
+      "countedRuns": 3,
+      "voidRuns": [
+        "iphone12 run 2"
+      ],
+      "status": "fail",
+      "pass": false,
+      "failedRows": [
+        "iphone12: S p99 ms"
+      ],
+      "missingReports": 0
+    }
+  },
+  "testsPassed": true,
+  "status": "passed",
+  "inputsAfter": {
+    "Games/DevelopmentContent/Package.swift": "ab60c51afd58a2ebb811d889ca6a81686210570a16ff9c64af84b00bd7319d08",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Games/DevelopmentContent/Sources/DevelopmentContentValidator/main.swift": "ed79f7673d421429122582584235c6f2ff7a9fa60d080dc8d029aae15791123b",
+    "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift": "a36419836043578ccd90a2fd984990660beebdb449ea489646c4109bbffcf355",
+    "Games/DevelopmentContent/test-content-cli.py": "2c1ae659fe3eb45f7ba64ec0ce6a6b6287a30a225fafb8afe2cfc6e3bb277d12",
+    "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GameCore/Tests/GameCoreTests/BundledContentTests.swift": "b354b88172d826fb5d6019ad52576f5dd8414784077bd09c6272fffeeacb7894",
+    "Packages/GameCore/Tests/GameCoreTests/DeterministicInputTests.swift": "7f2762ed2cea378458ee76cf1bc929c01c1cd4a4a77fbbaf411466a6f630cc74",
+    "Packages/GameCore/Tests/GameCoreTests/SaveSnapshotTests.swift": "3d396b2ceeb625d7307fee7889163a53c985e0c011f19541edd75bd223f4b87b",
+    "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+    "Packages/GamePlatform/Package.swift": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GameModule.swift": "f68e121ffee13a0089643bd423eb4b001700f098f5c2cb32592c36db9e8c6955",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleHost.swift": "e5a7807aba3dc668b868fa07886f4a43396a95b5b8c448614610ccbf247a4527",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleShellView.swift": "89e0421f1ef42c43e2bfff698e80f66fd863709123606c16a0a6a2b71e69eb7d",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "9a1a18dbd21d7b9a0e771ed4c7924825ec9287e3b5ce744040a13392405015b4",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellActionJournal.swift": "f3e567f98e0b1c89b0ad76407dab0cba43ca274915092b9f1c291f96a3ef6569",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "9bf8137929379d64ff0ca3bf4e78d9bdc6ba68f8bfef2c229183d04df870d587",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellPresentation.swift": "700f47ea1dedc28ddca46e56f3e061b80ac6900e43a2cc6b7833e1e3f4a6b787",
+    "Packages/GamePlatform/Sources/GamePlatform/TitleStorage.swift": "e9a0c215e61efdd94e86f31b591f7a1d4c4337a398c153f4e487b59c898ef1aa",
+    "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+    "Packages/GamePlatform/Tests/GamePlatformTests/LocalSaveStoreTests.swift": "582be8621810ef3ab516cf191405cf712ae38a428ec8e73a53395f6fc508f5da",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ModuleContractTests.swift": "4649ba7e8c80904534d7d58ae798f549bff4de443ed0c2854b7138347976d704",
+    "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+    "experiments/dig-feasibility/AppTests/DigSessionTests.swift": "e7fb8d8db8502d5bcfa6bd38a68260b752ded23d1652ffa633c373f2f5f4fee6",
+    "experiments/dig-feasibility/DigFeasibility.xcodeproj/project.pbxproj": "9c5989969178af93b96c442bd008bf25000715aee1c5fb06193fa9c3097fdf2e",
+    "experiments/dig-feasibility/DigFeasibility.xcodeproj/xcshareddata/xcschemes/DigFeasibility.xcscheme": "c8fbe711908643832a0e37cf67160915ec2c30c967ca9fbee16183aedca2dd1d",
+    "experiments/dig-feasibility/Package.swift": "819282d73f2394287a4db6deec4c2da280e00c99f1c342d3bd2873246c03299d",
+    "experiments/dig-feasibility/Sources/App/DigFeasibilityApp.swift": "5abb0388aefff44b0a7c99352517daca59c76175b6f3d98a2baa00a515e0eb3a",
+    "experiments/dig-feasibility/Sources/App/DigModule.swift": "ab0063247ab0d75734e5e50350c164b08ba1850c48fcee5459c401e4eac910b6",
+    "experiments/dig-feasibility/Sources/App/DigOptions.swift": "92fa3a0322a0dddeb21d62c8a9185c1b65459b812bfb59be18212c0908d5c6a0",
+    "experiments/dig-feasibility/Sources/App/DigSession.swift": "e433eab8ec70935136d46e93f8a569514d3689f375c89c986302760948148843",
+    "experiments/dig-feasibility/Sources/App/ModuleFixture.swift": "9cc6843d85d1ef8712d7db8464859cfe0590e38c76a134959c2a48f6afd558e8",
+    "experiments/dig-feasibility/Sources/Diagnostics/DigMetrics.swift": "c70af450c0842951ad6fa41069441161bf84786f78317aae64711f390027ddd0",
+    "experiments/dig-feasibility/Sources/Diagnostics/TraceDriver.swift": "8bf733b3a9b06e9a66dffb0c24edb989f82a4aa2424772ca57cdbb22ca93b768",
+    "experiments/dig-feasibility/Sources/DigBench/main.swift": "e820048474ed344d2bb3e453364acf05a92c144446a08198d3270f759e9e15e8",
+    "experiments/dig-feasibility/Sources/DigCore/DigRules.swift": "79e1e82d852b20ebf1dfbb123d30c59f5849ef65c518ee0e61f68947c7a96d82",
+    "experiments/dig-feasibility/Sources/DigCore/ExcavationField.swift": "5a52ada8319603be6e6756ab222cfaa8f3f79c716b6e0b23fcf556424cd1a5e1",
+    "experiments/dig-feasibility/Sources/DigCore/Geometry.swift": "7e69df5ac40e96cd9f8414972fc0d6e103b7da2790ab509f80b986b325c79cf6",
+    "experiments/dig-feasibility/Sources/DigCore/GeometrySync.swift": "c0c88a303e58230c9b51b066ed5d60f6e1ebe50bb9ae7fcbb8417e69120b3575",
+    "experiments/dig-feasibility/Sources/DigCore/HeightfieldField.swift": "e425aa91e626b28e1055cc2e8953b2e465555648210eb77783c8c51c479fccd3",
+    "experiments/dig-feasibility/Sources/DigCore/SideViewMask.swift": "73dfe97792519e2de0c0cbd87695c24ba05c443de798f56fa767ecc4e6dc726f",
+    "experiments/dig-feasibility/Sources/DigCore/Spike11Fixture.swift": "138dd91c4b01f56ac6aa8c7d01c10e4d94628567c7aff2f64a9ef33eab51bd20",
+    "experiments/dig-feasibility/Sources/DigCore/VoxelField.swift": "2081f32100a3c45408261500c68027fcce250138f9cf6e584d4a86ba7c8b05ab",
+    "experiments/dig-feasibility/Sources/DigCore/Workload.swift": "0704081f386d49e533a4e7f150bc006917cb4d5c73a056c5d0728832d6b449ca",
+    "experiments/dig-feasibility/Sources/Engine/DigEngine.swift": "442242cca4c385af6bd2a0661eba980e0176034d4218d9d8a7fd16b6e20edb26",
+    "experiments/dig-feasibility/Sources/Engine/RealityDigEngine.swift": "8168bc3711520264fe64497b826118f18e5eb25138223d9fbec5bfc96af214ea",
+    "experiments/dig-feasibility/Sources/Engine/SpriteDigEngine.swift": "c136b15c1cf7e308d9ba5a376b97f24dce400b3ae3375e3003bb3d0cc32fd91a",
+    "experiments/dig-feasibility/Tests/DigCoreTests/FieldTests.swift": "38910128ca59eed9d36cc926a22a97ea705fb11a6742d7f99e098c88c525327a",
+    "experiments/dig-feasibility/Tests/DigCoreTests/PendingGeometryTests.swift": "53341c1f435808e1667bcac5569df03dbf9d8219b156574290643a7cab27cfd1",
+    "experiments/dig-feasibility/Tests/DigCoreTests/RulesTests.swift": "e9dd239b4f428240dafc8e1efebfaad6a0c89973d84ba74a36bc5e2d67246973",
+    "experiments/dig-feasibility/Tests/DigCoreTests/Spike11FixtureTests.swift": "b8aa557b37edc5c676ebc06174d2b52955ed4b25d51f54b0999f71d8bb935fd7",
+    "experiments/dig-feasibility/UITests/DigFeasibilityUITests.swift": "102a2e69a1c85d3080e0353a28adfe0d8f65b2e15fd69c0082071ee0cb8db13f",
+    "experiments/dig-feasibility/scripts/generate-project.py": "bedfefb6affe34bd12760ea7c59db877f1a250e11e68a17d572591942f2c9764",
+    "experiments/dig-feasibility/scripts/test-verifier.py": "880a4f35e77865781ee0f1bd36945bece6d860dd7406ff5c5c0cdae2cb1fc4ed",
+    "experiments/dig-feasibility/scripts/verify.py": "85e6410512634feceb9a138a85ed595c060026f0f9517165477400f9c44ed778"
+  }
+}

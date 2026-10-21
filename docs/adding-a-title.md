@@ -32,7 +32,7 @@ Nothing else needs editing. The generator, `scripts/check-foundation.py`, `scrip
 
 ## What a title can rely on
 
-These are the module contract, [version 1](../roadmap/decisions/ADR-007-module-contract-v1.md), provisional until Spike 11 confirms that a terrain title fits it. A title uses only these shared APIs:
+These are the module contract, [version 1](../roadmap/decisions/ADR-007-module-contract-v1.md), which Spike 11 confirmed for a terrain title without change ([ADR-008](../roadmap/decisions/ADR-008-dig-terrain-feasibility.md)). A title uses only these shared APIs:
 
 - **`GameModule`** supplies `title` (a `TitleRegistration` whose ID is the save namespace and the catalog's `titleID`), `presentation` (`ShellPresentation` copy), `loadFailureMessage`, the retained `session`, `makeGameplay()`, `makeControls(_:)` and `setReducedMotion(_:)`.
 - **`ModuleSession`** receives `playing`, `settings` and `progressDidChange(_:)`. It decodes a level in `prepare(for:)`, creates fresh rule state in `begin(for:)`, reports each result through `outcomeHandler` with the request it belongs to, ends a session in `fail()`, and records completions in `recordSuccess(in:)` by stable level ID.

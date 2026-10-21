@@ -18,6 +18,10 @@ on:
         description: Run only the Spike 06 module-seam checks on both geometries
         type: boolean
         default: false
+      dig_feasibility:
+        description: Run only the Spike 11 dig-feasibility checks and measurements on both geometries
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -28,7 +32,7 @@ jobs:
     # Titles come from Games/*/title.json. A pull request tests the titles its
     # changes touch, and every title when a shared path changes; pushes and
     # manual runs test every title.
-    if: github.event_name != 'workflow_dispatch' || !inputs.module_seam
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.dig_feasibility)
     runs-on: ubuntu-latest
     outputs:
       titles: ${{ steps.select.outputs.titles }}
@@ -61,7 +65,7 @@ jobs:
           echo "lifecycle=$lifecycle" >> "$GITHUB_OUTPUT"
   verify:
     # Shared packages, every title's content and every build, on every change.
-    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only)
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only && !inputs.dig_feasibility)
     runs-on: macos-26
     timeout-minutes: 45
     env:
@@ -221,5 +225,36 @@ jobs:
             ${{ runner.temp }}/module-seam/receipt.json
             ${{ runner.temp }}/module-seam/*.log
             ${{ runner.temp }}/module-seam/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 30
+  dig-feasibility:
+    # Spike 11 dig feasibility: pure rules, contract registration, behaviour and timing runs, on demand.
+    if: github.event_name == 'workflow_dispatch' && inputs.dig_feasibility
+    runs-on: macos-26
+    timeout-minutes: 180
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Check verifier orchestration
+        run: python3 experiments/dig-feasibility/scripts/test-verifier.py
+      - name: Run dig-feasibility checks on iphone12 and ipad9
+        run: python3 experiments/dig-feasibility/scripts/verify.py "$RUNNER_TEMP/dig-feasibility"
+      - name: Retain dig-feasibility evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: dig-feasibility-evidence
+          path: |
+            ${{ runner.temp }}/dig-feasibility/receipt.json
+            ${{ runner.temp }}/dig-feasibility/measurements.json
+            ${{ runner.temp }}/dig-feasibility/*.log
+            ${{ runner.temp }}/dig-feasibility/*/dig-*.json
+            ${{ runner.temp }}/dig-feasibility/*.xcresult
           if-no-files-found: ignore
           retention-days: 30

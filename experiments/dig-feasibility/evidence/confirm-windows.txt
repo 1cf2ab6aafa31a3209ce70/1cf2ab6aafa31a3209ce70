@@ -1,0 +1,12 @@
+ADR-008 confirmation step 2: A2 (lowlevel), verify.py --candidate lowlevel --runs 2, 2026-10-20 17:22-17:50, after the baseline passed.
+Idle-control window I and sustained window S for every timing attempt, from the per-run reports. An attempt is void when any I interval row misses its budget;
+a run whose three attempts are all void counts as void. Scene-update callback intervals on the simulator host, not presented frames.
+
+geometry  run            attempt verdict |  I n    p95    p99  >33.3%   worst |   S n    p95    p99  >33.3%   worst
+iphone12  lowlevel-run1  a1      void    |  597  17.00  26.50   0.168   33.79 |  3593  17.15  23.78   0.083   41.60
+iphone12  lowlevel-run1  a2      kept    |  598  16.88  22.69   0.167   34.92 |  3582  17.23  25.99   0.112   35.29
+iphone12  lowlevel-run2  a1      void    |  597  16.92  27.53   0.000   33.29 |  3584  17.22  25.05   0.195   33.85
+iphone12  lowlevel-run2  a2      void    |  577  17.00  25.53   0.173  429.69 |  3590  17.19  22.13   0.139   33.64
+iphone12  lowlevel-run2  a3      void    |  594  16.90  33.05   0.505   39.43 |  3502  18.99  33.15   0.885  217.33
+ipad9     lowlevel-run1  a1      kept    |  600  16.88  23.57   0.000   26.15 |  3598  17.13  22.55   0.000   33.11
+ipad9     lowlevel-run2  a1      kept    |  600  16.85  21.23   0.000   25.91 |  3592  17.21  23.88   0.084   49.52
