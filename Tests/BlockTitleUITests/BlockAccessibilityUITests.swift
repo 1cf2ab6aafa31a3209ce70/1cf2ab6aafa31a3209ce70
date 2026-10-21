@@ -43,14 +43,33 @@ final class BlockAccessibilityUITests: XCTestCase {
     /// Every audit issue with its page, scroll pass and element frame.
     private var auditLog: [String] = []
 
-    @MainActor
-    func testAuditsPassOnEveryPageAtDefaultTextSize() throws {
-        try auditEveryPage(arguments: [], suffix: "default")
+    /// The audited pages come in two flows, so each test stays well inside the
+    /// runner's 180-second allowance on a hosted iPad at the largest size.
+    enum Flow: String {
+        /// Menu, settings, play and pause.
+        case shell
+        /// Success, a stuck board and failure.
+        case results
     }
 
     @MainActor
-    func testAuditsPassOnEveryPageAtAccessibilityTextSize() throws {
-        try auditEveryPage(arguments: ["--shell-large-text", "--shell-reduced-motion"], suffix: "large-text")
+    func testAuditsPassOnShellPagesAtDefaultTextSize() throws {
+        try auditPages(.shell, arguments: [], suffix: "default")
+    }
+
+    @MainActor
+    func testAuditsPassOnShellPagesAtAccessibilityTextSize() throws {
+        try auditPages(.shell, arguments: ["--shell-large-text", "--shell-reduced-motion"], suffix: "large-text")
+    }
+
+    @MainActor
+    func testAuditsPassOnResultPagesAtDefaultTextSize() throws {
+        try auditPages(.results, arguments: [], suffix: "default")
+    }
+
+    @MainActor
+    func testAuditsPassOnResultPagesAtAccessibilityTextSize() throws {
+        try auditPages(.results, arguments: ["--shell-large-text", "--shell-reduced-motion"], suffix: "large-text")
     }
 
     /// The gate's seeded-violation self-test: a DEBUG-only unlabeled 20-point
@@ -133,11 +152,11 @@ final class BlockAccessibilityUITests: XCTestCase {
         waitFor(app.staticTexts["shell.result.success"])
     }
 
-    /// Menu, settings, play, pause, success, a stuck board and failure, each
-    /// audited down to its last control. Findings are collected for the whole flow, then
-    /// every one without an excuse fails the test.
+    /// Each page of one flow audited down to its last control. Findings are
+    /// collected for the whole flow, then every one without an excuse fails
+    /// the test.
     @MainActor
-    private func auditEveryPage(arguments: [String], suffix: String) throws {
+    private func auditPages(_ flow: Flow, arguments: [String], suffix: String) throws {
         continueAfterFailure = false
         // The DEBUG text-size override pins Dynamic Type, so the audit's own
         // size change cannot scale text there; the default-size run checks
@@ -146,45 +165,49 @@ final class BlockAccessibilityUITests: XCTestCase {
             ? XCUIAccessibilityAuditType.all.subtracting(.dynamicType) : .all
         var findings: [String] = []
         let app = launchBlockTitle(arguments: arguments)
-        findings += try audit(app, "menu-\(suffix)", types, through: app.buttons["shell.settings"])
+        switch flow {
+        case .shell:
+            findings += try audit(app, "menu-\(suffix)", types, through: app.buttons["shell.settings"])
 
-        tap(app, "shell.settings")
-        let form = app.collectionViews["settings.form"]
-        waitFor(form)
-        findings += try audit(app, "settings-\(suffix)", types, through: app.buttons["save.delete"], scrolling: form)
-        app.buttons["settings.done"].tap()
-        waitFor(app.staticTexts["shell.menu"])
+            tap(app, "shell.settings")
+            let form = app.collectionViews["settings.form"]
+            waitFor(form)
+            findings += try audit(app, "settings-\(suffix)", types, through: app.buttons["save.delete"], scrolling: form)
+            app.buttons["settings.done"].tap()
+            waitFor(app.staticTexts["shell.menu"])
 
-        tap(app, "shell.start")
-        waitFor(app.staticTexts["shell.play"])
-        findings += try audit(app, "play-\(suffix)", types, through: app.buttons["shell.fail"])
+            tap(app, "shell.start")
+            waitFor(app.staticTexts["shell.play"])
+            findings += try audit(app, "play-\(suffix)", types, through: app.buttons["shell.fail"])
 
-        tap(app, "shell.pause")
-        waitFor(app.staticTexts["shell.paused"])
-        findings += try audit(app, "pause-\(suffix)", types, through: app.buttons["shell.menu.back"])
+            tap(app, "shell.pause")
+            waitFor(app.staticTexts["shell.paused"])
+            findings += try audit(app, "pause-\(suffix)", types, through: app.buttons["shell.menu.back"])
+        case .results:
+            tap(app, "shell.start")
+            waitFor(app.staticTexts["shell.play"])
+            for index in [3, 4, 5] { tap(app, "block.cell.\(index)") }
+            waitFor(app.staticTexts["shell.result.success"])
+            findings += try audit(app, "success-\(suffix)", types, through: app.buttons["shell.result.menu"])
 
-        tap(app, "shell.resume")
-        for index in [3, 4, 5] { tap(app, "block.cell.\(index)") }
-        waitFor(app.staticTexts["shell.result.success"])
-        findings += try audit(app, "success-\(suffix)", types, through: app.buttons["shell.result.menu"])
+            tap(app, "shell.result.retry")
+            waitFor(app.staticTexts["shell.play"])
+            tap(app, "block.cell.9")
+            tap(app, "block.cell.8")
+            waitFor(app.staticTexts["block.stuck"])
+            findings += try audit(app, "stuck-\(suffix)", types, through: app.buttons["shell.fail"])
 
-        tap(app, "shell.result.retry")
-        waitFor(app.staticTexts["shell.play"])
-        tap(app, "block.cell.9")
-        tap(app, "block.cell.8")
-        waitFor(app.staticTexts["block.stuck"])
-        findings += try audit(app, "stuck-\(suffix)", types, through: app.buttons["shell.fail"])
-
-        tap(app, "shell.fail")
-        waitFor(app.staticTexts["shell.result.failure"])
-        findings += try audit(app, "failure-\(suffix)", types, through: app.buttons["shell.result.menu"])
+            tap(app, "shell.fail")
+            waitFor(app.staticTexts["shell.result.failure"])
+            findings += try audit(app, "failure-\(suffix)", types, through: app.buttons["shell.result.menu"])
+        }
 
         let report = XCTAttachment(string: findings.isEmpty ? "No findings" : findings.joined(separator: "\n"))
-        report.name = "audit-findings-\(suffix).txt"
+        report.name = "audit-findings-\(flow.rawValue)-\(suffix).txt"
         report.lifetime = .keepAlways
         add(report)
         let log = XCTAttachment(string: auditLog.joined(separator: "\n"))
-        log.name = "audit-log-\(suffix).txt"
+        log.name = "audit-log-\(flow.rawValue)-\(suffix).txt"
         log.lifetime = .keepAlways
         add(log)
         for entry in auditLog { print("AUDIT \(entry)") }
@@ -259,6 +282,9 @@ final class BlockAccessibilityUITests: XCTestCase {
                 Thread.sleep(forTimeInterval: 1)
                 let again = try run(1)
                 found = found.filter { !$0.hasPrefix("FAIL") || again.contains($0) }
+                // The screen at a repeated failure, for reports that only
+                // occur now and then (the app name's contrast at AX3).
+                if found.contains(where: { $0.hasPrefix("FAIL") }) { attachScreen("audit-fail-\(screen)-pass\(pass)") }
             }
             for finding in found where !findings.contains(finding) { findings.append(finding) }
             if lastPass {
