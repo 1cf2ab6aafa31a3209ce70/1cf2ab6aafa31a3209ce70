@@ -15,7 +15,8 @@ public struct ModuleShellView<Module: GameModule>: View {
 
     public var body: some View {
         SharedShellView(controller: host.controller, presentation: host.module.presentation,
-                        forceReducedMotion: forceReducedMotion) {
+                        forceReducedMotion: forceReducedMotion,
+                        resultSummary: { host.module.session.resultSummary }) {
             host.module.makeGameplay()
         } gameplayControls: { reducesMotion in
             host.module.makeControls(ModulePlayContext(reducesMotion: reducesMotion,

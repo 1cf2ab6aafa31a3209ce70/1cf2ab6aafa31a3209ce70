@@ -26,16 +26,19 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     @State private var showingSettings = false
     private let presentation: ShellPresentation
     private let forceReducedMotion: Bool
+    private let resultSummary: () -> String?
     private let gameplayHost: () -> GameplayHost
     private let gameplayControls: (Bool) -> GameplayControls
 
     public init(controller: ShellController, presentation: ShellPresentation,
                 forceReducedMotion: Bool = false,
+                resultSummary: @escaping () -> String? = { nil },
                 @ViewBuilder gameplayHost: @escaping () -> GameplayHost,
                 @ViewBuilder gameplayControls: @escaping (Bool) -> GameplayControls) {
         self.controller = controller
         self.presentation = presentation
         self.forceReducedMotion = forceReducedMotion
+        self.resultSummary = resultSummary
         self.gameplayHost = gameplayHost
         self.gameplayControls = gameplayControls
     }
@@ -143,7 +146,11 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
             ShellHeading(outcome == .success ? presentation.successHeading : presentation.failureHeading,
                          id: outcome == .success ? "shell.result.success" : "shell.result.failure")
             Text(outcome == .success ? presentation.successMessage : presentation.failureMessage)
-            ShellActionButton(presentation.retryLabel, id: "shell.result.retry", prominent: true, action: controller.restart)
+            if let summary = resultSummary() {
+                Text(summary).accessibilityIdentifier("shell.result.summary")
+            }
+            ShellActionButton(outcome == .success ? presentation.successRetryLabel : presentation.retryLabel,
+                              id: "shell.result.retry", prominent: true, action: controller.restart)
             ShellActionButton("Back to menu", id: "shell.result.menu", action: controller.returnToMenu)
         case .loadFailed(_, let message):
             ShellHeading("Unable to start", id: "shell.load-error")

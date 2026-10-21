@@ -15,6 +15,8 @@ public struct ShellPresentation: Sendable {
     public let failureHeading: String
     public let failureMessage: String
     public let retryLabel: String
+    /// The success page's continue action; the failure page keeps `retryLabel`.
+    public let successRetryLabel: String
     public let languageName: String
     public let languageMessage: String
 
@@ -22,7 +24,8 @@ public struct ShellPresentation: Sendable {
                 startLabel: String, loadingMessage: String, pauseMessage: String,
                 audioPauseMessage: String, restartLabel: String, successHeading: String,
                 successMessage: String, failureHeading: String, failureMessage: String,
-                retryLabel: String, languageName: String, languageMessage: String) {
+                retryLabel: String, successRetryLabel: String? = nil,
+                languageName: String, languageMessage: String) {
         self.openingMessage = openingMessage
         self.menuHeading = menuHeading
         self.menuMessage = menuMessage
@@ -36,6 +39,7 @@ public struct ShellPresentation: Sendable {
         self.failureHeading = failureHeading
         self.failureMessage = failureMessage
         self.retryLabel = retryLabel
+        self.successRetryLabel = successRetryLabel ?? retryLabel
         self.languageName = languageName
         self.languageMessage = languageMessage
     }
