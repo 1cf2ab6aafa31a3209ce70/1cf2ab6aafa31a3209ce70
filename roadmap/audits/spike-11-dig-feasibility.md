@@ -302,4 +302,4 @@ Both repositories were cloned read-only outside the repository. Neither was buil
 
 ## Next step
 
-Spike 11 is complete for mobile simulator acceptance, and Epic 08 follows under the roadmap order. Epic 12 starts with 2D excavation and first removes C's restart footprint growth; reopening 3D needs a new decision record with new evidence. The hosted `dig_feasibility` job has not run.
+Spike 11 is complete for mobile simulator acceptance, and Epic 08 follows under the roadmap order. Epic 12 starts with 2D excavation and first removes C's restart footprint growth; reopening 3D needs a new decision record with new evidence. The hosted `dig_feasibility` job confirmed the builds and behaviour on the CI toolchain; its timing was void.
