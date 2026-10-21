@@ -1,15 +1,19 @@
 """Minimal Mach-O reader for the built-bundle gates (standard library only).
 
-Reads thin and universal 64-bit Mach-O files: segments and sections, LC_UUID,
-the symbol and string tables and the code signature blob. It reads layout
-only; scripts/check-required-reason-apis.py and the capability scan use the
-Xcode tools (nm, otool, swift-demangle) for symbol content.
+Reads thin 64-bit Mach-O files and universal files with 32- or 64-bit fat
+headers: segments and sections, LC_UUID, the symbol and string tables and the
+code signature blob. It reads layout only; scripts/check-required-reason-apis.py
+and the capability scan use the Xcode tools (nm, otool, swift-demangle) for
+symbol content.
 """
 from pathlib import Path
 import struct
 
-MAGIC = {b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xfe\xed\xfa\xce",
-         b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca"}
+# Universal headers: (byte order, 64-bit fat_arch entries). `lipo -fat64` writes the
+# 64-bit form, which a gate that knows only the 32-bit form would skip entirely.
+FAT_MAGIC = {b"\xca\xfe\xba\xbe": (">", False), b"\xbe\xba\xfe\xca": ("<", False),
+             b"\xca\xfe\xba\xbf": (">", True), b"\xbf\xba\xfe\xca": ("<", True)}
+MAGIC = {b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xfe\xed\xfa\xce"} | set(FAT_MAGIC)
 LC_SEGMENT_64, LC_SYMTAB, LC_UUID, LC_CODE_SIGNATURE = 0x19, 0x2, 0x1B, 0x1D
 
 
@@ -72,12 +76,13 @@ def parse(path):
 
 def parse_bytes(data):
     magic = data[:4]
-    if magic in (b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca"):
-        endian = ">" if magic == b"\xca\xfe\xba\xbe" else "<"
+    if magic in FAT_MAGIC:
+        endian, wide = FAT_MAGIC[magic]
         count = struct.unpack_from(endian + "I", data, 4)[0]
+        entry, width = ("iiQQII", 32) if wide else ("iiIII", 20)
         slices = []
         for index in range(count):
-            _, _, offset, size, _ = struct.unpack_from(endian + "iiIII", data, 8 + index * 20)
+            _, _, offset, size = struct.unpack_from(endian + entry, data, 8 + index * width)[:4]
             slices.append(_slice(data, offset, size))
         return slices
     return [_slice(data, 0, len(data))]

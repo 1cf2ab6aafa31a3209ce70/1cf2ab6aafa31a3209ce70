@@ -294,7 +294,11 @@ def check_sources():
         for path in sorted(directory.rglob("*.plist")):
             if ".build" in path.parts:
                 continue
-            problems = policy.info_plist_problems(plistlib.loads(path.read_bytes()), str(path.relative_to(ROOT)))
+            values = plistlib.loads(path.read_bytes())
+            # Only a dictionary can declare Info.plist keys; a content plist may be an array.
+            if not isinstance(values, dict):
+                continue
+            problems = policy.info_plist_problems(values, str(path.relative_to(ROOT)))
             require(not problems, "Review permission, background, network, URL scheme or attribution keys: "
                     + "; ".join(problems))
     for title in TITLES:

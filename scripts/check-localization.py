@@ -27,8 +27,9 @@ import plistlib
 import re
 import sys
 
-PLACEHOLDER = re.compile(r"%(?:(\d+)\$)?[-+ #0]*(?:\d+|\*)?(?:\.(?:\d+|\*))?(hh|h|ll|l|q|z|t|j|L)?([@dDuUxXoOfFeEgGcCsSaAp])"
-                         r"|%#@([A-Za-z0-9_]+)@|%%")
+# Substitutions and %% come first: otherwise `#` reads as a flag and %#@name@ parses as %@.
+PLACEHOLDER = re.compile(r"%(?:\d+\$)?#@([A-Za-z0-9_]+)@|%%"
+                         r"|%(?:(\d+)\$)?[-+ #0]*(?:\d+|\*)?(?:\.(?:\d+|\*))?(hh|h|ll|l|q|z|t|j|L)?([@dDiuUxXoOfFeEgGcCsSaAp])")
 ALLOWED_STATES = {"translated"}
 
 
@@ -36,7 +37,7 @@ def placeholders(value):
     """Format arguments as (position, conversion); substitutions as ('sub', name). %% is ignored."""
     found, position = set(), 0
     for match in PLACEHOLDER.finditer(value):
-        explicit, length, conversion, substitution = match.groups()
+        substitution, explicit, length, conversion = match.groups()
         if substitution:
             found.add(("sub", substitution))
         elif conversion:

@@ -11,18 +11,21 @@ Each packaged file is mapped back to its repository source:
   directory.
 
 The asset catalog compiles to Apple-generated outputs (Assets.car and the
-AppIcon renditions), which are not mapped directly; every image in the title's
-Assets.xcassets is checked as a source instead, so the icon cannot escape the
-trace.
+AppIcon renditions), which are not mapped directly; every file in the title's
+Assets.xcassets other than Contents.json is checked as a source instead, so
+the icon and any data set cannot escape the trace.
 
 A source is covered when a Markdown link in docs/asset-provenance.md or the
-title's CONTENT.md resolves to that file or to a directory containing it. A
-packaged file is third-party when its name marks a notice or license
-(NOTICE, LICENSE, COPYING, ATTRIBUTION, CREDITS) or a sentence linking it
-mentions third-party, upstream, adapted or public-domain origin. A
-third-party file needs a linking sentence that names its license (MIT,
-Apache, BSD, GPL, LGPL, MPL, ISC, zlib, CC0, CC BY, OFL, Unlicense or public
-domain) and its attribution requirement (attribution, notice or credit).
+title's CONTENT.md resolves to that file. A link to a directory counts only
+for an asset-catalog set (AppIcon.appiconset, an .imageset or .dataset and
+the like), whose files are renditions of one asset, so a file added to a
+linked folder is never covered without its own record. A packaged file is
+third-party when its name marks a notice or license (NOTICE, LICENSE,
+COPYING, ATTRIBUTION, CREDITS) or a sentence linking it mentions third-party,
+upstream, adapted or public-domain origin. A third-party file needs a linking
+sentence that names its license (MIT, Apache, BSD, GPL, LGPL, MPL, ISC, zlib,
+CC0, CC BY, OFL, Unlicense or public domain) and its attribution requirement
+(attribution, notice or credit).
 """
 import argparse
 import json
@@ -50,6 +53,12 @@ LICENSE = re.compile(r"\b(MIT|Apache|BSD|L?GPL|MPL|ISC|zlib|CC0|CC[- ]BY[\w.-]*|
                      r"|public[- ]domain", re.IGNORECASE)
 ATTRIBUTION = re.compile(r"attribution|notice|credit", re.IGNORECASE)
 LINK = re.compile(r"\[[^\]]*\]\(([^)\s]+)\)")
+# Asset-catalog set directories: a link to one covers the renditions of a single asset.
+CATALOG_SETS = (".appiconset", ".imageset", ".dataset", ".colorset", ".symbolset", ".imagestack", ".imagestacklayer",
+                ".solidimagestack", ".brandassets", ".launchimage", ".textureset", ".cubetextureset",
+                ".mipmaplevelset", ".spriteatlas", ".arresourcegroup", ".arimageset", ".arobject")
+# Catalog metadata (and Finder's) that never ships as an asset.
+CATALOG_METADATA = {"Contents.json", ".DS_Store"}
 SENTENCE = re.compile(r"(?<=[.!?])\s+(?=[A-Z\[`])")
 
 
@@ -71,9 +80,18 @@ def records(root, title_dir):
     return found
 
 
+def catalog_set(path):
+    return path.suffix in CATALOG_SETS and any(parent.suffix == ".xcassets" for parent in path.parents)
+
+
 def covering(record_list, source):
     return [(document, sentence) for document, sentence, targets in record_list
-            if any(source == target or target in source.parents for target in targets)]
+            if any(source == target or (target in source.parents and catalog_set(target)) for target in targets)]
+
+
+def linked_folder(record_list, source):
+    """Whether a record links only a non-set directory that contains the source."""
+    return any(target in source.parents and not catalog_set(target) for _, _, targets in record_list for target in targets)
 
 
 def source_for(relative, title_dir, content_package):
@@ -117,9 +135,9 @@ def check(app, root, target=None):
             continue
         sources.append((f"{app.name}/{key}", source))
     catalog = title_dir / "Assets.xcassets"
-    for image in sorted(catalog.rglob("*")) if catalog.is_dir() else []:
-        if image.is_file() and image.suffix.lower() in {".png", ".jpg", ".jpeg", ".pdf", ".svg", ".heic"}:
-            sources.append((f"{app.name}/Assets.car <- {image.relative_to(root)}", image))
+    for item in sorted(catalog.rglob("*")) if catalog.is_dir() else []:
+        if item.is_file() and item.name not in CATALOG_METADATA:
+            sources.append((f"{app.name}/Assets.car <- {item.relative_to(root)}", item))
 
     for label, source in sources:
         covers = covering(record_list, source)
@@ -128,7 +146,9 @@ def check(app, root, target=None):
                  "thirdParty": third_party}
         report["files"][label] = entry
         if not covers:
-            problems.append(f"{label}: no provenance record links {source.relative_to(root)} or a directory containing it")
+            hint = (" (a record links a directory containing it, but a directory link covers only an asset-catalog set; "
+                    "link the file)" if linked_folder(record_list, source) else "")
+            problems.append(f"{label}: no provenance record links {source.relative_to(root)}{hint}")
             continue
         if third_party and not any(LICENSE.search(s) and ATTRIBUTION.search(s) for _, s in covers):
             problems.append(f"{label}: third-party material, but no record sentence linking it names both its license and "

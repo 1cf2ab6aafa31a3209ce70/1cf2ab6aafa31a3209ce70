@@ -3,9 +3,11 @@
 
 Builds disposable iOS Simulator app bundles in a temporary directory: a clean
 one (unsigned, then ad-hoc signed with an allowed entitlement) and one per
-violation: an embedded third-party framework, a blocked system framework, an
-unreviewed system library, service entitlements, forbidden Info.plist keys,
-missing or tracking privacy manifests and an unreviewed resource bundle.
+violation: an embedded third-party framework, a dylib in a 64-bit universal
+(fat64) wrapper, a blocked system framework, an unreviewed system library,
+service entitlements in the signature and in the linker's __entitlements
+section, forbidden Info.plist keys, missing or tracking privacy manifests and
+an unreviewed resource bundle.
 Nothing is installed or run.
 """
 import json
@@ -41,6 +43,10 @@ public func track(_ event: String) { print(event) }
 TRACKER_CLIENT = """
 import Tracker
 track("launch")
+"""
+WEB_LIBRARY = """
+import WebKit
+@_cdecl("helper") public func helper() -> Int { WKWebView().hash }
 """
 PRIVACY = {"NSPrivacyTracking": False, "NSPrivacyTrackingDomains": [], "NSPrivacyCollectedDataTypes": [],
            "NSPrivacyAccessedAPITypes": []}
@@ -115,6 +121,11 @@ def main():
         subprocess.run(["codesign", "-s", "-", "--entitlements", str(entitlements), str(app)], check=True, capture_output=True)
         expect_refused("push and iCloud entitlements", app,
                        ["entitlement aps-environment", "entitlement com.apple.developer.icloud-container-identifiers"])
+        # Simulator builds carry entitlements in a linker section, not a signature.
+        sectioned = executable(root, "entitled", CLEAN, ["-Xlinker", "-sectcreate", "-Xlinker", "__TEXT",
+                                                         "-Xlinker", "__entitlements", "-Xlinker", str(entitlements)])
+        expect_refused("push entitlement in an unsigned __entitlements section", bundle(root, "sectioned", sectioned),
+                       ["entitlement aps-environment"])
 
         (root / "Tracker.swift").write_text(TRACKER)
         swiftc(root, ["-parse-as-library", "-emit-library", "-emit-module", "-module-name", "Tracker", "Tracker.swift",
@@ -129,6 +140,17 @@ def main():
                        ["Fixture.app/Frameworks: embedded code container", "Frameworks/Tracker.framework: embedded code container",
                         "embedded Mach-O file",
                         "links @rpath/Tracker.framework/Tracker: not a first-party system library"])
+
+        # lipo -fat64 writes a universal header that a 32-bit-only magic list never recognises.
+        (root / "web_library.swift").write_text(WEB_LIBRARY)
+        swiftc(root, ["-parse-as-library", "-emit-library", "web_library.swift", "-o", "web_library.dylib"])
+        app = bundle(root, "fat64", clean)
+        subprocess.run(["xcrun", "lipo", "-create", "-fat64", str(root / "web_library.dylib"), "-output", str(app / "helper")],
+                       check=True, capture_output=True)
+        assert (app / "helper").read_bytes()[:4] == b"\xca\xfe\xba\xbf", "lipo -fat64 header"
+        expect_refused("fat64 dylib linking WebKit", app,
+                       ["Fixture.app/helper: embedded Mach-O file",
+                        "links /System/Library/Frameworks/WebKit.framework/WebKit: blocked system framework WebKit"])
 
         expect_refused("blocked system framework", bundle(root, "webkit", executable(root, "web", WEB)),
                        ["links /System/Library/Frameworks/WebKit.framework/WebKit: blocked system framework WebKit"])

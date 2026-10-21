@@ -5,7 +5,8 @@ Copies the repository's tracked and new files to a temporary directory, runs
 the check on the unchanged copy, then seeds one violation at a time into the
 first title (a blocked framework import, an analytics SDK import, a push
 registration call, a URL scheme in its Info.plist and an ad-attribution key
-in a package plist) and restores it after.
+in a package plist) and restores it after. A package plist whose top level is
+an array, which declares no Info.plist keys, must pass.
 The original checkout is never modified.
 """
 from pathlib import Path
@@ -72,6 +73,14 @@ def main():
                     path.write_bytes(original)
             assert code == 1 and fragment in errors, (name, code, errors)
             print(f"PASS {name}: refused")
+        array_plist = copy / "Packages/GamePlatform/Sources/GamePlatform/Levels.plist"
+        array_plist.write_bytes(plistlib.dumps(["level-1", "level-2"]))
+        try:
+            code, errors = run(copy)
+        finally:
+            array_plist.unlink()
+        assert code == 0, ("top-level array plist", errors)
+        print("PASS top-level array plist in a package: exit 0")
     print("Foundation check refuses each seeded source-level privacy violation")
 
 

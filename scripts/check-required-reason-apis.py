@@ -21,6 +21,9 @@ import plistlib
 import subprocess
 import sys
 
+sys.path.insert(0, str(Path(__file__).resolve().parent))
+import macho  # noqa: E402
+
 CATEGORIES = {
     "NSPrivacyAccessedAPICategoryFileTimestamp": {
         "symbols": {"_getattrlist", "_getattrlistbulk", "_fgetattrlist", "_getattrlistat", "_stat", "_fstat",
@@ -53,8 +56,6 @@ CATEGORIES = {
         "swift": ["UserDefaults"],
     },
 }
-MACH_O_MAGIC = {b"\xcf\xfa\xed\xfe", b"\xce\xfa\xed\xfe", b"\xfe\xed\xfa\xcf", b"\xfe\xed\xfa\xce",
-                b"\xca\xfe\xba\xbe", b"\xbe\xba\xfe\xca"}
 BUNDLE_SUFFIXES = (".app", ".framework", ".appex", ".bundle", ".xctest")
 
 
@@ -121,8 +122,7 @@ def main():
     app = args.app.resolve()
     if not app.is_dir() or app.suffix != ".app":
         parser.error("expected a built .app directory")
-    binaries = sorted(path for path in app.rglob("*")
-                      if path.is_file() and not path.is_symlink() and path.open("rb").read(4) in MACH_O_MAGIC)
+    binaries = macho.files(app)
     report = {"app": app.name, "bundles": {}, "problems": []}
     by_bundle = {}
     for binary in binaries:

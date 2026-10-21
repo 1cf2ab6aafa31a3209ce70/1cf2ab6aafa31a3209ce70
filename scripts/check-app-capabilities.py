@@ -38,7 +38,8 @@ def swift_module(*modules):
 
 # classes: Objective-C class names, matched as referenced (_OBJC_CLASS_$_X),
 # defined or named in a C string. symbols: imported C symbols; a trailing *
-# matches a prefix. swift: patterns over demangled Swift references.
+# matches a prefix. selectors: full selector names, colons included.
+# swift: patterns over demangled Swift references.
 CAPABILITIES = {
     "network": {
         "classes": {"NSURLSession", "NSURLSessionConfiguration", "NSURLSessionTask", "NSURLSessionDataTask",
@@ -46,7 +47,11 @@ CAPABILITIES = {
                     "NSURLSessionWebSocketTask", "NSURLConnection", "NSURLDownload", "NWPathMonitor"},
         "symbols": {"_nw_*", "_CFStreamCreatePairWithSocketToHost", "_CFSocketCreate", "_CFSocketConnectToAddress",
                     "_CFReadStreamCreateForHTTPRequest", "_CFHTTPMessageCreateRequest", "_CFNetworkCopySystemProxySettings",
-                    "_SCNetworkReachabilityCreateWithName", "_socket", "_connect", "_getaddrinfo", "_gethostbyname",
+                    "_SCNetworkReachabilityCreateWithName", "_socket", "_connect", "_bind", "_sendto", "_sendmsg",
+                    "_getaddrinfo", "_gethostbyname", "_gethostbyname2", "_gethostbyaddr", "_getnameinfo",
+                    # dns_sd and resolver lookups reach the network through mDNSResponder, so the app
+                    # process holds no internet socket that runtime observation could see.
+                    "_DNSService*", "_getaddrinfo_async_*", "_res_*", "_dns_*",
                     "__swift_FORCE_LOAD_$_swiftNetwork"},
         "selectors": {"sharedSession", "sessionWithConfiguration:", "sessionWithConfiguration:delegate:delegateQueue:",
                       "dataTaskWithURL:", "dataTaskWithRequest:", "dataTaskWithURL:completionHandler:",
@@ -135,7 +140,10 @@ def defined_references(binary):
 
 
 def scan(binary):
-    imports, selectors, _ = required_reason.references(binary)
+    imports, _, _ = required_reason.references(binary)
+    # references() keeps each selector only up to its first colon, which suits the
+    # required-reason list but would never match `sessionWithConfiguration:`.
+    selectors = set(section_strings(binary, "__TEXT", "__objc_methname"))
     swift_imports = demangle(imports)
     swift_defined, defined_classes = defined_references(binary)
     referenced_classes = {name.split("_OBJC_CLASS_$_", 1)[1] for name in imports if name.startswith("_OBJC_CLASS_$_")}

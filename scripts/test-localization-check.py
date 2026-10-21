@@ -3,8 +3,9 @@
 
 Writes fixture title directories (title.json and Localizable.xcstrings),
 extracted-strings files and app bundles to a temporary directory. The clean
-catalog covers plain strings, plural variations, a positional placeholder
-reordering and an untranslatable key in English and German.
+catalog covers plain strings, plural variations, a plural substitution, a
+%i placeholder, a positional placeholder reordering and an untranslatable key
+in English and German.
 """
 import copy
 import json
@@ -21,6 +22,11 @@ def unit(value, state="translated"):
     return {"stringUnit": {"state": state, "value": value}}
 
 
+def boards(one, other):
+    return {"boards": {"argNum": 1, "formatSpecifier": "lld",
+                       "variations": {"plural": {"one": unit(one), "other": unit(other)}}}}
+
+
 CLEAN = {
     "sourceLanguage": "en",
     "version": "1.0",
@@ -30,11 +36,15 @@ CLEAN = {
         "%lld blocks left": {"localizations": {
             "en": {"variations": {"plural": {"one": unit("One block left"), "other": unit("%lld blocks left")}}},
             "de": {"variations": {"plural": {"one": unit("Ein Block übrig"), "other": unit("%lld Blöcke übrig")}}}}},
+        "%lld boards cleared": {"localizations": {
+            "en": dict(unit("%#@boards@ cleared"), substitutions=boards("%arg board", "%arg boards")),
+            "de": dict(unit("%#@boards@ geschafft"), substitutions=boards("%arg Brett", "%arg Bretter"))}},
+        "Moves: %i": {"localizations": {"de": unit("Züge: %i")}},
         "Block Match": {"shouldTranslate": False},
         "Play": {"extractionState": "manual", "localizations": {"de": unit("Spielen")}},
     },
 }
-CODE_KEYS = ["Score: %lld", "Row %lld, column %lld", "%lld blocks left", "Block Match"]
+CODE_KEYS = ["Score: %lld", "Row %lld, column %lld", "%lld blocks left", "%lld boards cleared", "Moves: %i", "Block Match"]
 
 
 def title(root, name, catalog, languages=("en", "de"), keys=CODE_KEYS, lproj=("en", "de")):
@@ -82,6 +92,11 @@ def main():
         ("dropped placeholder", mutate(lambda s: s["Row %lld, column %lld"]["localizations"]["de"].update(unit("Zeile %lld"))),
          {}, "differ from source"),
         ("missing plural", mutate(lambda s: s["%lld blocks left"]["localizations"]["de"]["variations"]["plural"].pop("other")),
+         {}, "differ from source"),
+        # %#@boards@ must not read as %@ with a # flag, or this replacement would match the source.
+        ("substitution replaced by %@", mutate(lambda s: s["%lld boards cleared"]["localizations"]["de"]["stringUnit"]
+                                               .update(value="%@ geschafft")), {}, "not in the source"),
+        ("dropped %i placeholder", mutate(lambda s: s["Moves: %i"]["localizations"]["de"].update(unit("Züge"))),
          {}, "differ from source"),
         ("code key not in catalog", CLEAN, {"keys": CODE_KEYS + ["Pause"]}, "'Pause': code key missing from the catalog"),
         ("catalog key not in code", CLEAN, {"keys": CODE_KEYS[1:]}, "'Score: %lld': catalog key no code references"),
