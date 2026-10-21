@@ -78,6 +78,17 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
         }
         .accessibilityIdentifier("shell.scroll")
         .background(Color(.systemGroupedBackground))
+        .overlay(alignment: .top) {
+            // The page scrolls behind the status bar; without a backdrop its
+            // text runs into the clock, which the audit reports as text with
+            // no accessibility element (S-8). A zero-height strip at the top
+            // of the safe area extends its background up over the bar.
+            Color.clear
+                .frame(height: 0)
+                .background(Color(.systemGroupedBackground).ignoresSafeArea(edges: .top))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .sheet(isPresented: $showingSettings) {
             // UIKit presents the sheet at the process's text size, so a size
             // set on the title's root view reaches it only through here.
