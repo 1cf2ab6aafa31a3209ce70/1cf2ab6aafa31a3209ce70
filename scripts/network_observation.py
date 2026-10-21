@@ -8,7 +8,10 @@ the app-hosted and UI tests run:
    their executable path inside the owned device's data directory and list
    their internet sockets with `lsof -nP -a -i -p`. Any socket held at a sample
    is a finding. A connection that opens and closes between two samples can
-   be missed, so the report records the largest gap between samples.
+   be missed, so the report records the largest gap between samples. A
+   sample whose ps or lsof times out on a loaded host is such a gap: it is
+   counted and widens the gap, and more than MAX_TIMEOUT_SHARE of them fails
+   the gate. Any other sampler error fails it.
 2. The device's unified log. After the run, read the app process's entries
    from Apple's networking subsystems (Network.framework, CFNetwork, URL
    sessions). These name connections however briefly they lived, but only
@@ -26,6 +29,9 @@ import threading
 import time
 
 SAMPLE_INTERVAL = 0.25
+# A hosted runner once stalled ps -axo for over 30 s three times in 782 samples
+# while booting simulators; beyond this share the socket channel is too thin to trust.
+MAX_TIMEOUT_SHARE = 0.1
 LOG_PREDICATE = ('(subsystem BEGINSWITH "com.apple.network" OR subsystem BEGINSWITH "com.apple.CFNetwork" '
                  'OR subsystem BEGINSWITH "com.apple.nsurlsession")')
 
@@ -133,8 +139,10 @@ class Observer:
         self.samples_path = self.output / f"{label}-network-samples.jsonl"
         self.report_path = self.output / f"{label}-network.json"
         self.started = None
+        self.attempts = 0
         self.samples = 0
         self.samples_with_app = 0
+        self.timeouts = []
         self.max_gap = 0.0
         self.pids = set()
         self.sockets = []
@@ -176,8 +184,12 @@ class Observer:
 
     def sample(self):
         """One sample; an error is recorded and fails the gate but never ends observation early."""
+        self.attempts += 1
         try:
             record = self.sample_once()
+        except subprocess.TimeoutExpired as error:
+            self.timeouts.append(f"{round(self.clock(), 3)}: {error}")
+            return
         except Exception as error:
             self.errors.append(f"{type(error).__name__}: {error}")
             return
@@ -251,6 +263,9 @@ def evaluate(observer, log_entries, log_read=True):
             violations.append(dict(entry, channel="log"))
     system_owned.extend(log_system.values())
     problems = list(observer.errors)
+    if len(observer.timeouts) > MAX_TIMEOUT_SHARE * max(observer.attempts, 1):
+        problems.append(f"{len(observer.timeouts)} of {observer.attempts} samples timed out, more than "
+                        f"{MAX_TIMEOUT_SHARE:.0%}; the socket channel was not watching (first: {observer.timeouts[0]})")
     if not observer.samples_with_app:
         problems.append(f"No sample saw {observer.executable}; the observer cannot claim the app made no connection")
     if not log_read:
@@ -265,7 +280,8 @@ def evaluate(observer, log_entries, log_read=True):
                    "limits": "A socket opened and closed between two samples is visible only through the log "
                              "channel, which covers Apple's networking stacks, not raw BSD sockets."},
         "samples": observer.samples, "samplesWithApp": observer.samples_with_app,
-        "maxSampleGapSeconds": round(observer.max_gap, 3), "pids": sorted(observer.pids),
+        "maxSampleGapSeconds": round(observer.max_gap, 3), "samplerTimeouts": observer.timeouts,
+        "pids": sorted(observer.pids),
         "logEntries": len(log_entries), "violations": violations, "systemOwned": system_owned,
         "problems": problems, "passed": passed,
     }
@@ -274,8 +290,9 @@ def evaluate(observer, log_entries, log_read=True):
 def summary(report):
     if report["passed"]:
         excused = sum(item.get("entries", 1) for item in report["systemOwned"])
+        timeouts = f", {len(report['samplerTimeouts'])} timed out" if report["samplerTimeouts"] else ""
         return (f"no app-originated network activity in {report['samples']} samples "
-                f"({report['samplesWithApp']} with the app running; max gap {report['maxSampleGapSeconds']}s) "
+                f"({report['samplesWithApp']} with the app running{timeouts}; max gap {report['maxSampleGapSeconds']}s) "
                 f"and {report['logEntries']} networking log entries ({excused} system-owned, listed with reasons)")
     details = [f"{v['channel']}: " + (f"{v.get('protocol')} {v.get('name')} {v.get('state') or ''} pid {v.get('pid')}"
                                        if v["channel"] == "socket" else

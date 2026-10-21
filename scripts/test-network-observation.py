@@ -57,12 +57,14 @@ ACTIVITY = json.dumps({"timestamp": "2026-10-20 19:00:00.000000-0700", "processI
                        "eventMessage": "Create activity from XPC object <nw_activity 50:1 [C77A] (reporting strategy default)>"})
 
 
-def scripted(ps=PS, lsof="", log="", lsof_code=None, log_code=0):
+def scripted(ps=PS, lsof="", log="", lsof_code=None, log_code=0, ps_timeouts=0):
     calls = []
 
     def runner(command, timeout=30):
         calls.append(command)
         if command[0] == "ps":
+            if sum(call[0] == "ps" for call in calls) <= ps_timeouts:
+                raise subprocess.TimeoutExpired(command, timeout)
             return 0, ps, ""
         if command[0] == "lsof":
             return (lsof_code if lsof_code is not None else (0 if lsof else 1)), lsof, "lsof: fixture error"
@@ -93,11 +95,14 @@ def mocked_cases():
             ("app never observed", scripted(ps="  105 /usr/libexec/nsurlsessiond"), False, "No sample saw"),
             ("sampler failure", scripted(lsof_code=2), False, "lsof failed"),
             ("log read failure", scripted(log_code=1), False, "Device log read failed"),
+            # A ps stalled on a loaded host is a counted gap; a sampler that mostly stalls fails.
+            ("one timed-out sample in twenty", scripted(ps_timeouts=1), True, "1 timed out"),
+            ("timed-out samples above the share", scripted(ps_timeouts=3), False, "3 of 20 samples timed out"),
         ]
         for index, (name, (runner, calls), passes, needle) in enumerate(cases):
             directory = root / str(index)
             directory.mkdir()
-            report = observe(directory, runner)
+            report = observe(directory, runner, samples=20 if "timed-out" in name else 3)
             text = observation.summary(report)
             assert report["passed"] is passes, (name, report)
             if needle:
