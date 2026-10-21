@@ -140,6 +140,9 @@ enum BlockStyle {
     static func symbol(_ color: Int) -> String {
         ["", "circle.fill", "square.fill", "triangle.fill", "diamond.fill"][color]
     }
+    static func outline(_ color: Int) -> String {
+        ["", "circle", "square", "triangle", "diamond"][color]
+    }
 }
 
 struct BlockBoardView: View {
@@ -168,6 +171,11 @@ struct BlockBoardView: View {
 struct BlockControlsView: View {
     @ObservedObject var session: BlockSession
     let context: ModulePlayContext
+    @Environment(\.dynamicTypeSize) private var typeSize
+
+    /// Three buttons a row broke labels into one letter per line at
+    /// accessibility text sizes; those sizes get one full-width button a row.
+    private var perRow: Int { typeSize.isAccessibilitySize ? 1 : 3 }
 
     var body: some View {
         VStack(alignment: .leading, spacing: 16) {
@@ -181,9 +189,9 @@ struct BlockControlsView: View {
                 // control even while it is scrolled out of view.
                 let blocks = game.board.cells.indices.filter { game.board.cells[$0] != 0 }
                 Grid(horizontalSpacing: 8, verticalSpacing: 8) {
-                    ForEach(Array(stride(from: 0, to: blocks.count, by: 3)), id: \.self) { start in
+                    ForEach(Array(stride(from: 0, to: blocks.count, by: perRow)), id: \.self) { start in
                         GridRow {
-                            ForEach(blocks[start..<min(start + 3, blocks.count)], id: \.self) { index in
+                            ForEach(blocks[start..<min(start + perRow, blocks.count)], id: \.self) { index in
                                 blockButton(index, board: game.board)
                             }
                         }
@@ -198,10 +206,19 @@ struct BlockControlsView: View {
     private func blockButton(_ index: Int, board: BlockBoard) -> some View {
         let color = board.cells[index]
         let row = index / board.columns + 1, column = index % board.columns + 1
+        // Text stays in the label color, and a label-colored outline carries
+        // the shape: coral, teal and gold alone fail contrast on the bordered
+        // button background, so the fill only repeats the board's color.
         return Button { session.select(index) } label: {
-            Label("Row \(row), column \(column)", systemImage: BlockStyle.symbol(color))
-                .foregroundStyle(Color(uiColor: BlockStyle.uiColor(color)), Color.primary)
-                .frame(maxWidth: .infinity, minHeight: 44)
+            Label {
+                Text("Row \(row), column \(column)").foregroundStyle(Color.primary)
+            } icon: {
+                ZStack {
+                    Image(systemName: BlockStyle.symbol(color)).foregroundStyle(Color(uiColor: BlockStyle.uiColor(color)))
+                    Image(systemName: BlockStyle.outline(color)).foregroundStyle(Color.primary)
+                }
+            }
+            .frame(maxWidth: .infinity, minHeight: 44)
         }
         .buttonStyle(.bordered)
         .disabled(!session.playing)

@@ -4,14 +4,10 @@ import XCTest
 /// accessible block controls and with a touch on the SpriteKit board, then
 /// confirm the saved progress after relaunch.
 final class BlockTitleUITests: XCTestCase {
-    /// One accessibility query on a loaded hosted runner can stall for
-    /// seconds (N08); waits bound only failures.
-    private let queryAllowance: TimeInterval = 30
-
     @MainActor
     func testClearFirstBoardThenRelaunchContinuesWithTheSecond() {
         continueAfterFailure = false
-        let app = launch()
+        let app = launchBlockTitle()
         tap(app, "shell.start")
         waitFor(app.staticTexts["shell.play"])
         // Column 0 by touch on the board; the other two groups by button.
@@ -49,7 +45,7 @@ final class BlockTitleUITests: XCTestCase {
     @MainActor
     func testWrongFirstChoiceOnTheSecondBoardEndsWithoutProgress() {
         continueAfterFailure = false
-        let app = launch()
+        let app = launchBlockTitle()
         tap(app, "shell.start")
         for index in [3, 4, 5] { tap(app, "block.cell.\(index)") }
         waitFor(app.staticTexts["shell.result.success"])
@@ -63,53 +59,5 @@ final class BlockTitleUITests: XCTestCase {
         XCTAssertEqual(progress.label, "Completed levels: 1")
         tap(app, "shell.result.menu")
         waitFor(app.staticTexts["shell.menu"])
-    }
-
-    @MainActor
-    private func launch() -> XCUIApplication {
-        XCUIDevice.shared.orientation = .portrait
-        let app = XCUIApplication()
-        // A fresh namespace isolates each test; relaunches keep the same one.
-        let identity = UUID()
-        app.launchArguments = ["--ui-test-fixture", identity.uuidString]
-        app.launch()
-        waitFor(app.staticTexts["shell.menu"])
-        let status = app.staticTexts["save.status"]
-        waitFor(status)
-        XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: queryAllowance))
-        return app
-    }
-
-    @MainActor
-    private func waitFor(_ element: XCUIElement, file: StaticString = #filePath, line: UInt = #line) {
-        XCTAssertTrue(element.waitForExistence(timeout: queryAllowance), "Missing \(element)", file: file, line: line)
-    }
-
-    @MainActor
-    private func tap(_ app: XCUIApplication, _ id: String) {
-        let button = app.buttons[id]
-        XCTAssertTrue(button.waitForExistence(timeout: queryAllowance), "Missing control \(id)")
-        reveal(app, button)
-        XCTAssertTrue(button.isHittable, "Unreachable control \(id)")
-        button.press(forDuration: 0.15)
-    }
-
-    /// Scroll the shell until the whole element is inside the window.
-    @MainActor
-    private func reveal(_ app: XCUIApplication, _ element: XCUIElement) {
-        let scroll = app.scrollViews["shell.scroll"]
-        for _ in 0..<10 {
-            let window = app.windows.firstMatch.frame
-            if element.exists && element.isHittable && window.contains(element.frame) { return }
-            if element.exists && element.frame.minY < window.minY { scroll.swipeDown() } else { scroll.swipeUp() }
-        }
-    }
-
-    @MainActor
-    private func attachScreen(_ name: String) {
-        let attachment = XCTAttachment(screenshot: XCUIScreen.main.screenshot())
-        attachment.name = name
-        attachment.lifetime = .keepAlways
-        add(attachment)
     }
 }

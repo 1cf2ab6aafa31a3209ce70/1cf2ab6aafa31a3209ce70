@@ -11,6 +11,7 @@ import re
 import subprocess
 import sys
 
+import release_policy as policy
 import titles as title_manifests
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -247,15 +248,13 @@ def source_without_comments(source):
 
 
 def check_sources():
-    blocked_imports = {
-        "Network", "FoundationNetworking", "CloudKit", "GameKit", "StoreKit",
-        "AdSupport", "AppTrackingTransparency", "WebKit", "SafariServices",
-        "MetricKit", "UserNotifications", "Firebase", "Amplitude", "Sentry",
-        "Segment", "Mixpanel", "GoogleMobileAds", "FBSDKCoreKit", "AppsFlyerLib",
-    }
-    blocked_apis = re.compile(r"\b(?:URLSession|URLRequest|NSURLConnection|NWConnection|NWListener|"
-                              r"CFNetwork|CKContainer|GKLocalPlayer|SKPaymentQueue|ASIdentifierManager|"
-                              r"ATTrackingManager|UserDefaults|NSUbiquitousKeyValueStore)\b")
+    # scripts/release_policy.py holds the blocked frameworks and SDK names that the
+    # built-bundle gates also apply to the Release binaries.
+    blocked_imports = set(policy.BLOCKED_FRAMEWORKS)
+    blocked_apis = re.compile(r"\b(?:URLSession|URLRequest|NSURLConnection|NWConnection|NWListener|NWPathMonitor|"
+                              r"CFNetwork|CKContainer|GKLocalPlayer|SKPaymentQueue|ASIdentifierManager|AAAttribution|"
+                              r"ATTrackingManager|UserDefaults|NSUbiquitousKeyValueStore|WKWebView|SFSafariViewController|"
+                              r"ASWebAuthenticationSession|UNUserNotificationCenter|registerForRemoteNotifications)\b")
     # Epic 04 owns local filesystem access in a single reviewed adapter.
     # Package fixtures may use FileManager for isolated roots; core/title code cannot.
     filesystem_adapter = ROOT / "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift"
@@ -272,8 +271,9 @@ def check_sources():
                 continue
             source = source_without_comments(path.read_text())
             imports = set(re.findall(r"\bimport\s+(?:(?:class|struct|enum|protocol|func|var|let)\s+)?([A-Za-z_][A-Za-z_0-9]*)", source))
-            require(not any(module in blocked_imports or module.startswith("Firebase") for module in imports),
-                    f"Disallowed privacy-related import in {path.relative_to(ROOT)}")
+            blocked = sorted(module for module in imports
+                             if module in blocked_imports or policy.SDK_LIBRARY_PATTERN.match(module))
+            require(not blocked, f"Disallowed privacy-related import in {path.relative_to(ROOT)}: {blocked}")
             require(not re.search(r"\bFileManager\b", source)
                     or path in {filesystem_adapter, fixture_diagnostics} | authoring_clis
                     or any(path.is_relative_to(root) for root in content_test_roots + [platform_test_root]),
@@ -294,9 +294,13 @@ def check_sources():
         for path in sorted(directory.rglob("*.plist")):
             if ".build" in path.parts:
                 continue
-            info = plistlib.loads(path.read_bytes())
-            require(not any(key.endswith("UsageDescription") or key in {"UIBackgroundModes", "NSAppTransportSecurity"}
-                            for key in info), f"Review permission/background/network keys in {path.relative_to(ROOT)}")
+            values = plistlib.loads(path.read_bytes())
+            # Only a dictionary can declare Info.plist keys; a content plist may be an array.
+            if not isinstance(values, dict):
+                continue
+            problems = policy.info_plist_problems(values, str(path.relative_to(ROOT)))
+            require(not problems, "Review permission, background, network, URL scheme or attribution keys: "
+                    + "; ".join(problems))
     for title in TITLES:
         imports = title_imports[title.target]
         require({"GameCore", "GamePlatform"} <= imports, f"{title.target} must import both foundation products")

@@ -70,6 +70,8 @@ jobs:
     timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      # The network observation fixture runs on the foundation matrix's runtime, not the newest installed.
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Check pinned toolchain
@@ -78,12 +80,22 @@ jobs:
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
       - name: Verify packages and mobile builds
         run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
+      - name: Check runtime gates against seeded violations
+        run: |
+          set -o pipefail
+          python3 scripts/test-mobile-runner.py | tee "$RUNNER_TEMP/foundation-verification/mobile-runner-tests.log"
+          python3 scripts/test-record-baselines.py | tee "$RUNNER_TEMP/foundation-verification/record-baselines-tests.log"
+          python3 scripts/test-network-observation.py --simulator | tee "$RUNNER_TEMP/foundation-verification/network-observation-tests.log"
       - name: Retain verification logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
           name: mobile-verification-logs
-          path: ${{ runner.temp }}/foundation-verification/*.log
+          # Release gates write their failure lists to <gate>.log.err.
+          path: |
+            ${{ runner.temp }}/foundation-verification/*.log
+            ${{ runner.temp }}/foundation-verification/*.log.err
+            ${{ runner.temp }}/foundation-verification/reproducible-evidence/
           if-no-files-found: ignore
           retention-days: 30
   foundation:
@@ -124,6 +136,9 @@ jobs:
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*-restart.json
             ${{ runner.temp }}/foundation-ui/*-retries.json
+            ${{ runner.temp }}/foundation-ui/*-network.json
+            ${{ runner.temp }}/foundation-ui/*-network-samples.jsonl
+            ${{ runner.temp }}/foundation-ui/*-network-log.ndjson
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
             ${{ runner.temp }}/foundation-ui/action-journals/
@@ -158,7 +173,13 @@ jobs:
           retention-days: 30
   minimum-runtime:
     # The deployment floor is iOS 18.0; ADR-003 keeps minimum-runtime execution explicit.
+    # Every title runs on both geometries, one geometry per job: both titles on
+    # one geometry took 24 minutes of the 60, so both geometries in one job would not fit.
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.minimum_runtime)
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [iphone12, ipad9]
     runs-on: macos-26
     timeout-minutes: 60
     env:
@@ -181,18 +202,23 @@ jobs:
             xcrun simctl list runtimes
             exit 1
           fi
-      - name: Test every title on iphone12 on the minimum runtime
-        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model iphone12
+      - name: Test every title on ${{ matrix.model }} on the minimum runtime
+        env:
+          MODEL: ${{ matrix.model }}
+        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model "$MODEL"
       - name: Retain minimum-runtime evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-minimum-runtime-evidence
+          name: mobile-minimum-runtime-evidence-${{ matrix.model }}
           path: |
             ${{ runner.temp }}/minimum-runtime-ui/**/*.log
             ${{ runner.temp }}/minimum-runtime-ui/inventory.json
             ${{ runner.temp }}/minimum-runtime-ui/**/*-restart.json
             ${{ runner.temp }}/minimum-runtime-ui/**/*-retries.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network-samples.jsonl
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network-log.ndjson
             ${{ runner.temp }}/minimum-runtime-ui/**/*.xcresult
             ${{ runner.temp }}/minimum-runtime-ui/**/*-diagnostics/
             ${{ runner.temp }}/minimum-runtime-ui/**/action-journals/
