@@ -33,7 +33,7 @@ After the first run, the verifier changed to exclude a run that stays void after
 - **Devices:** `verify.py` created one owned simulator at a time on iOS 26.0, `GameCore Spike11 owned iphone12` (iPhone 12) and then `GameCore Spike11 owned ipad9` (iPad (9th generation)). Every create, boot, shutdown and delete exited 0.
 - **Order:** the pure tests and both builds ran once. Then, per geometry, the behaviour suite ran once and each candidate's two timing cases twice. Each timing invocation is two UI test cases, the sustained trace and five restart cycles, and took 193–201 s. The recorded commands took about 107 minutes in all.
 - **Confirmation run:** same host, Xcode, simulator runtime and configuration. Step 1 ran 17:17–17:22 on owned simulators `GameCore Spike11 confirm-calibration <model>`, each deleted after its run. Step 2 ran 17:22–17:50 with `verify.py --candidate lowlevel --runs 2`: the pure tests and both builds once, then per geometry the A2 behaviour suite once and the timing cases until each run counted or reached three attempts. Each timing invocation took 198–205 s; the recorded commands took about 28 minutes.
-- **Hosted CI:** the `dig_feasibility` workflow job has not run.
+- **Hosted CI:** the `dig_feasibility` job ([run 39525135428](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39525135428), [hosted run](../../experiments/dig-feasibility/evidence/hosted-run.txt)) ran on a virtual M1 runner with Xcode 26.6 (`17F113`) and iOS 26.5 (`23F77`) at `b0276d8`, experiment hash `b21815d8…`. Debug and Release builds succeeded, including A2, and the behaviour suites passed 24 of 24 on both geometries. Every timing attempt broke the idle-window budgets (idle p99 27.6–153.9 ms), so every run was void, and the job reached its 180-minute timeout during the iPad heightfield runs. Hosted runners cannot rank candidates; the decision rests on the local runs.
 
 ## Workload and budgets fixed before the runs
 
@@ -283,7 +283,7 @@ Both repositories were cloned read-only outside the repository. Neither was buil
 | No retained visuals for the 2D scope | The confirmation retained screenshots for A2 only | Review C's visible terrain change early in Epic 12 and retain the evidence |
 | iPhone 12 p99 headroom of the `ARView` host, if 3D is reopened | A2 idle I p99 22.69–33.05 ms, above 25 ms in 4 of 5 confirmation attempts; in the first run 4 of 10 3D idle attempts on that geometry broke the row; the Spike 00 `RealityView` terrain held p99 20.0 ms in the confirmation session. Cause untested | A new decision record with new evidence, such as physical-hardware measurements or an idle comparison of `RealityView` and `ARView` hosts; never a budget change applied to these runs |
 | Collision cost dominates any 3D scope and is unmeasured on devices | Host per-chunk p95 17.5–18.9 ms in the first run and 17.1–17.5 ms in the confirmation's counted runs, against the 12 ms physical target; maxima up to 39.6 ms in counted runs; per-shape cost did not fall with smaller chunks | Applies if 3D is reopened. Collision stays off the input and rule path and is coalesced; lag p95 stayed at or below 80.1 ms. Measure on hardware in Epic 08's pre-distribution checks. Parallel chunk jobs, a lower collision cadence (`collisionInterval`) or fewer, larger chunks are untried options |
-| Experiment unverified on the CI toolchain | Built and run only with Xcode 27.1 and iOS 26.0 | Dispatch `mobile.yml` with `dig_feasibility` (Xcode 26.6, iOS 26.5) before Epic 12 relies on it; it has not run |
+| Hosted timing cannot rank candidates | On Xcode 26.6 and iOS 26.5 every hosted idle window broke the interval budgets and the full job exceeds its 180-minute timeout ([hosted run](../../experiments/dig-feasibility/evidence/hosted-run.txt)); builds and behaviour suites passed there | Use the hosted job for builds and behaviour; take timing comparisons from a calibrated local host |
 | iOS 18.0 floor not executed | Typecheck and build only; no local iOS 18 runtime | Run the dig title on an iOS 18 runtime as part of ADR-003's distribution-readiness checks |
 | Rule digests may differ across builds | `Float` heights; equality shown on one arm64 build | Before any feature compares digests across builds, add a cross-toolchain check or move rule state to integer depth units |
 | Drag conflicts with shell scrolling | Shell `ScrollView` takes surface drags as digs | Epic 12 decides on a full-screen gameplay presentation in the shell; not a contract change |
@@ -294,7 +294,7 @@ Both repositories were cloned read-only outside the repository. Neither was buil
 
 - Physical GPU work, presented frames, thermal behaviour, battery use and device memory pressure. Memory evidence is simulator `phys_footprint` snapshots and the process ledger peak.
 - iOS 18.0 runtime behaviour; the floor is a typecheck and build boundary only.
-- Hosted CI: the `dig_feasibility` job is defined but has not run.
+- Hosted timing: every hosted run was void (see Toolchain); hosted CI covered builds and behaviour only.
 - Release-build timing; Release was built, not measured.
 - VoiceOver, Dynamic Type, rotation and background/foreground interruption.
 - C in the confirmation session; its figures come from the first run only.
