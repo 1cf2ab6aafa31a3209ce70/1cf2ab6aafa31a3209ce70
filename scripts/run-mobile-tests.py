@@ -6,6 +6,7 @@ import hashlib
 import json
 import os
 from pathlib import Path
+import plistlib
 import re
 import signal
 import stat
@@ -17,6 +18,7 @@ import uuid
 
 # The seam verifier loads this file by path to reuse its input-fault scan.
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import network_observation  # noqa: E402
 import titles as title_manifests  # noqa: E402
 
 ROOT = Path(__file__).resolve().parents[1]
@@ -438,17 +440,51 @@ def verify_restart(xcode, device, model, output, runtime_identifier, title):
     print(f"PASS {model}: settings/progress restored after simulator restart", flush=True)
 
 
+def report_network(observer, title, model):
+    """Finish one device's network observation; fail on any app-originated activity."""
+    report = observer.finish()
+    message = f"{title.target} {model}: {network_observation.summary(report)}"
+    if report["passed"]:
+        print(f"NETWORK PASS {message}; evidence: {observer.report_path}", flush=True)
+        return
+    if os.environ.get("GITHUB_ACTIONS") == "true":
+        print(f"::error title=App network activity::{message}", flush=True)
+    raise RuntimeError(f"NETWORK FAIL {message}; evidence: {observer.report_path}")
+
+
+def cleanup_device(device, operation, log, label):
+    """Shut down or delete one owned device; an unwritable log (a full disk) never skips the command."""
+    try:
+        run(["xcrun", "simctl", operation, device], log=log, timeout=90)
+    except OSError as error:
+        print(f"Cleanup warning ({label}): {error}; retrying without a log", file=sys.stderr)
+        try:
+            run(["xcrun", "simctl", operation, device], timeout=90)
+        except (RuntimeError, OSError) as retry_error:
+            print(f"Cleanup warning ({label}): {retry_error}", file=sys.stderr)
+    except RuntimeError as error:
+        print(f"Cleanup warning ({label}): {error}", file=sys.stderr)
+
+
 def test_title(title, selected_models, output, runtime, record_device, navigation_only):
     """Build one title's scheme, then run its app-hosted and UI tests on each owned device."""
     xcode = ["xcodebuild", "-workspace", "GameCore.xcworkspace", "-scheme", title.target,
              "-derivedDataPath", str(output / "build"), "CODE_SIGNING_ALLOWED=NO"]
     run(xcode + ["-configuration", "Debug", "-destination", "generic/platform=iOS Simulator",
                  "build-for-testing"], log=output / "build.log", timeout=600)
+    # The observer finds the app's host process by its executable name.
+    with (output / f"build/Build/Products/Debug-iphonesimulator/{title.target}.app/Info.plist").open("rb") as stream:
+        executable = plistlib.load(stream)["CFBundleExecutable"]
     for model, device_type in selected_models:
         device = None
         journal_collected = False
+        observer = None
+        network_reported = False
         try:
-            device = run(["xcrun", "simctl", "create", f"GameCore Mobile {model} {uuid.uuid4().hex[:8]}",
+            # GAMECORE_SIM_OWNER names who owns the device when several people or agents share a host.
+            owner = re.sub(r"[^A-Za-z0-9-]", "", os.environ.get("GAMECORE_SIM_OWNER", ""))[:32]
+            device = run(["xcrun", "simctl", "create",
+                          " ".join(filter(None, ["GameCore Mobile", model, owner, uuid.uuid4().hex[:8]])),
                           device_type, runtime["identifier"]])
             record_device({"title": title.target, "model": model, "type": device_type, "id": device})
             run(["xcrun", "simctl", "boot", device])
@@ -458,6 +494,9 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
             except RuntimeError:
                 collect_boot_diagnostics(device, model, output)
                 raise
+            # Watch the app process for sockets and networking log entries
+            # through every test invocation on this device, restart included.
+            observer = network_observation.Observer(device, executable, output, model).start()
             # Hosted accessibility queries can exceed 120 seconds for a passing
             # multi-step UI case. Each case gets 180 seconds; the separate
             # 900-second whole-suite cap remains the aggregate failure bound.
@@ -484,17 +523,37 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
             print(f"PASS {title.target} {model}: {output / (model + '.xcresult')}", flush=True)
             if not navigation_only and title.restart_proof:
                 verify_restart(xcode, device, model, output, runtime["identifier"], title)
+            network_reported = True
+            report_network(observer, title, model)
         finally:
+            if observer and not network_reported:
+                # Keep the evidence after another failure without replacing it.
+                try:
+                    report = observer.finish()
+                    print(f"NETWORK {'PASS' if report['passed'] else 'FAIL'} {title.target} {model} "
+                          f"(after another failure): {network_observation.summary(report)}", flush=True)
+                except Exception as error:
+                    print(f"Network observation warning ({title.target} {model}): {error}", file=sys.stderr)
             if device:
                 if not journal_collected:
                     collect_action_journals(device, model, output, title.bundle_identifier)
                 # Only UUIDs returned by create in this invocation are cleaned up.
                 for operation in ("shutdown", "delete"):
-                    try:
-                        run(["xcrun", "simctl", operation, device],
-                            log=output / f"{model}-{operation}.log", timeout=90)
-                    except RuntimeError as error:
-                        print(f"Cleanup warning ({title.target} {model}): {error}", file=sys.stderr)
+                    cleanup_device(device, operation, output / f"{model}-{operation}.log", f"{title.target} {model}")
+
+
+def select_runtime():
+    """The newest available iOS >=18 simulator runtime, or exactly GAMECORE_SIM_RUNTIME_VERSION."""
+    inventory = json.loads(run(["xcrun", "simctl", "list", "runtimes", "--json"]))
+    available = [r for r in inventory["runtimes"] if r.get("isAvailable")
+                 and r["identifier"].startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
+                 and version(r["version"]) >= (18,)]
+    requested = os.environ.get("GAMECORE_SIM_RUNTIME_VERSION")
+    if requested:
+        available = [r for r in available if r["version"] == requested]
+    if not available:
+        raise RuntimeError(f"No available iOS simulator runtime >=18 matching {requested or 'installed inventory'}")
+    return max(available, key=lambda item: version(item["version"]))
 
 
 def main():
@@ -523,16 +582,7 @@ def main():
     else:
         output = Path(tempfile.mkdtemp(prefix="gamecore-mobile-tests-"))
     print(f"Mobile test evidence: {output}", flush=True)
-    inventory = json.loads(run(["xcrun", "simctl", "list", "runtimes", "--json"]))
-    available = [r for r in inventory["runtimes"] if r.get("isAvailable")
-                 and r["identifier"].startswith("com.apple.CoreSimulator.SimRuntime.iOS-")
-                 and version(r["version"]) >= (18,)]
-    requested = os.environ.get("GAMECORE_SIM_RUNTIME_VERSION")
-    if requested:
-        available = [r for r in available if r["version"] == requested]
-    if not available:
-        raise RuntimeError(f"No available iOS simulator runtime >=18 matching {requested or 'installed inventory'}")
-    runtime = max(available, key=lambda item: version(item["version"]))
+    runtime = select_runtime()
     print(f"Selected iOS {runtime['version']} ({runtime['identifier']}); minimum-OS coverage is separate", flush=True)
     metadata = {"xcode": run(["xcodebuild", "-version"]), "runtime": runtime["identifier"],
                 "runtimeVersion": runtime["version"], "runtimeBuild": runtime.get("buildversion"),
@@ -553,7 +603,8 @@ def main():
         title_output.mkdir(exist_ok=True)
         test_title(title, selected_models, title_output, runtime, record_device, args.navigation_only)
     scope = "Navigation diagnostics" if args.navigation_only else "Mobile app and UI tests"
-    print(f"{scope} passed for {', '.join(title.target for title in selected_titles)}; no physical performance claim", flush=True)
+    print(f"{scope} passed for {', '.join(title.target for title in selected_titles)} with no app-originated "
+          "network activity observed; no physical performance claim", flush=True)
 
 
 if __name__ == "__main__":
