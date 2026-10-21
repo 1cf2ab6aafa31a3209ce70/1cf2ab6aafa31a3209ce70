@@ -22,7 +22,7 @@ final class BlockAccessibilityUITests: XCTestCase {
                elements: ["Feedback", "Language", "Local data", "Block Match currently supports English.",
                           "Settings and progress are saved on this device. Automatic backup and sync are disabled. "
                           + "Uninstalling the app or losing the device can erase them.",
-                          "save.export", "save.reset", "save.delete", "-"],
+                          "save.export", "save.reset", "save.delete", "settings.done", "-"],
                tracked: "S-2 secondary, tint and destructive text below 4.5:1 in the settings sheet"),
         Excuse(page: "settings", type: .dynamicType,
                elements: ["settings.done", "save.export", "save.reset", "save.delete",
@@ -208,6 +208,7 @@ final class BlockAccessibilityUITests: XCTestCase {
         var reached = false
         for pass in 0..<16 {
             let window = app.windows.firstMatch.frame
+            let pageFrame = scroll.exists ? scroll.frame : window
             // Decide before auditing: the audit varies the text size while it
             // runs, and the page reports stale geometry until the next scroll.
             let lastPass = isFullyVisible(last, in: app)
@@ -224,9 +225,13 @@ final class BlockAccessibilityUITests: XCTestCase {
                     self.auditLog.append("\(screen) pass \(pass).\(attempt) \(type) \(element) frame \(frame) "
                                          + "window \(window): \(issue.detailedDescription)")
                     let finding: String
-                    if !frame.isNull && !window.contains(frame) {
-                        // Partly outside the window: the audit samples whatever
-                        // is drawn there. Another pass sees the element in full.
+                    let inBar = navigation.exists && navigation.frame.contains(frame)
+                    if !frame.isNull && (!window.contains(frame)
+                                         || (!inBar && frame.intersects(pageFrame) && !pageFrame.contains(frame))) {
+                        // Partly outside the window, or cut off by the edge of
+                        // the page's scroll view (an iPad sheet ends above the
+                        // window's bottom): the audit samples whatever is drawn
+                        // there. Another pass sees the element in full.
                         return true
                     } else if pass > 0 && issue.auditType == .contrast && frame.minY < barBand {
                         // Scrolled content now sits under the translucent status
