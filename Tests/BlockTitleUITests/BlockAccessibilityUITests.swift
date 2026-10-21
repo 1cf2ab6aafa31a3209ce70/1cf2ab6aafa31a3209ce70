@@ -90,9 +90,12 @@ final class BlockAccessibilityUITests: XCTestCase {
             XCTAssertEqual(button.label, label)
             XCTAssertGreaterThanOrEqual(button.frame.height, 44, "Block button \(index) is a full-size target")
         }
-        // VoiceOver reads the play page top to bottom: heading, counts, blocks, actions.
-        let order = [heading, app.staticTexts["block.remaining"], app.buttons["block.cell.3"],
+        // VoiceOver reads the play page top to bottom: heading, place, teaching,
+        // counts, blocks, actions; Undo joins above the blocks after a move.
+        let order = [heading, app.staticTexts["block.level"], app.staticTexts["block.teaching"],
+                     app.staticTexts["block.remaining"], app.buttons["block.cell.3"],
                      app.buttons["block.cell.8"], app.buttons["shell.pause"], app.buttons["shell.fail"]]
+        XCTAssertEqual(app.staticTexts["block.level"].label, "Board 1 of 30")
         for (earlier, later) in zip(order, order.dropFirst()) {
             XCTAssertLessThan(earlier.frame.minY, later.frame.minY, "\(earlier) reads before \(later)")
         }
@@ -102,6 +105,10 @@ final class BlockAccessibilityUITests: XCTestCase {
         XCTAssertTrue(remaining.wait(for: \.label, toEqual: "Blocks left: 4", timeout: queryAllowance))
         XCTAssertEqual(board.value as? String, "4 blocks left", "The board announces what is left")
         XCTAssertFalse(app.buttons["block.cell.6"].exists, "Cleared blocks lose their controls")
+        let undo = app.buttons["block.undo"]
+        waitFor(undo)
+        XCTAssertLessThan(remaining.frame.minY, undo.frame.minY, "Undo reads after the counts")
+        XCTAssertLessThan(undo.frame.minY, app.buttons["block.cell.4"].frame.minY, "Undo reads before the blocks")
         tap(app, "block.cell.4")
         tap(app, "block.cell.5")
         waitFor(app.staticTexts["shell.result.success"])
@@ -126,8 +133,8 @@ final class BlockAccessibilityUITests: XCTestCase {
         waitFor(app.staticTexts["shell.result.success"])
     }
 
-    /// Menu, settings, play, pause, success and failure, each audited down to
-    /// its last control. Findings are collected for the whole flow, then
+    /// Menu, settings, play, pause, success, a stuck board and failure, each
+    /// audited down to its last control. Findings are collected for the whole flow, then
     /// every one without an excuse fails the test.
     @MainActor
     private func auditEveryPage(arguments: [String], suffix: String) throws {
@@ -165,6 +172,10 @@ final class BlockAccessibilityUITests: XCTestCase {
         waitFor(app.staticTexts["shell.play"])
         tap(app, "block.cell.9")
         tap(app, "block.cell.8")
+        waitFor(app.staticTexts["block.stuck"])
+        findings += try audit(app, "stuck-\(suffix)", types, through: app.buttons["shell.fail"])
+
+        tap(app, "shell.fail")
         waitFor(app.staticTexts["shell.result.failure"])
         findings += try audit(app, "failure-\(suffix)", types, through: app.buttons["shell.result.menu"])
 
@@ -190,7 +201,7 @@ final class BlockAccessibilityUITests: XCTestCase {
         let scroll = scrolling ?? app.scrollViews["shell.scroll"]
         if scrolling == nil {
             // Start from the title header so nothing above the fold is skipped.
-            let top = app.staticTexts["Block Match"].firstMatch
+            let top = app.staticTexts["Blocky Marty"].firstMatch
             for _ in 0..<6 where !(top.exists && top.isHittable && app.windows.firstMatch.frame.contains(top.frame)) {
                 if scrolling == nil { dragShell(app, scroll, towardEnd: false) } else { scroll.swipeDown() }
             }

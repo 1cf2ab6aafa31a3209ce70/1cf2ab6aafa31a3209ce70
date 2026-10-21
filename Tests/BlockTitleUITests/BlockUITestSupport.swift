@@ -1,6 +1,6 @@
 import XCTest
 
-/// Shared steps for the Block Match UI tests. One accessibility query on a
+/// Shared steps for the Blocky Marty UI tests. One accessibility query on a
 /// loaded hosted runner can stall for seconds (N08); waits bound only failures.
 let queryAllowance: TimeInterval = 30
 

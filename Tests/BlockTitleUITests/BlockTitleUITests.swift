@@ -27,6 +27,8 @@ final class BlockTitleUITests: XCTestCase {
         tap(app, "block.cell.4")
         tap(app, "block.cell.5")
         waitFor(app.staticTexts["shell.result.success"])
+        XCTAssertEqual(app.staticTexts["shell.result.summary"].label, "Score: 6.")
+        XCTAssertEqual(app.buttons["shell.result.retry"].label, "Next board")
         let status = app.staticTexts["save.status"]
         reveal(app, status)
         XCTAssertTrue(status.wait(for: \.label, toEqual: "Local data saved", timeout: queryAllowance))
@@ -42,8 +44,10 @@ final class BlockTitleUITests: XCTestCase {
         XCTAssertTrue(app.buttons["block.cell.15"].waitForExistence(timeout: queryAllowance), "The second board is 4x4")
     }
 
+    /// intro-02's wrong first choice strands a block: the board stays on the
+    /// play page, Undo takes the move back, and ending the board records nothing.
     @MainActor
-    func testWrongFirstChoiceOnTheSecondBoardEndsWithoutProgress() {
+    func testStuckSecondBoardOffersUndoAndEndingItRecordsNothing() {
         continueAfterFailure = false
         let app = launchBlockTitle()
         tap(app, "shell.start")
@@ -51,9 +55,18 @@ final class BlockTitleUITests: XCTestCase {
         waitFor(app.staticTexts["shell.result.success"])
         tap(app, "shell.result.retry")
         waitFor(app.staticTexts["shell.play"])
+        XCTAssertFalse(app.buttons["block.undo"].exists, "Nothing to undo on a fresh board")
         tap(app, "block.cell.9")
         tap(app, "block.cell.8")
+        waitFor(app.staticTexts["block.stuck"])
+        tap(app, "block.undo")
+        XCTAssertTrue(app.buttons["block.cell.8"].waitForExistence(timeout: queryAllowance), "Undo restores the cleared group")
+        XCTAssertFalse(app.staticTexts["block.stuck"].exists)
+        tap(app, "block.cell.8")
+        waitFor(app.staticTexts["block.stuck"])
+        tap(app, "shell.fail")
         waitFor(app.staticTexts["shell.result.failure"])
+        XCTAssertEqual(app.buttons["shell.result.retry"].label, "Try again")
         let progress = app.staticTexts["save.progress"]
         reveal(app, progress)
         XCTAssertEqual(progress.label, "Completed levels: 1")
