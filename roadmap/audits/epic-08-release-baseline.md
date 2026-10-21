@@ -1,6 +1,6 @@
 # Epic 08 — Quality and release baseline evidence
 
-**Date:** 2026-10-20. **Status:** Not complete. Every automated gate, its seeded-violation self-test, the network observation, the regression baselines, the release checklist, the hardware check and ADR-009 are in place, and the reference title passes every automated check on both simulator geometries locally. Two things remain open. Three interactive steps of the accessibility checklist have not run: Accessibility Inspector headings and focus, Full Keyboard Access, and the Grayscale color filter. Hosted CI has not run this change, including the iOS 18.0 minimum-runtime job ([acceptance](#acceptance)).
+**Date:** 2026-10-20, hosted CI 2026-10-21. **Status:** Not complete. Every automated gate, its seeded-violation self-test, the network observation, the regression baselines, the release checklist, the hardware check and ADR-009 are in place. Both titles pass every automated check on both simulator geometries locally and in [hosted CI](#hosted-ci), including the iOS 18.0 minimum-runtime job. One thing remains open: three interactive steps of the accessibility checklist have not run (Accessibility Inspector headings and focus, Full Keyboard Access, and the Grayscale color filter) ([acceptance](#acceptance)).
 
 Every number here is a simulator observation or a property of a built bundle. None is a device result or a physical budget ([ADR-003](../decisions/ADR-003-simulator-mobile-foundation.md), [ADR-009](../decisions/ADR-009-release-scope-without-hardware.md)).
 
@@ -9,7 +9,8 @@ Every number here is a simulator observation or a property of a built bundle. No
 | Item | Value |
 | --- | --- |
 | Base revision | `b0276d8b2326692e7b3e69b69e22eb02d93a411e` (Spike 11 branch head); branch `wip/epic-08-release-baseline` |
-| Working tree | Dirty when the runs below were made: the Epic 08 changes were uncommitted. They were then committed unchanged as `80c876f`..`cdb2a8f`; the 142 inputs at `8ccc728` and later hash identically to the recorded ones |
+| Working tree | Dirty when the runs below were made: the Epic 08 changes were uncommitted. They were then committed unchanged as `80c876f`..`cdb2a8f`; the 142 inputs at `8ccc728` hash identically to the recorded ones |
+| Later changes | Review and hosted-CI fixes `0faad15`, `caaa9e6`, `bca8a9d` and `2bb05ce` change scripts, the Block Match audit test and records after the local runs below. They were checked by every self-test, the release gates on fresh Release builds of both titles and a scaffolded title, and `test-mobile.sh --title BlockTitle` on both geometries; [hosted CI](#hosted-ci) ran the full set on `2bb05ce` |
 | Inputs | 142 files under `Packages`, `Games`, `Tests`, `GameCore.xcodeproj`, `GameCore.xcworkspace`, `scripts` and `.github`; aggregate SHA-256 `366cb4f767433f284c7d0356f504bf17895f18d3ab0549b43b4054d1902f5502`. The per-file hashes are in the [evidence file](epic-08-release-baseline-evidence.json) |
 | Same inputs for | `verify.sh`, `test-mobile.sh` and `record-baselines.py`: the mobile run's inventory and the recorder's source identity carry identical hashes, and no input changed between `verify.sh` and them. Documentation outside those directories changed afterwards |
 
@@ -38,7 +39,7 @@ Each gate runs in CI on every title the manifests list, and each first runs a se
 | Reproducible build, `check-reproducible-build.py` | `verify.sh` rebuilds each Release iOS app into a second clean directory of equal path length | `test-reproducible-build-check.py`: the same source in two directories passes; a different path length is refused for `LC_UUID` only; changed code, a changed resource and an extra file are refused | Not bit-identical: 130 bytes of the string table differ (debug-map object paths); `LC_UUID` equal; executables identical after `strip -S`; resources identical | Same, 145 bytes |
 | Network observation, `network_observation.py` inside `run-mobile-tests.py` | `test-mobile.sh`, every title and geometry, restart proof included | `test-network-observation.py`: mocked outbound TCP, an unexplained CFNetwork entry, an app never observed and sampler or log failures fail; live host and simulator apps opening a connection fail; idle ones pass. `test-mobile-runner.py` proves a seeded violation fails the whole run | [Pass](#network-observation) | Pass |
 | Accessibility audits, `BlockAccessibilityUITests` | `test-mobile.sh` for Block Match | `testAuditGateFailsOnASeededViolation`: a DEBUG-only unlabeled 20-point control must come out of the same audit, filters and excuses as a failure | [Pass](#accessibility) | Not applied (the reference title carries the checklist) |
-| Minimum runtime, `minimum-runtime` job | Hosted only, iOS 18.0, both geometries | `test-mobile-runner.py`: every title on both geometries gets an owned iOS 18.0 device with retries; a missing 18.0 runtime fails before any device exists; the workflow check fails if the job loses `ipad9`, the 18.0 pin, every-title coverage or the evidence globs | [Not run](#still-needs-hosted-ci) | Not run |
+| Minimum runtime, `minimum-runtime` job | Hosted only, iOS 18.0, both geometries | `test-mobile-runner.py`: every title on both geometries gets an owned iOS 18.0 device with retries; a missing 18.0 runtime fails before any device exists; the workflow check fails if the job loses `ipad9`, the 18.0 pin, every-title coverage or the evidence globs | [Pass](#hosted-ci) on iOS 18.0, both geometries | Pass, same run |
 
 `verify.sh` runs the first seven self-tests and gates. The `verify` job's new step, "Check runtime gates against seeded violations", runs `test-mobile-runner.py`, `test-record-baselines.py` and `test-network-observation.py --simulator`.
 
@@ -56,7 +57,7 @@ Unsigned `xcodebuild build` Release executables keep the linker's debug map, who
 
 ## Minimum-runtime coverage
 
-The `minimum-runtime` job is now a `fail-fast: false` matrix over `iphone12` and `ipad9`, each running every title on iOS 18.0 with retries, the fault classification and the network evidence. One geometry for both titles took 24 of the job's 60 minutes before this change, so both geometries in one job would not fit. It runs on pushes to the shared branches and on `workflow_dispatch` with `minimum_runtime=true`. It has not run with this change: there is no iOS 18 runtime locally. Its orchestration is covered by `test-mobile-runner.py`.
+The `minimum-runtime` job is now a `fail-fast: false` matrix over `iphone12` and `ipad9`, each running every title on iOS 18.0 with retries, the fault classification and the network evidence. One geometry for both titles took 24 of the job's 60 minutes before this change, so both geometries in one job would not fit. It runs on pushes to the shared branches and on `workflow_dispatch` with `minimum_runtime=true`. There is no iOS 18 runtime locally; [hosted run 39563172575](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39563172575) passed both geometries for both titles in 32 and 33 minutes. Its orchestration is also covered by `test-mobile-runner.py`.
 
 ## Network observation
 
@@ -148,6 +149,7 @@ Not changed: `verify.sh` does not run the three runtime self-tests, because they
 | Action | Owner |
 | --- | --- |
 | Run the three interactive accessibility steps on both geometries and record them in `ACCESSIBILITY.md` | Accessibility / Block Match |
+| On the next reproducibility gate failure, compare the kept executables and link-file lists and fix the build's nondeterminism | Release |
 | S-1 to S-4 shell changes, then remove the excuses and the large-text settings skip | `GamePlatform` |
 | Populate both String Catalogs; give shared-shell strings a catalog and bundle (the `GamePlatform` package emits no `.stringsdata`) before any title declares a second language | Titles / `GamePlatform` |
 | Re-record baselines on a quiet host, preferably with the CI toolchain, and replace the retained file | Release |
@@ -155,20 +157,38 @@ Not changed: `verify.sh` does not run the three runtime self-tests, because they
 | Both apps import `_dlsym` from the Swift toolchain's static compatibility libraries; no project object references it | Recorded, no action |
 | Optional: an `ACCESSIBILITY.md` stub in `scripts/title-template` | Tooling |
 
-## Still needs hosted CI
+## Hosted CI
 
-- The `verify` job on Xcode 26.6 / iOS 26.5 SDK: the six new self-tests, the release gates (a framework that 26.6 links outside `ALLOWED_SYSTEM_FRAMEWORKS` would be named by the bundle audit), one extra Release build per title, and the new runtime self-test step, within the 45-minute budget.
-- The `foundation` matrix with network observation and `BlockAccessibilityUITests` on iOS 26.5.
-- The `minimum-runtime` matrix on iOS 18.0 on both geometries (`gh workflow run mobile.yml -f minimum_runtime=true`, or a push), gated on the per-job status of `minimum-runtime (iphone12)` and `minimum-runtime (ipad9)`, with the NETWORK PASS line and `<model>-network.json` in each. The network observer and its log predicate have only been checked against iOS 18 with mocks.
+Configured baseline: `macos-26`, Xcode 26.6 (`17F113`), iOS 26.5; the `minimum-runtime` matrix pins iOS 18.0. Runs on pull request #32; `minimum_runtime=true` runs were dispatched on the branch, because the job does not run on pull requests.
+
+| Run | Head | Result |
+| --- | --- | --- |
+| [39555497864](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39555497864) (pull request) | `e855951` | `verify` (every gate on Xcode 26.6) and `title-lifecycle` passed; three `foundation` jobs passed; `foundation (DevelopmentTitle, ipad9)` failed on sampler timeouts with no violation |
+| [39555551235](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39555551235) (dispatch) | `e855951` | Same, plus both `minimum-runtime` jobs failed in Block Match's settings audit on iOS 18.0 |
+| [39559297300](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39559297300) (pull request) | `caaa9e6` | Every `foundation` job and `title-lifecycle` passed; `verify` failed the reproducibility gate for the practice title |
+| [39563180194](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39563180194) (pull request) | `2bb05ce` | Every job passed |
+| [39563172575](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39563172575) (dispatch) | `2bb05ce` | Every job passed, `minimum-runtime (iphone12)` and `minimum-runtime (ipad9)` on iOS 18.0 included |
+
+What the failing runs found, and what changed:
+
+- **Sampler timeouts.** On a runner booting simulators, `ps -axo` exceeded its 30-second timeout three times in 782 samples, and every sampler error failed the network gate. A timed-out sample is now a counted gap, and the gate fails only above 10% timed out (`caaa9e6`). In the green runs 0 to 3 samples per job timed out, and the largest gap between socket samples was 8.6 to 105 seconds (the largest spans the practice title's simulator restart). On hosted runners the log channel therefore carries most of the coverage.
+- **iOS 18.0 settings audit.** Done, in the accent tint on the sheet's bar, nearly passes contrast on iOS 18.0 only; it is recorded under S-2 with its change and excused there. On iPad the export explanation, black on white, failed contrast while the sheet's bottom edge cut it off, and passed once scrolled into view: the harness now skips an element cut by its page's scroll view, as it does one partly outside the window (`bca8a9d`).
+- **Reproducibility.** One hosted `verify` run found the practice title's two Release builds differing in `__text` (7,637 bytes), `__stubs` (5,149 bytes) and `LC_UUID`; Block Match's were identical after `strip -S`. The three other hosted runs and three local Xcode 27.1 builds reproduced, with identical link-file lists. The cause is unknown. `verify.sh` now keeps both executables and every link-file list when the gate fails, and CI uploads them (`2bb05ce`).
+
+In the two green runs no XCTest case was retried. `verify` took 12 and 14 of its 45 minutes, `foundation` jobs 14 to 22 of 60, and `minimum-runtime` 32 and 33 of 60. Every job reported NETWORK PASS for each title it ran, with only `com.apple.network:activity` entries (63 per Block Match run, 77 per practice run) listed as system-owned.
+
+### Review fixes
+
+A review of the gates before the hosted runs found ways for them to pass a violation. Each fix has a self-test case that fails without it (`0faad15`): the capability scan now matches full selector names (23 of 30 selector rules could not match) and DNS and resolver symbols; a provenance link to a directory covers only an asset-catalog set, so each packaged file needs its own record, and every asset-catalog file is traced; the localization parser reads `%#@name@` and `%i`; the Mach-O reader accepts 64-bit universal headers; `check-foundation.py` skips plists whose top level is not a dictionary; the bundle self-test covers an unsigned binary's `__entitlements` section. CI keeps the gates' `*.log.err` files and pins the `verify` job's simulator runtime.
 
 ## Acceptance
 
 | Criterion | Verdict | Evidence |
 | --- | --- | --- |
-| CI runs the automated gates on every app target, and each gate fails on a seeded violation | Met locally; hosted run pending | `verify.sh` loops over every manifest title and runs in the `verify` job; network observation runs for every title and geometry in `foundation` and `minimum-runtime`; each gate's self-test fails without the refusal it seeds, and all ten passed locally |
-| The reference title passes the automated gates, the minimum-runtime job and the accessibility checklist on both simulator geometries | **Not met** | Automated gates: pass. Minimum-runtime job: not run (hosted). Accessibility checklist: every automated and simulator-manual item passed except three interactive steps that did not run (Inspector headings and focus, Full Keyboard Access, Grayscale filter) |
-| App-bundle audit finds no ad, analytics, attribution, IAP, account, cloud or push integration and no app-originated network traffic during exercised flows | Met locally | Bundle audit and capability scan pass on both titles' Release builds; no app-originated activity in about 2,700 samples and 271 log entries across both titles and geometries |
-| A reviewer can trace every packaged third-party asset to its license and attribution requirement | Met locally | The provenance gate traces every packaged file of both titles; the only third-party file, the SplitMix64 notice, links to a sentence naming its public-domain license and that it needs no attribution |
+| CI runs the automated gates on every app target, and each gate fails on a seeded violation | Met | `verify.sh` loops over every manifest title and runs in the `verify` job; network observation runs for every title and geometry in `foundation` and `minimum-runtime`; each gate's self-test fails without the refusal it seeds. All passed locally and in hosted runs 39563180194 and 39563172575; one earlier hosted run failed the reproducibility gate, recorded under [Hosted CI](#hosted-ci) |
+| The reference title passes the automated gates, the minimum-runtime job and the accessibility checklist on both simulator geometries | **Not met** | Automated gates: pass. Minimum-runtime job: passed on iOS 18.0 on both geometries (run 39563172575). Accessibility checklist: every automated and simulator-manual item passed except three interactive steps that did not run (Inspector headings and focus, Full Keyboard Access, Grayscale filter) |
+| App-bundle audit finds no ad, analytics, attribution, IAP, account, cloud or push integration and no app-originated network traffic during exercised flows | Met | Bundle audit and capability scan pass on both titles' Release builds locally and on Xcode 26.6; no app-originated activity locally (about 2,700 samples, 271 log entries) or in any hosted job on iOS 26.5 and 18.0 |
+| A reviewer can trace every packaged third-party asset to its license and attribution requirement | Met | The provenance gate traces every packaged file of both titles; the only third-party file, the SplitMix64 notice, links to a sentence naming its public-domain license and that it needs no attribution |
 | Accessibility findings have either a fix or an explicit, tracked title-specific action before that title ships | Met | F-1 to F-3 fixed with tests; S-1 to S-4 tracked with the exact shell change, each excused only on its page and recorded in the title record; the retry's banner artifact recorded above |
 
-Epic 08 stays open until the three interactive accessibility steps pass on both geometries. After that, the epic is complete for mobile simulator acceptance, with the hosted `verify`, `foundation` and `minimum-runtime` results named as pending.
+Epic 08 stays open until the three interactive accessibility steps pass on both geometries. After that, the epic is complete for mobile simulator acceptance.

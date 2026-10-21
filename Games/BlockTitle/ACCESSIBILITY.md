@@ -4,7 +4,7 @@ This record applies the [accessibility checklist](../../docs/accessibility-check
 
 ## Environment
 
-Recorded 2026-10-20 on the Epic 08 working tree based on `b0276d8`, uncommitted. Host Mac14,6 (Apple M2 Max), macOS 27.2, Xcode 27.1 (`27A9275`), iOS Simulator 26.0 (`23A5287g`) on owned simulators with iPhone 12 and iPad (9th generation) geometry, Debug build, portrait. Every result here is a simulator observation. The configured CI runtime (iOS 26.5) and the iOS 18.0 minimum runtime have not run these tests yet.
+Recorded 2026-10-20 on the Epic 08 working tree based on `b0276d8`, uncommitted. Host Mac14,6 (Apple M2 Max), macOS 27.2, Xcode 27.1 (`27A9275`), iOS Simulator 26.0 (`23A5287g`) on owned simulators with iPhone 12 and iPad (9th generation) geometry, Debug build, portrait. Every result here is a simulator observation. Hosted CI later passed these tests on iOS 26.5 and on the iOS 18.0 minimum runtime on both geometries, after the iOS 18.0 settings findings below ([evidence](../../roadmap/audits/epic-08-release-baseline.md#hosted-ci)).
 
 The final run of all 6 app-hosted and 7 UI tests (`BlockTitleTests`, `BlockTitleUITests`) passed on both geometries on the first attempt, with no XCTest retry. Apart from the settings sheet, the audits reported nothing on any page at either text size on either geometry, so no repeat-filtered or excused finding hides a Block Match page result. The runs used `xcodebuild test-without-building` with the same retry and time-allowance flags as `scripts/test-mobile.sh`, on simulators named for this work, rather than `scripts/test-mobile.sh` itself.
 
