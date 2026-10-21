@@ -1,0 +1,33 @@
+Spike 11 local run: idle-control window I for every timing attempt, extracted from the per-run reports
+(dig-<candidate>-<model>-<run>-a<n>-timing-timing.json) of the run recorded in local-receipt.json.
+An attempt is void when any I interval row misses its budget (p95 <= 20.0 ms, p99 <= 25.0 ms, share > 33.3 ms <= 0.5 %);
+only the kept attempt of each run enters local-measurements.json. Scene-update callback intervals on the simulator host, not presented frames.
+
+geometry  run               attempt verdict    n  p95 ms  p99 ms  >33.3 % worst ms
+iphone12  heightfield-run1  a1      kept     599   17.04   24.32    0.000    33.03
+iphone12  lowlevel-run1     a1      kept     598   17.07   24.72    0.000    33.21
+iphone12  voxel-run1        a1      void     596   17.20   31.01    0.000    33.27
+iphone12  voxel-run1        a2      kept     600   16.88   23.02    0.000    27.88
+iphone12  sprite-run1       a1      void     597   16.67   16.67    0.503    34.88
+iphone12  sprite-run1       a2      void     595   16.67   16.67    0.672    39.52
+iphone12  sprite-run1       a3      void     594   16.67   27.87    0.842    38.80
+iphone12  heightfield-run2  a1      void     590   17.30   33.24    0.508    33.52
+iphone12  heightfield-run2  a2      void     593   17.24   33.27    0.675    34.15
+iphone12  heightfield-run2  a3      kept     598   17.07   24.85    0.000    33.22
+iphone12  lowlevel-run2     a1      kept     597   17.09   24.58    0.335    40.22
+iphone12  voxel-run2        a1      void     595   17.13   30.87    0.336    34.23
+iphone12  voxel-run2        a2      kept     600   16.86   22.47    0.000    27.85
+iphone12  sprite-run2       a1      void     596   16.67   16.67    0.671    37.13
+iphone12  sprite-run2       a2      void     592   16.67   33.33    1.182    39.53
+iphone12  sprite-run2       a3      void     596   16.67   16.67    0.503    39.88
+ipad9     heightfield-run1  a1      void     595   17.09   32.04    0.336    36.42
+ipad9     heightfield-run1  a2      kept     600   16.89   22.43    0.000    26.41
+ipad9     lowlevel-run1     a1      kept     600   16.86   21.57    0.000    26.71
+ipad9     voxel-run1        a1      kept     598   16.95   24.48    0.000    33.10
+ipad9     sprite-run1       a1      void     593   16.67   33.33    1.180    33.33
+ipad9     sprite-run1       a2      void     596   16.67   16.67    0.503    41.43
+ipad9     sprite-run1       a3      kept     598   16.67   16.67    0.167    37.65
+ipad9     heightfield-run2  a1      kept     598   16.98   24.35    0.167    33.66
+ipad9     lowlevel-run2     a1      kept     598   16.91   24.46    0.167    33.44
+ipad9     voxel-run2        a1      kept     600   16.95   23.76    0.000    26.22
+ipad9     sprite-run2       a1      kept     599   16.67   16.67    0.167    33.33
