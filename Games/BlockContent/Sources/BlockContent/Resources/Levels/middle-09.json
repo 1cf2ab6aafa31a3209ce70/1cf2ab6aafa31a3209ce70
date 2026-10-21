@@ -1,0 +1,21 @@
+{
+  "schemaVersion": 1,
+  "id": "middle-09",
+  "gameType": "block",
+  "contentVersion": 2,
+  "seed": 209007,
+  "payload": {
+    "chapter": 2,
+    "columns": 7,
+    "rows": 7,
+    "cells": [3, 1, 2, 0, 3, 2, 3,
+              3, 1, 3, 2, 1, 2, 1,
+              3, 2, 3, 2, 1, 2, 1,
+              1, 1, 3, 3, 1, 2, 2,
+              3, 2, 3, 2, 1, 3, 3,
+              3, 1, 2, 3, 2, 1, 1,
+              3, 1, 1, 3, 3, 2, 2],
+    "solution": [21, 47, 20, 38, 18, 45, 47, 19, 41, 7, 9, 22, 22],
+    "nextLevelIDs": ["middle-10"]
+  }
+}
