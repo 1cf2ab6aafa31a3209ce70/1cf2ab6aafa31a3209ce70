@@ -81,6 +81,16 @@ for target in $targets; do
   release_gate "$target-reproducible" "$output_dir/$target-reproducible-build.log" \
     python3 scripts/check-reproducible-build.py "$output_dir/ios-Release/Build/Products/Release-iphoneos/$target.app" \
     "$output_dir/ios-Rebuild/Build/Products/Release-iphoneos/$target.app"
+  case " $gate_failures " in
+    *" $target-reproducible "*)
+      # Keep both executables and link inputs so the difference can be examined.
+      evidence="$output_dir/reproducible-evidence/$target"
+      for build in ios-Release ios-Rebuild; do
+        mkdir -p "$evidence/$build"
+        cp "$output_dir/$build/Build/Products/Release-iphoneos/$target.app/$target" "$evidence/$build/"
+        find "$output_dir/$build/Build/Intermediates.noindex" -name '*.LinkFileList' -exec cp {} "$evidence/$build/" \;
+      done ;;
+  esac
 done
 if [ -n "$gate_failures" ]; then
   echo "Release gates failed:$gate_failures (logs in $output_dir)" >&2

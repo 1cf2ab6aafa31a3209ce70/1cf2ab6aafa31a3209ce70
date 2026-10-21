@@ -95,6 +95,7 @@ jobs:
           path: |
             ${{ runner.temp }}/foundation-verification/*.log
             ${{ runner.temp }}/foundation-verification/*.log.err
+            ${{ runner.temp }}/foundation-verification/reproducible-evidence/
           if-no-files-found: ignore
           retention-days: 30
   foundation:
