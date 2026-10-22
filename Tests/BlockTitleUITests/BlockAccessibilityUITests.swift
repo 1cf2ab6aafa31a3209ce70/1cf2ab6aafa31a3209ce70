@@ -18,21 +18,17 @@ final class BlockAccessibilityUITests: XCTestCase {
     /// the same entry in Games/BlockTitle/ACCESSIBILITY.md. All are in the
     /// shared settings sheet (`SharedShellSettingsView` in GamePlatform).
     static let excuses: [Excuse] = [
-        Excuse(page: "settings", type: .contrast,
-               elements: ["Feedback", "Language", "Local data", "Block Match currently supports English.",
-                          "Settings and progress are saved on this device. Automatic backup and sync are disabled. "
-                          + "Uninstalling the app or losing the device can erase them.",
-                          "save.export", "save.reset", "save.delete", "settings.done", "-"],
-               tracked: "S-2 secondary, tint and destructive text below 4.5:1 in the settings sheet"),
+        Excuse(page: "settings", type: .contrast, elements: ["settings.done", "-"],
+               tracked: "S-2 Done on the sheet's bar and an unresolved element below 4.5:1 in the settings sheet"),
         Excuse(page: "settings", type: .dynamicType,
-               elements: ["settings.done", "save.export", "save.reset", "save.delete",
+               elements: ["settings.done", "Export local data", "Reset progress", "Delete local data",
                           "Export creates a JSON copy using Files. A provider you choose may transfer that copy. "
                           + "The developer receives nothing. Exported copies remain under your control after reset or deletion."],
                tracked: "S-3 settings rows reported as not scaling"),
         Excuse(page: "settings", type: .dynamicType, elements: ["-"],
                tracked: "S-3 unresolved settings element reported as not scaling (iPad)"),
         Excuse(page: "settings", type: .textClipped,
-               elements: ["save.delete", "-",
+               elements: ["Export local data", "Reset progress", "Delete local data", "-",
                           "Export creates a JSON copy using Files. A provider you choose may transfer that copy. "
                           + "The developer receives nothing. Exported copies remain under your control after reset or deletion."],
                tracked: "S-3 settings rows reported as clipped at larger sizes"),
@@ -145,17 +141,12 @@ final class BlockAccessibilityUITests: XCTestCase {
         let app = launchBlockTitle(arguments: arguments)
         findings += try audit(app, "menu-\(suffix)", types, through: app.buttons["shell.settings"])
 
-        // `--shell-large-text` does not reach the settings sheet (S-1 in
-        // Games/BlockTitle/ACCESSIBILITY.md), so this run would audit it at
-        // the default size again. Its large-text check is a manual step.
-        if !arguments.contains("--shell-large-text") {
-            tap(app, "shell.settings")
-            let form = app.collectionViews["settings.form"]
-            waitFor(form)
-            findings += try audit(app, "settings-\(suffix)", types, through: app.buttons["save.delete"], scrolling: form)
-            app.buttons["settings.done"].tap()
-            waitFor(app.staticTexts["shell.menu"])
-        }
+        tap(app, "shell.settings")
+        let form = app.collectionViews["settings.form"]
+        waitFor(form)
+        findings += try audit(app, "settings-\(suffix)", types, through: app.buttons["save.delete"], scrolling: form)
+        app.buttons["settings.done"].tap()
+        waitFor(app.staticTexts["shell.menu"])
 
         tap(app, "shell.start")
         waitFor(app.staticTexts["shell.play"])
