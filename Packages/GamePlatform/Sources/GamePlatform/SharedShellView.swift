@@ -26,16 +26,19 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     @State private var showingSettings = false
     private let presentation: ShellPresentation
     private let forceReducedMotion: Bool
+    private let resultSummary: () -> String?
     private let gameplayHost: () -> GameplayHost
     private let gameplayControls: (Bool) -> GameplayControls
 
     public init(controller: ShellController, presentation: ShellPresentation,
                 forceReducedMotion: Bool = false,
+                resultSummary: @escaping () -> String? = { nil },
                 @ViewBuilder gameplayHost: @escaping () -> GameplayHost,
                 @ViewBuilder gameplayControls: @escaping (Bool) -> GameplayControls) {
         self.controller = controller
         self.presentation = presentation
         self.forceReducedMotion = forceReducedMotion
+        self.resultSummary = resultSummary
         self.gameplayHost = gameplayHost
         self.gameplayControls = gameplayControls
     }
@@ -75,6 +78,17 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
         }
         .accessibilityIdentifier("shell.scroll")
         .background(Color(.systemGroupedBackground))
+        .overlay(alignment: .top) {
+            // The page scrolls behind the status bar; without a backdrop its
+            // text runs into the clock, which the audit reports as text with
+            // no accessibility element (S-8). A zero-height strip at the top
+            // of the safe area extends its background up over the bar.
+            Color.clear
+                .frame(height: 0)
+                .background(Color(.systemGroupedBackground).ignoresSafeArea(edges: .top))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .sheet(isPresented: $showingSettings) {
             // UIKit presents the sheet at the process's text size, so a size
             // set on the title's root view reaches it only through here.
@@ -143,7 +157,11 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
             ShellHeading(outcome == .success ? presentation.successHeading : presentation.failureHeading,
                          id: outcome == .success ? "shell.result.success" : "shell.result.failure")
             Text(outcome == .success ? presentation.successMessage : presentation.failureMessage)
-            ShellActionButton(presentation.retryLabel, id: "shell.result.retry", prominent: true, action: controller.restart)
+            if let summary = resultSummary() {
+                Text(summary).accessibilityIdentifier("shell.result.summary")
+            }
+            ShellActionButton(outcome == .success ? presentation.successRetryLabel : presentation.retryLabel,
+                              id: "shell.result.retry", prominent: true, action: controller.restart)
             ShellActionButton("Back to menu", id: "shell.result.menu", action: controller.returnToMenu)
         case .loadFailed(_, let message):
             ShellHeading("Unable to start", id: "shell.load-error")

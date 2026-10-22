@@ -75,8 +75,12 @@ public protocol ModuleSession: AnyObject {
     /// Saved progress, delivered at registration, after loading and after each
     /// change, so the session can choose a level. Optional.
     func progressDidChange(_ progress: SaveProgress)
+    /// One line the result page shows under the outcome message, such as a
+    /// score, read when the page draws. Optional; nil shows nothing.
+    var resultSummary: String? { get }
 }
 
 extension ModuleSession {
     public func progressDidChange(_ progress: SaveProgress) {}
+    public var resultSummary: String? { nil }
 }

@@ -2,11 +2,36 @@ import Foundation
 import GameCore
 
 public struct BlockMatchPayload: Codable, Equatable, Sendable {
+    public let chapter: Int
     public let columns: Int
     public let rows: Int
-    /// Row-major from the top row; 0 is empty, 1...4 a block color.
+    /// Row-major from the top row; 0 is empty, 1...4 a block kind.
     public let cells: [Int]
+    /// One clearing sequence: the board index selected by each move, in order.
+    public let solution: [Int]
     public let nextLevelIDs: [String]
+
+    public init(chapter: Int, columns: Int, rows: Int, cells: [Int], solution: [Int], nextLevelIDs: [String]) {
+        self.chapter = chapter
+        self.columns = columns
+        self.rows = rows
+        self.cells = cells
+        self.solution = solution
+        self.nextLevelIDs = nextLevelIDs
+    }
+}
+
+/// A chapter's board sizes and block kinds (ADR-010): each chapter adds a kind.
+public struct BlockChapter: Equatable, Sendable {
+    public let number: Int
+    /// Allowed columns and rows.
+    public let sizes: ClosedRange<Int>
+    /// The chapter's boards use exactly kinds 1...kinds.
+    public let kinds: Int
+
+    public static let all = [BlockChapter(number: 1, sizes: 3...5, kinds: 2),
+                             BlockChapter(number: 2, sizes: 5...7, kinds: 3),
+                             BlockChapter(number: 3, sizes: 6...8, kinds: 4)]
 }
 
 public typealias BlockLevel = LevelEnvelope<BlockMatchPayload>
@@ -20,10 +45,13 @@ public struct BlockCatalog: Sendable {
 
     public func level(id: String) -> BlockLevel? { levels.first { $0.id == id } }
 
-    /// The first level in catalog order that `progress` has not completed, or
-    /// the last level once every level is complete.
-    public func nextLevel(after progress: SaveProgress) -> BlockLevel {
-        levels.first { !progress.completedLevels.contains($0.id) } ?? levels[levels.count - 1]
+    /// The first level in catalog order that `progress` has not completed.
+    /// Once every level is complete, the level after `last`, the last level
+    /// leading back to the first; without `last`, the first level.
+    public func nextLevel(after progress: SaveProgress, following last: String? = nil) -> BlockLevel {
+        if let open = levels.first(where: { !progress.completedLevels.contains($0.id) }) { return open }
+        guard let last, let index = levels.firstIndex(where: { $0.id == last }) else { return levels[0] }
+        return levels[(index + 1) % levels.count]
     }
 
     public static func decode(catalogData: Data, availableAssets: Set<String>,
@@ -43,23 +71,50 @@ public struct BlockCatalog: Sendable {
                 }
                 let level = try BlockLevel.decode(try levelData(reference.file))
                 try level.validate(reference: reference, catalog: catalog)
-                try validate(level.payload, catalog: catalog)
+                try validate(level.payload)
                 levels.append(level)
             } catch {
                 throw ContentValidationError(message: "\(reference.file) [\(reference.id)]: \(error.localizedDescription)")
             }
         }
+        try validateOrder(levels)
         return BlockCatalog(envelope: catalog, levels: levels)
     }
 
-    private static func validate(_ payload: BlockMatchPayload, catalog: CatalogEnvelope) throws {
-        guard (2...8).contains(payload.columns), (2...8).contains(payload.rows),
-              payload.cells.count == payload.columns * payload.rows else {
-            throw ContentValidationError(message: "board must be 2...8 columns by 2...8 rows with one cell each")
+    /// Chapters in order, each level unlocking the next, and no board or seed twice.
+    private static func validateOrder(_ levels: [BlockLevel]) throws {
+        guard !levels.isEmpty else { throw ContentValidationError(message: "catalog.json: no levels") }
+        for (index, level) in levels.enumerated() {
+            let next = index + 1 < levels.count ? [levels[index + 1].id] : []
+            guard level.payload.nextLevelIDs == next else {
+                throw ContentValidationError(message: "\(level.id): must unlock exactly the next level in catalog order")
+            }
+            if index > 0, level.payload.chapter < levels[index - 1].payload.chapter {
+                throw ContentValidationError(message: "\(level.id): chapters must not go backwards in catalog order")
+            }
         }
-        guard payload.cells.allSatisfy({ $0 == 0 || BlockBoard.colors.contains($0) }),
-              payload.cells.filter({ $0 != 0 }).count >= 2 else {
-            throw ContentValidationError(message: "cells must be 0 or a color 1...4, with at least two blocks")
+        guard Set(levels.map(\.seed)).count == levels.count else {
+            throw ContentValidationError(message: "catalog.json: two levels share a seed")
+        }
+        let boards = levels.map { [$0.payload.columns, $0.payload.rows] + $0.payload.cells }
+        guard Set(boards).count == levels.count else {
+            throw ContentValidationError(message: "catalog.json: two levels share a board")
+        }
+    }
+
+    private static func validate(_ payload: BlockMatchPayload) throws {
+        guard let chapter = BlockChapter.all.first(where: { $0.number == payload.chapter }) else {
+            throw ContentValidationError(message: "chapter must be 1...\(BlockChapter.all.count)")
+        }
+        let sizes = chapter.sizes
+        guard sizes.contains(payload.columns), sizes.contains(payload.rows),
+              payload.cells.count == payload.columns * payload.rows else {
+            throw ContentValidationError(message: "chapter \(chapter.number) boards must be \(sizes.lowerBound)...\(sizes.upperBound) "
+                                         + "columns by \(sizes.lowerBound)...\(sizes.upperBound) rows with one cell each")
+        }
+        guard Set(payload.cells.filter { $0 != 0 }) == Set(1...chapter.kinds),
+              payload.cells.allSatisfy({ $0 == 0 || BlockBoard.colors.contains($0) }) else {
+            throw ContentValidationError(message: "chapter \(chapter.number) cells must be 0 or a kind 1...\(chapter.kinds), using every kind")
         }
         for column in 0..<payload.columns {
             let stack = (0..<payload.rows).map { payload.cells[$0 * payload.columns + column] }
@@ -68,13 +123,14 @@ public struct BlockCatalog: Sendable {
                 throw ContentValidationError(message: "blocks must rest on the floor or another block")
             }
         }
-        let board = BlockBoard(columns: payload.columns, rows: payload.rows, cells: payload.cells)
-        guard BlockReplay.solution(for: board) != nil else {
-            throw ContentValidationError(message: "board cannot be cleared")
+        var board = BlockBoard(columns: payload.columns, rows: payload.rows, cells: payload.cells)
+        for move in payload.solution {
+            guard board.clear(at: move) > 0 else {
+                throw ContentValidationError(message: "clearing sequence selects no group at \(move)")
+            }
         }
-        guard Set(payload.nextLevelIDs).count == payload.nextLevelIDs.count,
-              Set(payload.nextLevelIDs).isSubset(of: Set(catalog.levels.map(\.id))) else {
-            throw ContentValidationError(message: "unknown or repeated next-level reference")
+        guard board.isEmpty else {
+            throw ContentValidationError(message: "clearing sequence leaves blocks on the board")
         }
     }
 }

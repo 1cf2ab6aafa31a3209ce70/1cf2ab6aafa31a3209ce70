@@ -45,8 +45,8 @@ The generator uses Python's standard library. CI checks generated files without 
 | `Packages/GamePlatform` | Shared mobile controller/UI and Apple adapters; depends on local `GameCore` |
 | `Games/DevelopmentTitle` | Practice module, SpriteKit practice scene and `title.json` manifest |
 | `Games/DevelopmentContent` | Original bundled fixtures, title payload validation and the build-time validator |
-| `Games/BlockTitle` | Block Match reference slice: module, SpriteKit board, accessible controls and manifest |
-| `Games/BlockContent` | Block Match boards, pure rules, solver-checked validation and its validator |
+| `Games/BlockTitle` | Blocky Marty, the block title: module, SpriteKit board, accessible controls and manifest |
+| `Games/BlockContent` | Blocky Marty's 30 boards, pure rules, validation that replays each board's clearing sequence, and its validator and level generator |
 | `Tests/<Title>Tests` | App-hosted tests of each title through the shared host and save store |
 | `Tests/<Title>UITests` | Each title's native navigation, input and persistence paths |
 | `scripts` | Title manifests, project generation, structural checks and mobile build/test commands |
