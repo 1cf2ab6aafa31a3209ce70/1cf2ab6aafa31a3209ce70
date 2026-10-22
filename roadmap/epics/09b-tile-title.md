@@ -6,7 +6,7 @@
 
 **Polishing:** as for Epic 09A, original art, audio, animation, release metadata and hands-on or device accessibility steps go to [Polishing](../polishing.md) (owner decision, 2026-10-21). This epic closes on rules, levels and play that pass the automated gates.
 
-**Status:** In progress. Task 1 is recorded in [ADR-011](../decisions/ADR-011-tile-match-rules.md) (Few Tiles: tray triple-match, unlimited undo; scoring proposed, awaiting the owner). Tasks 2 and 4 and the play page, saves and results of tasks 3 and 5 are built; no shared grid helper is extracted, because the titles share no rule code. Art, audio, animation, release metadata and the interactive and device accessibility steps are [Polishing](../polishing.md) items P-8 to P-11.
+**Status:** Closed 2026-10-21 for rules, levels and play. Task 1 is recorded in [ADR-011](../decisions/ADR-011-tile-match-rules.md) (Few Tiles: tray triple-match, unlimited undo); its scoring rule is implemented as proposed and awaits the owner's confirmation. Tasks 2 and 4 and the play page, saves and results of tasks 3 and 5 are done; no shared grid helper is extracted, because the titles share no rule code. Every gate and every title's tests pass locally and in hosted CI on iOS 26.5 and 18.0 on both geometries (run [39719648914](https://github.com/1cf2ab6aafa31a3209ce70/1cf2ab6aafa31a3209ce70/actions/runs/39719648914)). Art, audio, animation, release metadata and the interactive and device accessibility steps are [Polishing](../polishing.md) items P-8 to P-11.
 
 ## Scope and tasks
 
