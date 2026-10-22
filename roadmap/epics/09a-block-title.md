@@ -4,6 +4,8 @@
 
 **Entry:** Epic 08 release gates, Spike 11's contract decision and Epics 01–07 are complete. Epic 07's reference slice is the starting point. **Next:** Epic 09B. This epic depends on all earlier ordered work.
 
+**Status:** Closed 2026-10-21 for rules, levels and play. Tasks 1, 2 and 4 are done under [ADR-010](../decisions/ADR-010-block-match-rules.md), with the play page, saves and results of tasks 3 and 5; the title passes the automated release gates and its tests on both geometries, iOS 18.0 included. By the owner's decision, art, audio, animation, release metadata, task 6 and the open accessibility steps moved to [Polishing](../polishing.md), so the checklist's store and hardware items are not yet run.
+
 ## Scope and tasks
 
 1. Define original rules, win/fail states, input model, scoring, and level progression. Record them before writing any shared genre code.
