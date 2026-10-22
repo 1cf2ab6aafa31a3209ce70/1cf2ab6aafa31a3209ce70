@@ -35,6 +35,8 @@ CASES = [
     ("floating tile", "Levels/intro-02.json", tile(8, [1, 9, 1, 1]), "must rest on a tile in the layer below"),
     ("broken unlock chain", "Levels/intro-05.json", payload(lambda p: p.update(nextLevelIDs=["intro-07"])), "unlock exactly the next level"),
     ("shared seed", "Levels/intro-04.json", lambda level: {**level, "seed": 301}, "two levels share a seed"),
+    ("a later level that cannot fill the tray", "Levels/intro-03.json",
+     payload(lambda p: p.update(tiles=[t[:3] + [min(t[3], 3)] for t in p["tiles"]])), "needs at least four kinds"),
 ]
 
 

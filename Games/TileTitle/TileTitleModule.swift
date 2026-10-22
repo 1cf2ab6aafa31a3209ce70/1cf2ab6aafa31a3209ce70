@@ -170,6 +170,13 @@ enum TileTeaching {
         }
     }
 
+    /// A tile's place in whole cells. A tile on an odd layer straddles two
+    /// rows and two columns, and says so.
+    static func position(of tile: TileBoard.Tile) -> String {
+        func span(_ half: Int) -> String { half % 2 == 0 ? "\(half / 2 + 1)" : "\(half / 2 + 1) to \(half / 2 + 2)" }
+        return "row \(span(tile.y)), column \(span(tile.x))"
+    }
+
     /// The tray in words, for VoiceOver and the play page.
     static func tray(_ game: TileGame) -> String {
         let free = TileGame.traySlots - game.tray.count
@@ -322,7 +329,7 @@ struct TileControlsView: View {
 
     private func tileButton(_ index: Int, game: TileGame) -> some View {
         let tile = game.board.tiles[index]
-        let row = tile.y / 2 + 1, column = tile.x / 2 + 1
+        let position = TileTeaching.position(of: tile)
         let name = TileStyle.name(tile.kind)
         let waiting = game.tray.filter { game.board.tiles[$0].kind == tile.kind }.count
         let freed = game.board.uncovers(index).map { TileStyle.name(game.board.tiles[$0].kind) }
@@ -333,7 +340,7 @@ struct TileControlsView: View {
         // button background, so the fill only repeats the board's color.
         return Button { session.select(index) } label: {
             Label {
-                Text("Row \(row), column \(column)").foregroundStyle(Color.primary)
+                Text(position.prefix(1).uppercased() + position.dropFirst()).foregroundStyle(Color.primary)
             } icon: {
                 ZStack {
                     Image(systemName: TileStyle.symbol(tile.kind)).foregroundStyle(Color(uiColor: TileStyle.uiColor(tile.kind)))
@@ -344,7 +351,7 @@ struct TileControlsView: View {
         }
         .buttonStyle(.bordered)
         .disabled(!session.playing)
-        .accessibilityLabel("\(name), row \(row), column \(column), layer \(tile.layer + 1)")
+        .accessibilityLabel("\(name), \(position), layer \(tile.layer + 1)")
         .accessibilityHint(hint)
         .accessibilityIdentifier("tile.cell.\(index)")
     }
@@ -433,11 +440,14 @@ final class TileScene: SKScene {
     override func touchesEnded(_ touches: Set<UITouch>, with event: UIEvent?) {
         guard touches.count == 1, let point = touches.first?.location(in: self), let session, session.playing,
               let board = session.game?.board, half > 0 else { return }
-        // The topmost tile under the touch; a covered tile ignores it.
+        // The topmost drawn tile under the touch; a covered tile ignores it.
+        // Tiles on one layer never share a point, and the gap between them
+        // selects nothing.
+        let reach = half - 2
         let hit = board.tiles.indices.filter { index in
             guard board.present[index] else { return false }
             let center = center(of: board.tiles[index])
-            return abs(point.x - center.x) <= half && abs(point.y - center.y) <= half
+            return abs(point.x - center.x) < reach && abs(point.y - center.y) < reach
         }.max { board.tiles[$0].layer < board.tiles[$1].layer }
         if let hit { session.select(hit) }
     }

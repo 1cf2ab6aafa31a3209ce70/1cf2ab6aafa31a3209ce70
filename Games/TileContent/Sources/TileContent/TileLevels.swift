@@ -39,6 +39,7 @@ public struct TileCatalog: Sendable {
     public static let titleID = "tile-match"
     /// The board's largest width and height in half cells: seven tiles across.
     public static let extent = 14
+    public static let levelsPerChapter = 10
     public let envelope: CatalogEnvelope
     public let levels: [TileLevel]
 
@@ -80,9 +81,17 @@ public struct TileCatalog: Sendable {
         return TileCatalog(envelope: catalog, levels: levels)
     }
 
-    /// Chapters in order, each level unlocking the next, and no board or seed twice.
+    /// Chapters of ten in order, each level unlocking the next, no board or
+    /// seed twice, and (ADR-011 rule 8) only the first two levels with too few
+    /// kinds to fill the tray.
     private static func validateOrder(_ levels: [TileLevel]) throws {
         guard !levels.isEmpty else { throw ContentValidationError(message: "catalog.json: no levels") }
+        for chapter in TileChapter.all where levels.filter({ $0.payload.chapter == chapter.number }).count != levelsPerChapter {
+            throw ContentValidationError(message: "catalog.json: chapter \(chapter.number) must have \(levelsPerChapter) levels")
+        }
+        for level in levels.dropFirst(2) where Set(level.payload.tiles.map(\.kind)).count < 4 {
+            throw ContentValidationError(message: "\(level.id): every level after the first two needs at least four kinds, so the tray can fill")
+        }
         for (index, level) in levels.enumerated() {
             let next = index + 1 < levels.count ? [levels[index + 1].id] : []
             guard level.payload.nextLevelIDs == next else {
@@ -112,9 +121,10 @@ public struct TileCatalog: Sendable {
         guard chapter.layers.contains(layers) else {
             throw ContentValidationError(message: "chapter \(chapter.number) boards must have \(chapter.layers.lowerBound)...\(chapter.layers.upperBound) layers")
         }
+        // The range check comes first, so an absurd kind fails before 1...k is built.
         let kinds = Set(tiles.map(\.kind))
-        guard let most = kinds.max(), kinds == Set(1...max(1, most)), chapter.kinds.contains(kinds.count),
-              kinds.isSubset(of: Set(TileBoard.kinds)) else {
+        guard kinds.isSubset(of: Set(TileBoard.kinds)), let most = kinds.max(), kinds == Set(1...most),
+              chapter.kinds.contains(kinds.count) else {
             throw ContentValidationError(message: "chapter \(chapter.number) tiles must use kinds 1...k for k in "
                                          + "\(chapter.kinds.lowerBound)...\(chapter.kinds.upperBound)")
         }

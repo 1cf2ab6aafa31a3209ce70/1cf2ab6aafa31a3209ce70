@@ -207,6 +207,14 @@ final class TileTitleModuleTests: XCTestCase {
         }
     }
 
+    /// A tile on an odd layer sits between two rows and two columns, and its
+    /// button says so.
+    func testPositionsNameTheCellsATileCovers() {
+        XCTAssertEqual(TileTeaching.position(of: TileBoard.Tile(layer: 0, x: 2, y: 0, kind: 1)), "row 1, column 2")
+        XCTAssertEqual(TileTeaching.position(of: TileBoard.Tile(layer: 1, x: 3, y: 1, kind: 1)), "row 1 to 2, column 2 to 3")
+        XCTAssertEqual(TileTeaching.position(of: TileBoard.Tile(layer: 2, x: 4, y: 2, kind: 1)), "row 2, column 3")
+    }
+
     /// The tray in words, as VoiceOver and the play page read it.
     func testTraySummaryGroupsKindsAndCountsFreeSlots() throws {
         var game = TileGame(level: try XCTUnwrap(BundledContent.load().level(id: "intro-02")))

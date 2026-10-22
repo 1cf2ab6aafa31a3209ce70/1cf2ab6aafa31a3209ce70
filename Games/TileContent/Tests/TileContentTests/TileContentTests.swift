@@ -196,6 +196,11 @@ final class TileContentTests: XCTestCase {
         rejects(files, containing: "multiple of three")
         try tiles("Levels/intro-01.json") { $0 = $0.map { [$0[0], $0[1], $0[2], $0[3] == 2 ? 5 : $0[3]] } }
         rejects(files, containing: "kinds 1...k")
+        try tiles("Levels/intro-01.json") { $0 = $0.map { [$0[0], $0[1], $0[2], $0[3] == 2 ? 9_000_000_000 : $0[3]] } }
+        rejects(files, containing: "kinds 1...k")
+        // intro-03 with only three kinds could never fill the tray.
+        try tiles("Levels/intro-03.json") { $0 = $0.map { [$0[0], $0[1], $0[2], min($0[3], 3)] } }
+        rejects(files, containing: "intro-03: every level after the first two needs at least four kinds")
         files = base
         try payload("Levels/intro-01.json", in: &files) { $0["solution"] = [0, 1, 2, 3] }
         rejects(files, containing: "leaves tiles")
@@ -218,6 +223,13 @@ final class TileContentTests: XCTestCase {
             catalog["levels"] = levels
         }
         rejects(files, containing: "unlock exactly the next level")
+        files = base
+        try mutate("catalog.json", in: &files) { catalog in
+            var levels = catalog["levels"] as! [[String: Any]]
+            levels.removeLast()
+            catalog["levels"] = levels
+        }
+        rejects(files, containing: "chapter 3 must have 10 levels")
         files = base
         try mutate("Levels/intro-03.json", in: &files) { $0["seed"] = 302 }
         rejects(files, containing: "share a seed")
