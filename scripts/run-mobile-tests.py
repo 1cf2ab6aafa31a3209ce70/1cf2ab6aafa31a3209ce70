@@ -498,11 +498,14 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
             # through every test invocation on this device, restart included.
             observer = network_observation.Observer(device, executable, output, model).start()
             # Hosted accessibility queries can exceed 120 seconds for a passing
-            # multi-step UI case. Each case gets 180 seconds; the separate
+            # multi-step UI case. Each case gets 300 seconds; the separate
             # 1,800-second whole-suite cap remains the aggregate failure bound.
             # Three titles' suites outgrew 900 seconds: Few Tiles' 20 cases on a
             # hosted iPhone 12 hit it with every finished case passing, one of
             # them held 84 seconds by an N08 query stall (run 39726770631).
+            # A case over its allowance is stopped and not retried; Blocky
+            # Marty's AX3 menu-to-pause audit, which had passed in earlier
+            # hosted runs, ran out of 180 seconds (run 39742238301).
             # A failed case runs once more (N06 in the navigation-contact audit:
             # XCTest's synthesized touches race backboardd on loaded simulators).
             # Every retry is reported by name, and a second failure still fails.
@@ -516,7 +519,7 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
                 run(xcode + ["-destination", f"platform=iOS Simulator,id={device}",
                              "-resultBundlePath", str(output / f"{model}.xcresult"),
                              "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
-                             "-maximum-test-execution-time-allowance", "180",
+                             "-maximum-test-execution-time-allowance", "300",
                              "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
                     log=output / f"{model}.log", timeout=1800)
             finally:
