@@ -6,6 +6,8 @@
 
 **Polishing:** as for Epic 09A, original art, audio, animation, release metadata and hands-on or device accessibility steps go to [Polishing](../polishing.md) (owner decision, 2026-10-21). This epic closes on rules, levels and play that pass the automated gates.
 
+**Status:** In progress. Task 1 is recorded in [ADR-011](../decisions/ADR-011-tile-match-rules.md) (Few Tiles: tray triple-match, unlimited undo; scoring proposed, awaiting the owner). Tasks 2 and 4 and the play page, saves and results of tasks 3 and 5 are built; no shared grid helper is extracted, because the titles share no rule code. Art, audio, animation, release metadata and the interactive and device accessibility steps are [Polishing](../polishing.md) items P-8 to P-11.
+
 ## Scope and tasks
 
 1. Define original rules, win/fail states, input model, scoring, and level progression. Document how they differ from the block title before sharing any genre code.
