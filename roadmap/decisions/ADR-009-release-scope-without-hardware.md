@@ -26,7 +26,7 @@ Simulator results do not establish, and no Epic 08 gate measures, any of the fol
 | Thermal and battery | Thermal state, throttling and battery drain over sustained play | None; the simulator has no thermal or battery model |
 | GPU | SpriteKit and RealityKit rendering cost on device GPUs | Apple states that Simulator GPU behavior does not represent devices |
 | Touch | Digitizer accuracy, latency, edge cells, multi-touch and palm contact on real glass | XCTest synthesized gestures, which also carry the simulator input faults N06 and N09 |
-| Accessibility output | VoiceOver speech and gestures, Voice Control, Switch Control | System accessibility audits and accessibility-element tests; the iOS Simulator does not run VoiceOver |
+| Accessibility output | VoiceOver speech and gestures, Voice Control, Switch Control, the Grayscale color filter | System accessibility audits and accessibility-element tests; the iOS Simulator does not run VoiceOver and has no Color Filters setting |
 | Audio and haptics | Haptic output; audio through the speaker, headphones and Bluetooth; the ring/silent switch; real route changes | Shell feedback tests with fake outputs; the simulator produces no haptics |
 | Minimum OS on device | iOS and iPadOS 18.0 on hardware | The hosted iOS 18.0 simulator job |
 | Distribution | Signing, provisioning, App Store processing and installation from TestFlight | Unsigned Release builds and bundle inspection |

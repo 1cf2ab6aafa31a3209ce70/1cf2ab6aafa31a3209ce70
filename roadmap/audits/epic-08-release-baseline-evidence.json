@@ -1,6 +1,6 @@
 {
   "date": "2026-10-20",
-  "status": "gates-and-automated-acceptance-passed-locally; interactive-accessibility-steps-and-hosted-ci-pending",
+  "status": "complete-for-mobile-simulator-acceptance; interactive-accessibility-steps-run-2026-10-21; shell-findings-S-1-to-S-7-tracked",
   "baseRevision": "b0276d8b2326692e7b3e69b69e22eb02d93a411e",
   "worktreeDirty": true,
   "toolchain": {
@@ -357,5 +357,144 @@
     "scripts/titles.py": "5eec2f7422533a93f17decd9fbe786c33da5849079efad204f6e7225f44150a1",
     "scripts/verify.sh": "d37df79f2efe28a51918e555b9814b6bdd59ae162c11c87fa45c23ac119de712",
     ".github/workflows/mobile.yml": "c4054a9d6cb894c38046d2b462d7ce6b971b4fee3d479a0d152cfeeab8a39e81"
+  },
+  "interactiveAccessibility": {
+    "date": "2026-10-21",
+    "revision": "681a507",
+    "worktreeDirty": false,
+    "build": "Debug, BlockTitle scheme, CODE_SIGNING_ALLOWED=NO",
+    "toolchain": "Xcode 27.1 (27A9275), iOS Simulator 26.0 (23A5287g), Mac14,6, macOS 27.2",
+    "devices": [
+      "new owned iPhone 12 simulator",
+      "new owned iPad (9th generation) simulator"
+    ],
+    "methods": {
+      "headings": "temporary UI test reading element traits from XCUIApplication.snapshot() via key-value coding (private)",
+      "keyboard": "Full Keyboard Access enabled in Settings by a temporary UI test; keys sent as hardware keyboard HID events through SimulatorKit (private); focus read from screenshot differences and Vision text recognition",
+      "grayscale": "not available on the simulator; play-page screenshots converted with sips to Generic Gray Gamma 2.2"
+    },
+    "headingsPerPage": {
+      "menu": [
+        "Block Match (app name)",
+        "Block Match"
+      ],
+      "settings": [
+        "Settings",
+        "Feedback",
+        "Language",
+        "Local data"
+      ],
+      "play": [
+        "Block Match (app name)",
+        "Clear the board"
+      ],
+      "pause": [
+        "Block Match (app name)",
+        "Paused"
+      ],
+      "success": [
+        "Block Match (app name)",
+        "Board cleared"
+      ],
+      "failure": [
+        "Block Match (app name)",
+        "No moves left"
+      ]
+    },
+    "geometries": {
+      "iphone12": {
+        "keyboardStops": {
+          "menu": [
+            "Play",
+            "Settings"
+          ],
+          "settings": [
+            "Sound effects",
+            "Music",
+            "Haptics",
+            "Export local data",
+            "Reset progress",
+            "Delete local data",
+            "Done"
+          ],
+          "play": [
+            "Block board",
+            "6 block buttons in row order",
+            "Pause",
+            "End board"
+          ],
+          "pause": [
+            "Resume",
+            "Restart board",
+            "Settings",
+            "Back to menu"
+          ],
+          "result": [
+            "Play again",
+            "Back to menu"
+          ]
+        },
+        "boardClearedFromKeyboard": true,
+        "focusAfterPageChange": {
+          "start": "Block board",
+          "pause": "Resume",
+          "resume": "Block board",
+          "success": "removed control (S-5)",
+          "failure": "removed control (S-5)",
+          "backToMenu": "removed control (S-5)",
+          "openSettings": "Haptics",
+          "closeSettings": "Settings"
+        }
+      },
+      "ipad9": {
+        "keyboardStops": {
+          "menu": [
+            "Play",
+            "Settings"
+          ],
+          "settings": [
+            "Sound effects",
+            "Music",
+            "Haptics",
+            "Export local data",
+            "Reset progress",
+            "Delete local data",
+            "Done unreachable; Escape closes the sheet (S-6)"
+          ],
+          "play": [
+            "6 block buttons in row order",
+            "Pause",
+            "End board"
+          ],
+          "pause": [
+            "Resume",
+            "Restart board",
+            "Settings",
+            "Back to menu"
+          ],
+          "result": [
+            "Play again",
+            "Back to menu"
+          ]
+        },
+        "boardClearedFromKeyboard": true,
+        "focusAfterPageChange": {
+          "start": "Row 2, column 1",
+          "pause": "removed control (S-5)",
+          "resume": "removed control (S-5)",
+          "success": "removed control (S-5)",
+          "failure": "removed control (S-5)",
+          "backToMenu": "removed control (S-5)",
+          "openSettings": "Haptics",
+          "closeSettings": "Settings"
+        }
+      }
+    },
+    "grayscale": "Color Filters absent from Settings on both geometries; grayscale screenshots keep circle and square blocks distinct; moved to the hardware check",
+    "findings": [
+      "S-5",
+      "S-6",
+      "S-7"
+    ]
   }
 }
