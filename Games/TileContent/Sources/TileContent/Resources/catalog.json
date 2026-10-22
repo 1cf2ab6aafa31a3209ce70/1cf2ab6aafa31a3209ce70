@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "titleID": "tile-match",
+  "contentVersion": 1,
+  "levels": [
+    {"id": "level-01", "file": "Levels/level-01.json", "gameType": "tile"}
+  ],
+  "assets": [],
+  "localizationKeys": []
+}
