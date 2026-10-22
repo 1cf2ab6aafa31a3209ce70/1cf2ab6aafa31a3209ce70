@@ -7,24 +7,24 @@ A title is an app target that registers one module with the shared shell. It own
 From the repository root:
 
 ```sh
-python3 scripts/new-title.py TileTitle --title-id tile-match --display-name "Tile Match" --game-type tile
+python3 scripts/new-title.py UnscrewTitle --title-id unscrew --display-name "Unscrew" --game-type unscrew
 bash scripts/verify.sh
-bash scripts/test-mobile.sh --title TileTitle
+bash scripts/test-mobile.sh --title UnscrewTitle
 ```
 
 The script copies [scripts/title-template](../scripts/title-template), renders a placeholder app icon and regenerates the Xcode project. It creates:
 
 | Path | Contents |
 | --- | --- |
-| `Games/TileTitle/title.json` | The manifest: target, stable title ID, home-screen name, bundle identifier, content package and test directories |
-| `Games/TileTitle/TileTitleApp.swift` | The composition root: `TitleStorage`, `ShellFeedbackController` and `ModuleHost` |
-| `Games/TileTitle/TileTitleModule.swift` | The module, its session, its gameplay view and its play controls |
-| `Games/TileTitle/Assets.xcassets` | The app icon, one opaque 1024-pixel PNG |
-| `Games/TileTitle/Localizable.xcstrings` | The title's String Catalog, English source |
-| `Games/TileTitle/PrivacyInfo.xcprivacy` | The reviewed privacy manifest: no tracking, collected data or required-reason APIs. `verify.sh` checks it against the Release build |
-| `Games/TileTitle/Info.plist`, `CONTENT.md` | Single-window scene configuration; the content record to keep current |
-| `Games/TileContent` | The content package: catalog, levels, payload validation, `TileContentValidator` and package tests |
-| `Tests/TileTitleTests`, `Tests/TileTitleUITests` | App-hosted tests through the real host and save store, and a native UI test |
+| `Games/UnscrewTitle/title.json` | The manifest: target, stable title ID, home-screen name, bundle identifier, content package and test directories |
+| `Games/UnscrewTitle/UnscrewTitleApp.swift` | The composition root: `TitleStorage`, `ShellFeedbackController` and `ModuleHost` |
+| `Games/UnscrewTitle/UnscrewTitleModule.swift` | The module, its session, its gameplay view and its play controls |
+| `Games/UnscrewTitle/Assets.xcassets` | The app icon, one opaque 1024-pixel PNG |
+| `Games/UnscrewTitle/Localizable.xcstrings` | The title's String Catalog, English source |
+| `Games/UnscrewTitle/PrivacyInfo.xcprivacy` | The reviewed privacy manifest: no tracking, collected data or required-reason APIs. `verify.sh` checks it against the Release build |
+| `Games/UnscrewTitle/Info.plist`, `CONTENT.md` | Single-window scene configuration; the content record to keep current |
+| `Games/UnscrewContent` | The content package: catalog, levels, payload validation, `UnscrewContentValidator` and package tests |
+| `Tests/UnscrewTitleTests`, `Tests/UnscrewTitleUITests` | App-hosted tests through the real host and save store, and a native UI test |
 
 The skeleton's session completes a level after a configured number of selections. It builds, validates and passes its tests before any gameplay exists; replace its rules, renderer, controls and levels with the title's own.
 
