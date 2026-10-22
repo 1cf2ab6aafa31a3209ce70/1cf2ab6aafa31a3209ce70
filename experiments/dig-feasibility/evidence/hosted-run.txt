@@ -1,0 +1,47 @@
+Hosted dig_feasibility job, run 39525135428 (workflow_dispatch on wip/spike-11-dig-feasibility), 2026-10-21 01:04-04:06 UTC.
+Runner: VirtualMac2,1, Apple M1 (Virtual); Xcode 26.6 Build version 17F113; iOS 26.5 (23F77) simulator.
+Source: b0276d8, clean checkout, experiment sources SHA-256 b21815d8... (the confirmation run's hash).
+Builds: Debug build-for-testing and Release both succeeded, including the LowLevelMesh candidate.
+Behaviour suites: 24 of 24 passed on iPhone 12 and on iPad (9th generation) geometry (iOS 26.5).
+Timing: every attempt below broke the idle-window interval budgets, so every run was void and no candidate verdict exists.
+The job reached its 180-minute timeout during iPad heightfield run 2 and was cancelled; receipt and measurements are partial.
+Scene-update callback intervals on a virtual hosted runner, not presented frames. Hosted runners cannot rank candidates.
+
+attempt                            |  I p99 I >33.3% |  S p95  S p99 S >33.3%
+dig-heightfield-ipad9-run1-a1      |   81.7     5.75 |   31.2   46.3     2.51
+dig-heightfield-ipad9-run1-a2      |   45.2     1.40 |   25.2   33.3     1.00
+dig-heightfield-ipad9-run1-a3      |   48.3     2.12 |   23.4   34.1     1.26
+dig-heightfield-ipad9-run2-a1      |   27.6     0.17 |   23.6   32.3     0.65
+dig-lowlevel-ipad9-run1-a1         |   68.2     4.87 |   26.4   36.5     1.53
+dig-lowlevel-ipad9-run1-a2         |   44.0     1.40 |   30.9   50.0     3.26
+dig-lowlevel-ipad9-run1-a3         |   39.8     1.39 |   22.5   32.1     0.45
+dig-sprite-ipad9-run1-a1           |  153.9    20.18 |   71.0  169.3    12.09
+dig-sprite-ipad9-run1-a2           |   35.9     2.23 |   16.7   33.3     1.19
+dig-sprite-ipad9-run1-a3           |   33.3     1.01 |   16.7   33.3     1.47
+dig-voxel-ipad9-run1-a1            |   31.8     0.34 |   23.8   32.5     0.74
+dig-voxel-ipad9-run1-a2            |   32.4     0.17 |   24.0   33.1     0.88
+dig-voxel-ipad9-run1-a3            |   33.2     0.87 |   23.0   31.6     0.42
+dig-heightfield-iphone12-run1-a1   |   70.8     3.34 |   27.8   48.3     2.29
+dig-heightfield-iphone12-run1-a2   |   60.5     4.32 |   31.8   50.0     3.49
+dig-heightfield-iphone12-run1-a3   |   49.5     3.38 |   31.0   48.4     2.55
+dig-heightfield-iphone12-run2-a1   |   49.8     3.21 |   27.5   40.6     2.10
+dig-heightfield-iphone12-run2-a2   |   36.2     1.39 |   30.9   49.3     3.21
+dig-heightfield-iphone12-run2-a3   |   49.7     3.27 |   28.7   46.5     2.33
+dig-lowlevel-iphone12-run1-a1      |   75.4     6.09 |   30.1   48.4     3.13
+dig-lowlevel-iphone12-run1-a2      |  115.6     8.52 |   31.7   49.9     3.40
+dig-lowlevel-iphone12-run1-a3      |   45.1     2.27 |   31.3   48.2     2.88
+dig-lowlevel-iphone12-run2-a1      |   50.4     3.72 |   26.4   38.1     1.82
+dig-lowlevel-iphone12-run2-a2      |   53.7     1.79 |   30.7   47.8     2.92
+dig-lowlevel-iphone12-run2-a3      |  116.8     5.20 |   39.5   60.3     6.66
+dig-sprite-iphone12-run1-a1        |   43.4     3.49 |   33.9   53.9     5.96
+dig-sprite-iphone12-run1-a2        |   36.8     3.11 |   16.7   43.5     3.81
+dig-sprite-iphone12-run1-a3        |   34.4     1.72 |   16.7   36.1     2.06
+dig-sprite-iphone12-run2-a1        |   44.0     3.52 |   16.7   44.9     4.01
+dig-sprite-iphone12-run2-a2        |   33.3     1.01 |   16.7   35.4     2.03
+dig-sprite-iphone12-run2-a3        |   41.0     2.41 |   27.8   47.4     4.67
+dig-voxel-iphone12-run1-a1         |   33.4     1.03 |   29.3   42.9     2.22
+dig-voxel-iphone12-run1-a2         |   34.3     1.38 |   30.1   43.1     2.27
+dig-voxel-iphone12-run1-a3         |   37.2     1.56 |   53.8  119.8     8.22
+dig-voxel-iphone12-run2-a1         |   33.0     0.68 |   31.7   49.4     3.67
+dig-voxel-iphone12-run2-a2         |   41.5     3.36 |   29.5   46.5     2.59
+dig-voxel-iphone12-run2-a3         |   41.3     2.82 |   28.5   44.0     2.43

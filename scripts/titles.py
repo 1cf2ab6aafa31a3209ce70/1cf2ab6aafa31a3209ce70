@@ -15,7 +15,9 @@ import sys
 ROOT = Path(__file__).resolve().parents[1]
 FIELDS = {"schemaVersion", "target", "titleID", "appDisplayName", "bundleIdentifier",
           "contentPackage", "unitTests", "uiTests"}
-OPTIONAL = {"restartProof"}
+# "languages" lists the BCP 47 codes a title ships; check-localization.py also
+# requires it to include the String Catalog's source language.
+OPTIONAL = {"restartProof", "languages"}
 
 
 class Title:
@@ -77,6 +79,12 @@ def load(root=ROOT):
         for key, path in [("unitTests", title.unit_tests), ("uiTests", title.ui_tests)]:
             _require(re.fullmatch(r"Tests/[A-Z][A-Za-z0-9]*", path) and (root / path).is_dir(),
                      f"{relative}: {key} must be an existing directory under Tests")
+        languages = values.get("languages")
+        if languages is not None:
+            _require(isinstance(languages, list) and languages and len(set(languages)) == len(languages)
+                     and all(isinstance(code, str) and re.fullmatch(r"[a-z]{2,3}(-[A-Za-z0-9]+)*", code)
+                             for code in languages),
+                     f"{relative}: languages must be a non-empty list of unique BCP 47 codes")
         if title.restart_proof is not None:
             _require(isinstance(title.restart_proof, str)
                      and title.restart_proof.startswith(Path(title.unit_tests).name + "/"),

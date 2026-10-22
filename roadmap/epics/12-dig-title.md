@@ -4,6 +4,8 @@
 
 **Entry:** Spike 11 selected a feasible mechanic and renderer; all earlier epics are complete. This is the final title in the initial roadmap and depends on all earlier ordered work.
 
+**Starting scope:** [ADR-008](../decisions/ADR-008-dig-terrain-feasibility.md#scope) sets it to 2D excavation: SpriteKit `SKTileMapNode` drawing top-down depth bands over heightfield rules, with no physics. The first task removes the prototype's restart footprint growth (12.1–12.3 MiB over five simulator restarts). Its other simulator misses, the iPad scene-update share row and void iPhone 12 runs, are entry risks to measure again after that fix. 3D can be reopened only by a new decision record with new evidence, such as physical-hardware measurements or an idle comparison of `RealityView` and `ARView` hosts, never by changing the Spike 11 budgets applied to its runs.
+
 ## Scope and tasks
 
 1. Define movement, excavation growth, object interaction, score/progression, boundaries, win/fail rules, and level format around the spike's scope choice.

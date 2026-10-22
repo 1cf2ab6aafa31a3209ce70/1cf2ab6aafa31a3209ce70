@@ -1,0 +1,500 @@
+{
+  "date": "2026-10-20",
+  "status": "complete-for-mobile-simulator-acceptance; interactive-accessibility-steps-run-2026-10-21; shell-findings-S-1-to-S-7-tracked",
+  "baseRevision": "b0276d8b2326692e7b3e69b69e22eb02d93a411e",
+  "worktreeDirty": true,
+  "toolchain": {
+    "xcode": "Xcode 27.1 (27A9275)",
+    "sdk": "iOS 27.1",
+    "simulatorRuntime": "iOS 26.0 (23A5287g)",
+    "host": "Mac14,6 (Apple M2 Max), macOS 27.2"
+  },
+  "inputsSHA256": "366cb4f767433f284c7d0356f504bf17895f18d3ab0549b43b4054d1902f5502",
+  "inputFiles": 142,
+  "verify": {
+    "command": "bash scripts/verify.sh <new dir>",
+    "exit": 0,
+    "releaseGates": {
+      "BlockTitle": {
+        "requiredReason": "Required-reason APIs match the privacy manifests in BlockTitle.app: none referenced",
+        "bundle": "App bundle audit passed for BlockTitle.app: 35 reviewed system libraries, no embedded code, entitlements unsigned, no entitlements, no forbidden Info.plist keys, privacy manifest declares no tracking or collection",
+        "capabilities": "App capability scan passed for BlockTitle.app: 1 Mach-O file(s), no network, web view, commerce, ads, attribution, tracking, cloud, game-service, push or analytics SDK references",
+        "localization": "Localization check passed for BlockTitle: 0 catalog key(s)",
+        "provenance": "Asset provenance check passed for BlockTitle.app: 5 packaged source(s) traced, 1 third-party with license and attribution, 7 Apple-generated or reviewed declaration file(s) excluded",
+        "reproducible": "Reproducible build check passed for BlockTitle.app: not bit-identical; differences confined to string table (debug-map paths); LC_UUID equal and executables identical after strip -S"
+      },
+      "DevelopmentTitle": {
+        "requiredReason": "Required-reason APIs match the privacy manifests in DevelopmentTitle.app: none referenced",
+        "bundle": "App bundle audit passed for DevelopmentTitle.app: 34 reviewed system libraries, no embedded code, entitlements unsigned, no entitlements, no forbidden Info.plist keys, privacy manifest declares no tracking or collection",
+        "capabilities": "App capability scan passed for DevelopmentTitle.app: 1 Mach-O file(s), no network, web view, commerce, ads, attribution, tracking, cloud, game-service, push or analytics SDK references",
+        "localization": "Localization check passed for DevelopmentTitle: 0 catalog key(s)",
+        "provenance": "Asset provenance check passed for DevelopmentTitle.app: 8 packaged source(s) traced, 1 third-party with license and attribution, 7 Apple-generated or reviewed declaration file(s) excluded",
+        "reproducible": "Reproducible build check passed for DevelopmentTitle.app: not bit-identical; differences confined to string table (debug-map paths); LC_UUID equal and executables identical after strip -S"
+      }
+    }
+  },
+  "selfTests": {
+    "app-bundle-check": {
+      "cases": 10,
+      "result": "App bundle audit passes a reviewed bundle and refuses every seeded violation"
+    },
+    "app-capabilities-check": {
+      "cases": 5,
+      "result": "App capability scan detects every forbidden capability and passes a clean app"
+    },
+    "asset-provenance-check": {
+      "cases": 9,
+      "result": "Asset provenance check traces every packaged file and refuses each seeded gap"
+    },
+    "foundation-check": {
+      "cases": 6,
+      "result": "Foundation check refuses each seeded source-level privacy violation"
+    },
+    "localization-check": {
+      "cases": 14,
+      "result": "Localization check passes a complete catalog and refuses every seeded defect"
+    },
+    "reproducible-build-check": {
+      "cases": 6,
+      "result": "Reproducible build check accepts debug-map-only differences and refuses code, resource and file-set changes"
+    },
+    "required-reason-check": {
+      "cases": 4,
+      "result": "Required-reason API check detects every category and refuses mismatched manifests"
+    },
+    "mobile-runner": {
+      "cases": 9,
+      "result": "Mobile runner orchestration, minimum-runtime coverage and network gate checked with mocked commands"
+    },
+    "record-baselines": {
+      "cases": 6,
+      "result": "Baseline recorder writes only complete observations and deletes its simulators"
+    },
+    "network-observation": {
+      "cases": 11,
+      "result": "Network observation gate fails on app-originated connections and passes a clean app"
+    }
+  },
+  "mobile": {
+    "command": "GAMECORE_SIM_OWNER=integrator bash scripts/test-mobile.sh <new dir>",
+    "exit": 0,
+    "runs": [
+      {
+        "title": "BlockTitle",
+        "model": "iphone12",
+        "testCasesPassed": 13,
+        "retries": [],
+        "inputFaultScan": null,
+        "launchTimeouts": 0,
+        "network": {
+          "passed": true,
+          "samples": 635,
+          "samplesWithApp": 575,
+          "maxSampleGapSeconds": 2.76,
+          "logEntries": 63,
+          "violations": [],
+          "systemOwned": [
+            {
+              "channel": "log",
+              "subsystem": "com.apple.network",
+              "category": "activity",
+              "reason": "nw_activity telemetry objects handed to the app over XPC with its launch request; creating, parenting and completing an activity opens no socket or flow",
+              "entries": 63,
+              "examples": [
+                "Create activity from XPC object <nw_activity 50:1 [A256E72E-4D28-491D-843C-E818FA2F0BDB] (reporting strategy default)>",
+                "Create activity from XPC object <nw_activity 50:2 [B9F534CC-1053-4880-9E14-0F591A7CA530] (reporting strategy default)>",
+                "Set activity <nw_activity 50:1 [A256E72E-4D28-491D-843C-E818FA2F0BDB] (reporting strategy default)> as the global parent"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "BlockTitle",
+        "model": "ipad9",
+        "testCasesPassed": 13,
+        "retries": [
+          {
+            "test": "BlockAccessibilityUITests/testAuditsPassOnEveryPageAtAccessibilityTextSize()",
+            "result": "Passed",
+            "firstFailure": [
+              "failed - FAIL menu-large-text elementDetection -: Potentially inaccessible text"
+            ],
+            "cause": "system notification banner ('Ready for Apple Intelligence') over the menu; see audit"
+          }
+        ],
+        "inputFaultScan": {
+          "archives": 1,
+          "faults": []
+        },
+        "launchTimeouts": 0,
+        "network": {
+          "passed": true,
+          "samples": 767,
+          "samplesWithApp": 638,
+          "maxSampleGapSeconds": 1.612,
+          "logEntries": 70,
+          "violations": [],
+          "systemOwned": [
+            {
+              "channel": "log",
+              "subsystem": "com.apple.network",
+              "category": "activity",
+              "reason": "nw_activity telemetry objects handed to the app over XPC with its launch request; creating, parenting and completing an activity opens no socket or flow",
+              "entries": 70,
+              "examples": [
+                "Create activity from XPC object <nw_activity 50:1 [514349C8-2CC4-4792-8362-900129648B31] (reporting strategy default)>",
+                "Create activity from XPC object <nw_activity 50:2 [D3F7C4BD-7842-49F9-B05C-714818029BE7] (reporting strategy default)>",
+                "Set activity <nw_activity 50:1 [514349C8-2CC4-4792-8362-900129648B31] (reporting strategy default)> as the global parent"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "DevelopmentTitle",
+        "model": "iphone12",
+        "testCasesPassed": 28,
+        "retries": [],
+        "inputFaultScan": null,
+        "launchTimeouts": 0,
+        "network": {
+          "passed": true,
+          "samples": 658,
+          "samplesWithApp": 550,
+          "maxSampleGapSeconds": 17.504,
+          "logEntries": 69,
+          "violations": [],
+          "systemOwned": [
+            {
+              "channel": "log",
+              "subsystem": "com.apple.network",
+              "category": "activity",
+              "reason": "nw_activity telemetry objects handed to the app over XPC with its launch request; creating, parenting and completing an activity opens no socket or flow",
+              "entries": 69,
+              "examples": [
+                "Create activity from XPC object <nw_activity 50:1 [8EFC8AA4-924C-4BE1-92AC-59B33425E520] (reporting strategy default)>",
+                "Create activity from XPC object <nw_activity 50:2 [E592D888-71BD-4A5E-8CFE-11AAD67C255A] (reporting strategy default)>",
+                "Set activity <nw_activity 50:1 [8EFC8AA4-924C-4BE1-92AC-59B33425E520] (reporting strategy default)> as the global parent"
+              ]
+            }
+          ]
+        }
+      },
+      {
+        "title": "DevelopmentTitle",
+        "model": "ipad9",
+        "testCasesPassed": 28,
+        "retries": [],
+        "inputFaultScan": null,
+        "launchTimeouts": 0,
+        "network": {
+          "passed": true,
+          "samples": 615,
+          "samplesWithApp": 517,
+          "maxSampleGapSeconds": 23.581,
+          "logEntries": 69,
+          "violations": [],
+          "systemOwned": [
+            {
+              "channel": "log",
+              "subsystem": "com.apple.network",
+              "category": "activity",
+              "reason": "nw_activity telemetry objects handed to the app over XPC with its launch request; creating, parenting and completing an activity opens no socket or flow",
+              "entries": 69,
+              "examples": [
+                "Create activity from XPC object <nw_activity 50:1 [D73BC301-80F5-4BC1-9D7E-F9C5D08117F8] (reporting strategy default)>",
+                "Create activity from XPC object <nw_activity 50:2 [106678D0-0E0F-4725-8ADE-71A3D9FF8126] (reporting strategy default)>",
+                "Set activity <nw_activity 50:1 [D73BC301-80F5-4BC1-9D7E-F9C5D08117F8] (reporting strategy default)> as the global parent"
+              ]
+            }
+          ]
+        }
+      }
+    ]
+  },
+  "baselines": "epic-08-simulator-baselines.json",
+  "sourceSHA256": {
+    "Packages/GameCore/Package.swift": "0ee438d093fb8cafa055351eea99facbb570e5dc78d5d7c6d06cdde746b0e454",
+    "Packages/GameCore/Sources/GameCore/BundledContent.swift": "ec0393a6acd5909c8208feae991eead2a6dd938743f8f760bc6a627fb92cc687",
+    "Packages/GameCore/Sources/GameCore/DeterministicInput.swift": "c3198353b2c0c41c3957ceff6282871928c85e54e977dbfc58c28dcdbb544205",
+    "Packages/GameCore/Sources/GameCore/GameCore.swift": "fd19153ff3bc44bd55bd1f570e6bc2accbcf1c479df20ef49ca23ad31a73536d",
+    "Packages/GameCore/Sources/GameCore/SaveSnapshot.swift": "e6252b75d3dbc0924a60e5e85e5b3aa6fa4733791f8c0322c15e1ec1835dc380",
+    "Packages/GameCore/Sources/GameCore/ShellFlow.swift": "efb0044fbc42de6526af9b91eeff582a95da22c221093eaa441dd046c7dfd811",
+    "Packages/GameCore/Tests/GameCoreTests/BundledContentTests.swift": "b354b88172d826fb5d6019ad52576f5dd8414784077bd09c6272fffeeacb7894",
+    "Packages/GameCore/Tests/GameCoreTests/DeterministicInputTests.swift": "7f2762ed2cea378458ee76cf1bc929c01c1cd4a4a77fbbaf411466a6f630cc74",
+    "Packages/GameCore/Tests/GameCoreTests/SaveSnapshotTests.swift": "3d396b2ceeb625d7307fee7889163a53c985e0c011f19541edd75bd223f4b87b",
+    "Packages/GameCore/Tests/GameCoreTests/ShellFlowTests.swift": "0090176f97893fd7b53b00ce154977bf210133a6794ad43cae0f44e5e0b614bb",
+    "Packages/GamePlatform/Package.swift": "5a24fa3d042aca9f306f48b1328ca702d1ec9476484cfbf8cf83940489b4c467",
+    "Packages/GamePlatform/Sources/GamePlatform/AuthoredAudio.swift": "e1c81defcc7ac27d7b7deba165e9063d7548af96fcd60f7344e789bd61c83a0c",
+    "Packages/GamePlatform/Sources/GamePlatform/GameModule.swift": "f68e121ffee13a0089643bd423eb4b001700f098f5c2cb32592c36db9e8c6955",
+    "Packages/GamePlatform/Sources/GamePlatform/GamePlatform.swift": "74ca7c49643e857c0fb700f6a8f5fa66d7b6a5e17ce1a22598333d0041fd7dae",
+    "Packages/GamePlatform/Sources/GamePlatform/LocalSaveStore.swift": "fa5722c726354c5a76aeae6f5563013d08f6f4d45a7e596f5bfcc343c7997aad",
+    "Packages/GamePlatform/Sources/GamePlatform/MobileFeedbackOutput.swift": "efcb92698b29cd3df593d1e51a81c7347edcaeb933ead0a39e33557a0105fbfb",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleHost.swift": "e5a7807aba3dc668b868fa07886f4a43396a95b5b8c448614610ccbf247a4527",
+    "Packages/GamePlatform/Sources/GamePlatform/ModuleShellView.swift": "89e0421f1ef42c43e2bfff698e80f66fd863709123606c16a0a6a2b71e69eb7d",
+    "Packages/GamePlatform/Sources/GamePlatform/NotificationAudioObserver.swift": "a8507e3f370037abcba77af5b2858b3d20454a3446f8f2ce17d1e08a6e5a3155",
+    "Packages/GamePlatform/Sources/GamePlatform/SharedShellView.swift": "9a1a18dbd21d7b9a0e771ed4c7924825ec9287e3b5ce744040a13392405015b4",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellActionJournal.swift": "f3e567f98e0b1c89b0ad76407dab0cba43ca274915092b9f1c291f96a3ef6569",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellController.swift": "9bf8137929379d64ff0ca3bf4e78d9bdc6ba68f8bfef2c229183d04df870d587",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellFeedbackController.swift": "7cdc732ed6fd3727f5fd95bca55204aac3a6c041ef0f20cc438d23b3ca58ec93",
+    "Packages/GamePlatform/Sources/GamePlatform/ShellPresentation.swift": "700f47ea1dedc28ddca46e56f3e061b80ac6900e43a2cc6b7833e1e3f4a6b787",
+    "Packages/GamePlatform/Sources/GamePlatform/TitleStorage.swift": "e9a0c215e61efdd94e86f31b591f7a1d4c4337a398c153f4e487b59c898ef1aa",
+    "Packages/GamePlatform/Tests/GamePlatformTests/AuthoredAudioTests.swift": "67f81a588965873725495897a2322062a6f8c765bd6ab2a559095cd80ce10256",
+    "Packages/GamePlatform/Tests/GamePlatformTests/LocalSaveStoreTests.swift": "582be8621810ef3ab516cf191405cf712ae38a428ec8e73a53395f6fc508f5da",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ModuleContractTests.swift": "4649ba7e8c80904534d7d58ae798f549bff4de443ed0c2854b7138347976d704",
+    "Packages/GamePlatform/Tests/GamePlatformTests/NotificationAudioObserverTests.swift": "1720253fd956066b347e1a44f53767b981ca5f339091e926a10f340262606869",
+    "Packages/GamePlatform/Tests/GamePlatformTests/ShellFeedbackControllerTests.swift": "119c757bb3cc400d7fb1cb498409d6d0ad2d23eaf2d8309417c83af7df2c0b00",
+    "Games/BlockContent/Package.swift": "e23b9e8b668f79a2c5338eb394847c70171cbaffa1672a574d2669e4a0d546c2",
+    "Games/BlockContent/Sources/BlockContent/BlockLevels.swift": "41d0b8a0225223cde08f2ac813accac18de6ea9cd888dd4988a7a473b65dd3ec",
+    "Games/BlockContent/Sources/BlockContent/BlockRules.swift": "d61c6bda55cc82e6acf24d203c9ad385c2fa52a13fd39d0b133e8730d4410c4a",
+    "Games/BlockContent/Sources/BlockContent/BundledContent.swift": "abf728009441724ce99e2130727405a5b9e4c97440eae4f6ea913d50b99627b8",
+    "Games/BlockContent/Sources/BlockContent/Resources/Levels/intro-01.json": "91cbb4a11f123777ab14daa0d4bc92aaa4ea38a5f26b00254ea2f4d67262c849",
+    "Games/BlockContent/Sources/BlockContent/Resources/Levels/intro-02.json": "13bdf7ed39026ad0fa1538135ca9d1261643429adda30f26f78b00fac5f34415",
+    "Games/BlockContent/Sources/BlockContent/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "Games/BlockContent/Sources/BlockContent/Resources/catalog.json": "12038a670ab30fc077901b9dd04482de23aa61d6b1a1e17a3581e44ec8ae7c50",
+    "Games/BlockContent/Sources/BlockContentValidator/main.swift": "9b42fde0eb1f78a96c062ba738232784eda738d4fc48aa37f37293aa33a6000f",
+    "Games/BlockContent/Tests/BlockContentTests/BlockContentTests.swift": "5dfe46b4e00e7c2cd7d4580e4e69f47bdea859c5e94f4a332b06dc5a9cbbcde7",
+    "Games/BlockTitle/ACCESSIBILITY.md": "3884124547040aaf479aee77e968dec0937a9f3c138baa4b4917bdcce29ba569",
+    "Games/BlockTitle/Assets.xcassets/AppIcon.appiconset/AppIcon.png": "75a1bf778214bcf574cd3f7cc8c53db321596f4a9394a55351ff523cce48fb19",
+    "Games/BlockTitle/Assets.xcassets/AppIcon.appiconset/Contents.json": "3725fefca1cc2f15dcff52b03b7db47884c8141e5be1d4e559367b76117f8c48",
+    "Games/BlockTitle/Assets.xcassets/Contents.json": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+    "Games/BlockTitle/BlockModule.swift": "e62aa792c80a2a1672329c70bb632513353c948f5591ef1472a599b77e27924d",
+    "Games/BlockTitle/BlockTitleApp.swift": "df575a32cd78c7f277ad81947b257754e989f9e76f03fec7b0067d16b4f1c750",
+    "Games/BlockTitle/CONTENT.md": "517f16412619a172bad2de54d5aa2614a34d2ddd74ed28d2f73256b13d906ed4",
+    "Games/BlockTitle/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+    "Games/BlockTitle/Localizable.xcstrings": "06aab55fd4de10ed22a374b3432a2faf28f55f2c0411918b49bfaef730cd3ddb",
+    "Games/BlockTitle/PrivacyInfo.xcprivacy": "528ab3fca910d2ac2f3ef256d5ea4c2327303a7a4a5efb9236987f3018e311f3",
+    "Games/BlockTitle/title.json": "acd6577b3b683b90e70cc493182d575a1d8db39ad3f25637cadd0c9d6ca1e861",
+    "Games/DevelopmentContent/Package.swift": "ab60c51afd58a2ebb811d889ca6a81686210570a16ff9c64af84b00bd7319d08",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/BundledContent.swift": "2d45e4f29c0d38935e02372c10d0962f2f4cc6c0ef7b3b6bcff539876f808dd8",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/DevelopmentLevels.swift": "fae50eaa34c5086afbc47abf67154973e8bf7c537b104c440f5743a3f6bfd0bc",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/FixtureRules.swift": "49ee4deec06e0aeab2d80bf2b9f6797a52de8d1411aae5763ec4fbd582e4ccee",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/block.json": "3dcf23c1377ae0659e037c1f864d3b4205e2dd805d8659c807f4001cc5ef9890",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/dig.json": "8b275842c1edcca5ddb6b3803078fd904ede74b2f7cd47c1b2359487f4f8f528",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/tile.json": "385265085cbc5d5fd6ab07b771ae2ab7d83083b84dfe8372ce0c9cd6aa1ee8d7",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/Levels/unscrew.json": "8af0012532d14efc974f79bdcbb4e57cd8dc26308d69c2c6f7f739fbab6029fb",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/catalog.json": "db8e94911006f3323337ec715fb3d84a8720b5a6ec2d62c653276f7be8e4aa21",
+    "Games/DevelopmentContent/Sources/DevelopmentContent/Resources/marker.svg": "24109fa3b6c1f6b8629f8a86a16d38d9386b7670dba21a39e8343cd3c5b57089",
+    "Games/DevelopmentContent/Sources/DevelopmentContentValidator/main.swift": "ed79f7673d421429122582584235c6f2ff7a9fa60d080dc8d029aae15791123b",
+    "Games/DevelopmentContent/Tests/DevelopmentContentTests/DevelopmentContentTests.swift": "a36419836043578ccd90a2fd984990660beebdb449ea489646c4109bbffcf355",
+    "Games/DevelopmentContent/test-content-cli.py": "2c1ae659fe3eb45f7ba64ec0ce6a6b6287a30a225fafb8afe2cfc6e3bb277d12",
+    "Games/DevelopmentTitle/Assets.xcassets/AppIcon.appiconset/AppIcon.png": "2bb82ae9dc707950025a82d5cae7fe704919462ea1b8732e123cd5aac17e753d",
+    "Games/DevelopmentTitle/Assets.xcassets/AppIcon.appiconset/Contents.json": "3725fefca1cc2f15dcff52b03b7db47884c8141e5be1d4e559367b76117f8c48",
+    "Games/DevelopmentTitle/Assets.xcassets/Contents.json": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+    "Games/DevelopmentTitle/CONTENT.md": "c6a5264e29e948f91c370581c58e81547942af3a4eb9d4053381822a1105312b",
+    "Games/DevelopmentTitle/DevelopmentScene.swift": "3a952f54bfc9083f3eb20c96f097468b2c7d4c0f9ebc48f83e43aa9c6c590401",
+    "Games/DevelopmentTitle/DevelopmentTitleApp.swift": "c6b133a365f5fbdc7cecc51c7d65aa87e61b8548c37308693bbb49778508c615",
+    "Games/DevelopmentTitle/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+    "Games/DevelopmentTitle/Localizable.xcstrings": "06aab55fd4de10ed22a374b3432a2faf28f55f2c0411918b49bfaef730cd3ddb",
+    "Games/DevelopmentTitle/PracticeModule.swift": "600310458aca89c4ecc55820c18e839dba8d720e1665a6833156e77356dab258",
+    "Games/DevelopmentTitle/PrivacyInfo.xcprivacy": "528ab3fca910d2ac2f3ef256d5ea4c2327303a7a4a5efb9236987f3018e311f3",
+    "Games/DevelopmentTitle/ShellModel.swift": "72105f4470eaa95f7e99925015f0cf381d430beef7923b61198de99b70fafc8d",
+    "Games/DevelopmentTitle/ShellView.swift": "0e0901f8fdcc9d18b06feb7c42d276f38b8c3c189ce800f55d9c90e07141d761",
+    "Games/DevelopmentTitle/title.json": "6393c389f133a0cada6b5b37940cc34f79e73e13739da6ea20cb480934c03aba",
+    "Tests/BlockTitleTests/BlockModuleTests.swift": "1b92d89c56812d7da5d2317a3f5f3432b1bdf2548c96a19358365f4acab093c0",
+    "Tests/BlockTitleUITests/BlockAccessibilityUITests.swift": "3d1f90de85f3025f37fb2f1e35c0345d9fc17d744bc5e24ee015b50ed00535e8",
+    "Tests/BlockTitleUITests/BlockTitleUITests.swift": "4ae822f7c79e8adf7a0f0968f23ed18d0b9662082ae58e700f2be278cdcab0f6",
+    "Tests/BlockTitleUITests/BlockUITestSupport.swift": "c574baffd8970ff990e69ff6f6ec7d6df7ab7cdba0e916204cc779c78f047e2a",
+    "Tests/DevelopmentTitleTests/BundledContentTests.swift": "e1c37c0a6d7a035082277617603718cbe382b2d188777b9ddf369529da8ea827",
+    "Tests/DevelopmentTitleTests/SavePersistenceTests.swift": "3e6133d5e4ebbe68e833488451e93abc3e27435d7efac958b1b824d41b39b0c4",
+    "Tests/DevelopmentTitleTests/ShellActionJournalTests.swift": "bc2e4fe07ac09f8808e292ff4696a9267dca67551c4e2f2e8978acedaba4ea5c",
+    "Tests/DevelopmentTitleTests/ShellModelTests.swift": "e471765a17daf80a747d0f3c07a05526eb02d07194b8e081ed3fc860fce96ccf",
+    "Tests/DevelopmentTitleTests/UITestFixtureTests.swift": "9158a26b8a3b7d4903006f4303623dc351ca7be6284395bdec2fc2bab1dfd020",
+    "Tests/DevelopmentTitleUITests/DevelopmentTitleUITests.swift": "d00c7e9e9153b7cd0599904b0c31296db68a5cc8e65eb6d045e7fd77a36b8d2e",
+    "GameCore.xcodeproj/project.pbxproj": "a9a39a8951958890b6da48b632501cb745cfd846e813f130fb32b595ee53b61b",
+    "GameCore.xcodeproj/xcshareddata/xcschemes/BlockTitle.xcscheme": "c9a18a331859c74a99766331fdaa3ecbb219c69b19122ebeabc821e75520f52d",
+    "GameCore.xcodeproj/xcshareddata/xcschemes/DevelopmentTitle.xcscheme": "b629e71c64bc254ca3c4b62ea8eadc6b0bd3cb81e1438d2e6c3c0b07c611e7ba",
+    "GameCore.xcworkspace/contents.xcworkspacedata": "ebddb78ab26a0dd7d3ecd08e19bb71105e1e094782356618793db5bcc53a0f4d",
+    "scripts/app-icon.py": "95f8fc94da6a07f53189e9d3f68fc7b57582679f48c0f799122c0cbbb2a4a9ba",
+    "scripts/baseline-probe/BaselineProbe.m": "577dcd937456e940d891e621d06fb88c84af3a6b4fa168eccf49142855d4cc59",
+    "scripts/check-app-bundle.py": "2ab4d9d8e92878cfc10094388ecf9725f9fc2ab6b3f575cbdcdf2a16c7b65046",
+    "scripts/check-app-capabilities.py": "b5116b2bb104a6e8cf73cab334646436e6cd54d8de43f0c7c3ccf3ba414d56dc",
+    "scripts/check-asset-provenance.py": "f7ec667508a9a87b9e1fae2ec5b50ffec401cf36c01237f7e205094f6337193d",
+    "scripts/check-foundation.py": "5252f9ba28675db2ec39210f25b2ff7739ee9970c90a39b3b647c2342188b2cd",
+    "scripts/check-localization.py": "19c566b0d77ee71cb7c0f1690507b25f5441bea016169db0faa60d0dcd9ba11f",
+    "scripts/check-reproducible-build.py": "17885ae32beea6811755084560192a74c2d0c18b69124c7c15bb35dc48427113",
+    "scripts/check-required-reason-apis.py": "4ee779ab9fe6036286ed5a37bdcfe3097bbbc6d32b9e1deb8fe66a6fa79906fc",
+    "scripts/generate-project.py": "b3e1588ce7451229a02a822530827776258f2e6c9a8be744448895fa8fca2ff7",
+    "scripts/macho.py": "e152d4b644c74b39e09f8d9fdc241103b24cb3445d2bbf33d2fd728067de4e53",
+    "scripts/network_observation.py": "2a7c2406c83d44840567ced8a03bf44c3a2dcc9bcd1524204033b1a286305154",
+    "scripts/new-title.py": "203281c1bd67037ac16eb5c930b802d564d4d76cdec225ce137f334054d0000e",
+    "scripts/record-baselines.py": "596507e7f39502130327d8ac6bb9f1ebbbb271037432505f8fcd5e40c27201e5",
+    "scripts/release_policy.py": "fe1c64342fcafdf7bdfe04bea3fb8c89c6068f34be01a7313d14867b7b433791",
+    "scripts/run-mobile-tests.py": "4850614611797671a50d764c94a4a5de89ceaf12a88fcb7ebe246272ccb43396",
+    "scripts/test-app-bundle-check.py": "b853fba10f28205672d63c8b7c3239a6abf86e985ce75feb314471d462362712",
+    "scripts/test-app-capabilities-check.py": "96fbfee797ba1234f81f9f355e151ea6c7481408c150931ba7838c3ae4c60061",
+    "scripts/test-asset-provenance-check.py": "7fdc0ea71b34d5897815206fd0fdb05913ce5a9e40d39aa597fac4ea3f4087ca",
+    "scripts/test-foundation-check.py": "729d2fea5ed964bd9ed5f54156f8bf113dac5f75f5a5408539065641b7849351",
+    "scripts/test-localization-check.py": "c76c3539af7542e52c9b8b8e35dac6cfcf0ef78e819fdbf2d0763261d9897e9a",
+    "scripts/test-mobile-runner.py": "8f6084c68dfd4ee7271dec59b424026a1397d436c51be04502fff3d545e57470",
+    "scripts/test-mobile.sh": "c6cc0b19e041a4ac9b787f6b3e1d71b3224a223c42a5e3c570fd26aa4419adcc",
+    "scripts/test-network-observation.py": "63b7ec6f345a4813ae1de9717d903ba9e4c4aa3f467b4ccb9836d30bdc2b7f08",
+    "scripts/test-record-baselines.py": "da2baf2fd5f7bcc88add98880df82722027e787df8db2d8c11255f4473da3ec9",
+    "scripts/test-reproducible-build-check.py": "2654cba4d8fa5645877e0a31623771aed0c5e73c786e8207a198aab1bf802a45",
+    "scripts/test-required-reason-check.py": "74bc342447d445bac339368c2213b38ddc285f9d673087be1c7323cc4845d70a",
+    "scripts/test-title-lifecycle.py": "b48431acccd321846b1a0f113b5487cf8ebfa98af7e22bf0f93aa30a94fbe3aa",
+    "scripts/title-template/Games/__CONTENT__/Package.swift": "1db9ae52f6944118ba244c3152f4b1ec98fafea139c839bc991d60f2d72d5222",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__/BundledContent.swift": "96f4c8524f7f2d8f57351d53cce8c9c421fd4d14b04ed402788bc95685658b06",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__/Levels.swift": "edc4bd762432f91dadec00bd6c1c1cdeeb717185f013ef745499956fdd9be397",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__/Resources/Levels/level-01.json": "b4e33b1cb788410b0a7d91a24e63be42ef38ac2686b555e6e3308383fbf46324",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__/Resources/SplitMix64-NOTICE.txt": "c5675d7918836790fb3b0ead45e92a46db9cbdc343d9331042b182b1e385ca5c",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__/Resources/catalog.json": "bef7c2a7aeb0d01521a45e97204dc9ed22666ca66bc660a23ecc58ff7a63c389",
+    "scripts/title-template/Games/__CONTENT__/Sources/__CONTENT__Validator/main.swift": "8be20f03c5037c6e01fb5cb2298b83bdbab5de877fa8436ff3a65e324286a7b8",
+    "scripts/title-template/Games/__CONTENT__/Tests/__CONTENT__Tests/__CONTENT__Tests.swift": "98fa119bdf9674d085290ec2c88c41e24de32f468e086c786f54192a7dc4d157",
+    "scripts/title-template/Games/__TARGET__/Assets.xcassets/AppIcon.appiconset/Contents.json": "3725fefca1cc2f15dcff52b03b7db47884c8141e5be1d4e559367b76117f8c48",
+    "scripts/title-template/Games/__TARGET__/Assets.xcassets/Contents.json": "0fd49ba3c3585c709678e0046a821c3c60685ec7063720d30d3a3448be3a208b",
+    "scripts/title-template/Games/__TARGET__/CONTENT.md": "178fd319d00cb7771ead2b26ce6225f9559d3b7712888d68912f3d9128e8e867",
+    "scripts/title-template/Games/__TARGET__/Info.plist": "39ba6b30d4159dcf34f4f23432ed181123486d6366d3a8edf859b703a7f54213",
+    "scripts/title-template/Games/__TARGET__/Localizable.xcstrings": "06aab55fd4de10ed22a374b3432a2faf28f55f2c0411918b49bfaef730cd3ddb",
+    "scripts/title-template/Games/__TARGET__/PrivacyInfo.xcprivacy": "528ab3fca910d2ac2f3ef256d5ea4c2327303a7a4a5efb9236987f3018e311f3",
+    "scripts/title-template/Games/__TARGET__/__TARGET__App.swift": "ba2e54c58008724a52908b3580114d680f1b0dc12699bea23764a0c210332c40",
+    "scripts/title-template/Games/__TARGET__/__TARGET__Module.swift": "4cab49d431325f227cacfd4c85fb1638f6dd510c83d8d9327c2ef0393d3de435",
+    "scripts/title-template/Games/__TARGET__/title.json": "fb0540d5d38f83bd5a4090dfc361db42ccfa1ed97c9bd71ea9b5f5bcac22b9fc",
+    "scripts/title-template/Tests/__TARGET__Tests/__TARGET__ModuleTests.swift": "e71e9924b24d97727bd52a9471dd41079bd8ab9d3a8ab30626b09d82b05e981c",
+    "scripts/title-template/Tests/__TARGET__UITests/__TARGET__UITests.swift": "bac58c546c0a9b0168afb0634589eccf29bb3e483b160c5ef3b0dd9da65f139c",
+    "scripts/titles.py": "5eec2f7422533a93f17decd9fbe786c33da5849079efad204f6e7225f44150a1",
+    "scripts/verify.sh": "d37df79f2efe28a51918e555b9814b6bdd59ae162c11c87fa45c23ac119de712",
+    ".github/workflows/mobile.yml": "c4054a9d6cb894c38046d2b462d7ce6b971b4fee3d479a0d152cfeeab8a39e81"
+  },
+  "interactiveAccessibility": {
+    "date": "2026-10-21",
+    "revision": "681a507",
+    "worktreeDirty": false,
+    "build": "Debug, BlockTitle scheme, CODE_SIGNING_ALLOWED=NO",
+    "toolchain": "Xcode 27.1 (27A9275), iOS Simulator 26.0 (23A5287g), Mac14,6, macOS 27.2",
+    "devices": [
+      "new owned iPhone 12 simulator",
+      "new owned iPad (9th generation) simulator"
+    ],
+    "methods": {
+      "headings": "temporary UI test reading element traits from XCUIApplication.snapshot() via key-value coding (private)",
+      "keyboard": "Full Keyboard Access enabled in Settings by a temporary UI test; keys sent as hardware keyboard HID events through SimulatorKit (private); focus read from screenshot differences and Vision text recognition",
+      "grayscale": "not available on the simulator; play-page screenshots converted with sips to Generic Gray Gamma 2.2"
+    },
+    "headingsPerPage": {
+      "menu": [
+        "Block Match (app name)",
+        "Block Match"
+      ],
+      "settings": [
+        "Settings",
+        "Feedback",
+        "Language",
+        "Local data"
+      ],
+      "play": [
+        "Block Match (app name)",
+        "Clear the board"
+      ],
+      "pause": [
+        "Block Match (app name)",
+        "Paused"
+      ],
+      "success": [
+        "Block Match (app name)",
+        "Board cleared"
+      ],
+      "failure": [
+        "Block Match (app name)",
+        "No moves left"
+      ]
+    },
+    "geometries": {
+      "iphone12": {
+        "keyboardStops": {
+          "menu": [
+            "Play",
+            "Settings"
+          ],
+          "settings": [
+            "Sound effects",
+            "Music",
+            "Haptics",
+            "Export local data",
+            "Reset progress",
+            "Delete local data",
+            "Done"
+          ],
+          "play": [
+            "Block board",
+            "6 block buttons in row order",
+            "Pause",
+            "End board"
+          ],
+          "pause": [
+            "Resume",
+            "Restart board",
+            "Settings",
+            "Back to menu"
+          ],
+          "result": [
+            "Play again",
+            "Back to menu"
+          ]
+        },
+        "boardClearedFromKeyboard": true,
+        "focusAfterPageChange": {
+          "start": "Block board",
+          "pause": "Resume",
+          "resume": "Block board",
+          "success": "removed control (S-5)",
+          "failure": "removed control (S-5)",
+          "backToMenu": "removed control (S-5)",
+          "openSettings": "Haptics",
+          "closeSettings": "Settings"
+        }
+      },
+      "ipad9": {
+        "keyboardStops": {
+          "menu": [
+            "Play",
+            "Settings"
+          ],
+          "settings": [
+            "Sound effects",
+            "Music",
+            "Haptics",
+            "Export local data",
+            "Reset progress",
+            "Delete local data",
+            "Done unreachable; Escape closes the sheet (S-6)"
+          ],
+          "play": [
+            "6 block buttons in row order",
+            "Pause",
+            "End board"
+          ],
+          "pause": [
+            "Resume",
+            "Restart board",
+            "Settings",
+            "Back to menu"
+          ],
+          "result": [
+            "Play again",
+            "Back to menu"
+          ]
+        },
+        "boardClearedFromKeyboard": true,
+        "focusAfterPageChange": {
+          "start": "Row 2, column 1",
+          "pause": "removed control (S-5)",
+          "resume": "removed control (S-5)",
+          "success": "removed control (S-5)",
+          "failure": "removed control (S-5)",
+          "backToMenu": "removed control (S-5)",
+          "openSettings": "Haptics",
+          "closeSettings": "Settings"
+        }
+      }
+    },
+    "grayscale": "Color Filters absent from Settings on both geometries; grayscale screenshots keep circle and square blocks distinct; moved to the hardware check",
+    "findings": [
+      "S-5",
+      "S-6",
+      "S-7"
+    ]
+  }
+}

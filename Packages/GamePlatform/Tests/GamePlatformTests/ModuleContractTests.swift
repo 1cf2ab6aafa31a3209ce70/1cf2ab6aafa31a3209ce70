@@ -121,6 +121,22 @@ final class ModuleContractTests: XCTestCase {
         XCTAssertFalse(relaunched.module.session.settings.musicEnabled, "Restored settings reach the session")
     }
 
+    /// ADR-010's two additive members keep version 1 behavior when a title
+    /// leaves them out: no result line, and one retry label for both outcomes.
+    func testResultSummaryAndSuccessLabelDefaultToVersionOneBehavior() {
+        let module = FakeModule()
+        XCTAssertNil(module.session.resultSummary)
+        XCTAssertEqual(module.presentation.successRetryLabel, "Retry")
+        let labelled = ShellPresentation(openingMessage: "Opening", menuHeading: "Menu", menuMessage: "Fake module",
+                                         startLabel: "Start", loadingMessage: "Loading", pauseMessage: "Paused",
+                                         audioPauseMessage: "Audio paused", restartLabel: "Restart",
+                                         successHeading: "Done", successMessage: "Recorded", failureHeading: "Ended",
+                                         failureMessage: "Not recorded", retryLabel: "Retry", successRetryLabel: "Next",
+                                         languageName: "English", languageMessage: "English only")
+        XCTAssertEqual(labelled.successRetryLabel, "Next")
+        XCTAssertEqual(labelled.retryLabel, "Retry", "The failure page keeps the retry label")
+    }
+
     func testModuleLoadFailureIsRecoverable() async throws {
         let host = try host()
         let session = host.module.session

@@ -1,12 +1,15 @@
 import BlockContent
 import Foundation
 
-func validate() throws {
-    let args = Array(CommandLine.arguments.dropFirst())
-    guard args.count <= 1 else {
-        throw NSError(domain: "ContentValidator", code: 3, userInfo: [NSLocalizedDescriptionKey: "usage: BlockContentValidator [content-directory]; omitted directory validates the bundled levels"])
-    }
-    let root = try (args.isEmpty ? BundledContent.resourceDirectory() : URL(fileURLWithPath: args[0], isDirectory: true)).standardizedFileURL.resolvingSymlinksInPath()
+let usage = """
+usage: BlockContentValidator [content-directory]
+       BlockContentValidator generate <level-plan.json> <content-directory>
+An omitted directory validates the bundled levels. generate writes the plan's
+level files and catalog into the directory, then validates it.
+"""
+
+@discardableResult
+func validate(_ root: URL) throws -> BlockCatalog {
     let catalog = try BundledContent.load { relative in
         let file = root.appendingPathComponent(relative).standardizedFileURL.resolvingSymlinksInPath()
         guard file.path.hasPrefix(root.path + "/") else {
@@ -48,10 +51,61 @@ func validate() throws {
         }
     }
     print("Valid content: \(catalog.envelope.titleID), version \(catalog.envelope.contentVersion), \(catalog.levels.count) levels")
-    for level in catalog.levels { print("  \(level.id): \(level.payload.columns)x\(level.payload.rows), seed \(level.seed)") }
+    for level in catalog.levels {
+        print("  \(level.id): chapter \(level.payload.chapter), \(level.payload.columns)x\(level.payload.rows), seed \(level.seed)")
+    }
+    return catalog
 }
 
-do { try validate() }
+/// Writes the plan's levels and catalog, then validates the directory. Files
+/// outside the plan are left alone, so a stale level fails validation.
+func generate(plan planURL: URL, into root: URL) throws {
+    let plan = try JSONDecoder().decode(LevelPlan.self, from: Data(contentsOf: planURL))
+    let levels = try LevelPlanner.build(plan)
+    try FileManager.default.createDirectory(at: root.appendingPathComponent("Levels"), withIntermediateDirectories: true)
+    for (index, level) in levels.enumerated() {
+        let next = index + 1 < levels.count ? levels[index + 1].entry.id : nil
+        try Data(LevelPlanner.levelJSON(level, contentVersion: plan.contentVersion, next: next).utf8)
+            .write(to: root.appendingPathComponent("Levels/\(level.entry.id).json"))
+    }
+    try Data(LevelPlanner.catalogJSON(levels, contentVersion: plan.contentVersion).utf8)
+        .write(to: root.appendingPathComponent("catalog.json"))
+    print("Generated \(levels.count) levels from \(planURL.lastPathComponent)")
+    for level in levels {
+        let blocks = level.board.cells.filter { $0 != 0 }.count
+        var replay = level.board, score = 0
+        for move in level.solution {
+            let count = replay.clear(at: move)
+            score += count * (count - 1)
+        }
+        let rate = String(format: "%.3f", level.measure.clearRate)
+        print("  \(level.entry.id): \(level.board.columns)x\(level.board.rows), \(blocks) blocks, seed \(level.seed), "
+              + "\(level.solution.count) moves, random clear rate \(rate), recorded line \(score), best random clear \(level.measure.bestScore)")
+    }
+    try validate(root)
+}
+
+func directory(_ path: String) -> URL {
+    URL(fileURLWithPath: path, isDirectory: true).standardizedFileURL.resolvingSymlinksInPath()
+}
+
+func run() throws {
+    let args = Array(CommandLine.arguments.dropFirst())
+    switch args.first {
+    case "generate":
+        guard args.count == 3 else {
+            throw NSError(domain: "ContentValidator", code: 3, userInfo: [NSLocalizedDescriptionKey: usage])
+        }
+        try generate(plan: URL(fileURLWithPath: args[1]), into: directory(args[2]))
+    default:
+        guard args.count <= 1 else {
+            throw NSError(domain: "ContentValidator", code: 3, userInfo: [NSLocalizedDescriptionKey: usage])
+        }
+        try validate(args.isEmpty ? BundledContent.resourceDirectory().standardizedFileURL.resolvingSymlinksInPath() : directory(args[0]))
+    }
+}
+
+do { try run() }
 catch {
     FileHandle.standardError.write(Data("Content validation failed: \(error.localizedDescription)\n".utf8))
     exit(1)

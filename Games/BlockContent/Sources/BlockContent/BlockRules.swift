@@ -1,11 +1,11 @@
 import Foundation
 import GameCore
 
-/// Reference rules for the Epic 07 block slice, kept to what the module
-/// contract needs: select a group of two or more orthogonally connected blocks
-/// of one color to clear it, and the blocks above fall into the gap. A board is
-/// won when empty and lost when blocks remain but no group of two does.
-/// Epic 09A records the complete title's rules and extends these.
+/// Blocky Marty's rules (ADR-010): select a group of two or more orthogonally
+/// connected blocks of one kind to clear it, and the blocks above fall
+/// straight down; columns never shift sideways. A board is cleared when empty
+/// and stuck when blocks remain but no group of two does. Undo takes back
+/// moves, a stuck board's included.
 public struct BlockBoard: Equatable, Sendable {
     public static let colors = 1...4
     public let columns: Int
@@ -70,19 +70,26 @@ public enum BlockOutcome: Equatable, Sendable {
     case playing, cleared, stuck
 }
 
-/// Developer replay action: select the block at a board index.
-public struct BlockAction: Codable, Equatable, Sendable {
-    public let index: Int
-    public init(index: Int) { self.index = index }
+/// Developer replay action: select the block at a board index, or undo.
+public enum BlockAction: Codable, Equatable, Sendable {
+    case select(Int)
+    case undo
 }
 
 /// One play of a level. Frame time and animation never advance it; only
-/// selections do, so a level, its seed and an input fixture fix the outcome.
+/// selections and undos do, so a level, its seed and an input fixture fix the
+/// outcome.
 public struct BlockGame: Equatable, Sendable {
     public let levelID: String
     public private(set) var board: BlockBoard
     public private(set) var score = 0
-    public private(set) var selections = 0
+    /// The board and score before each move still on the board, oldest first.
+    private var history: [Step] = []
+
+    private struct Step: Equatable, Sendable {
+        let board: BlockBoard
+        let score: Int
+    }
 
     public init(level: BlockLevel) {
         levelID = level.id
@@ -94,16 +101,39 @@ public struct BlockGame: Equatable, Sendable {
         return board.hasMove ? .playing : .stuck
     }
 
+    /// Moves made and not undone.
+    public var selections: Int { history.count }
+    /// A cleared board is final; any other board with a move behind it can undo.
+    public var canUndo: Bool { outcome != .cleared && !history.isEmpty }
+
     /// Applies one selection. An illegal selection or a finished game changes nothing.
     @discardableResult
     public mutating func select(_ index: Int) -> Bool {
         guard outcome == .playing else { return false }
+        let before = Step(board: board, score: score)
         let cleared = board.clear(at: index)
         guard cleared > 0 else { return false }
-        selections += 1
-        // Larger groups score more: n blocks earn n × (n − 1).
+        history.append(before)
+        // Each block scores one point for every other block in its group.
         score += cleared * (cleared - 1)
         return true
+    }
+
+    /// Restores the board and score before the last move. Undo is free.
+    @discardableResult
+    public mutating func undo() -> Bool {
+        guard canUndo, let last = history.popLast() else { return false }
+        board = last.board
+        score = last.score
+        return true
+    }
+
+    @discardableResult
+    public mutating func apply(_ action: BlockAction) -> Bool {
+        switch action {
+        case .select(let index): return select(index)
+        case .undo: return undo()
+        }
     }
 }
 
@@ -114,36 +144,16 @@ public enum BlockReplay {
         var clock = GameTickClock(), game = BlockGame(level: level)
         for input in fixture.inputs {
             try clock.advance(by: input.tick - clock.tick)
-            game.select(input.action.index)
+            game.apply(input.action)
         }
         return game
     }
 
-    /// The first clearing sequence in move order, or nil when none exists or
-    /// the search exceeds `stateLimit` distinct boards.
-    public static func solution(for board: BlockBoard, stateLimit: Int = 100_000) -> [Int]? {
-        var dead = Set<[Int]>()
-        func search(_ board: BlockBoard) -> [Int]? {
-            if board.isEmpty { return [] }
-            guard !dead.contains(board.cells), dead.count < stateLimit else { return nil }
-            for move in board.moves {
-                var next = board
-                next.clear(at: move)
-                if let rest = search(next) { return [move] + rest }
-            }
-            dead.insert(board.cells)
-            return nil
-        }
-        return search(board)
-    }
-
-    /// Test helper: a fixture that plays the level's first solution.
-    public static func solutionFixture(level: BlockLevel) -> InputFixture<BlockAction>? {
-        let board = BlockBoard(columns: level.payload.columns, rows: level.payload.rows, cells: level.payload.cells)
-        guard let moves = solution(for: board) else { return nil }
-        return InputFixture(levelID: level.id, contentVersion: level.contentVersion, seed: level.seed,
-                            inputs: moves.enumerated().map {
-            TimedInput(tick: UInt64($0.offset + 1) * 10, action: BlockAction(index: $0.element))
+    /// A fixture that plays the level's recorded clearing sequence.
+    public static func solutionFixture(level: BlockLevel) -> InputFixture<BlockAction> {
+        InputFixture(levelID: level.id, contentVersion: level.contentVersion, seed: level.seed,
+                     inputs: level.payload.solution.enumerated().map {
+            TimedInput(tick: UInt64($0.offset + 1) * 10, action: .select($0.element))
         })
     }
 }

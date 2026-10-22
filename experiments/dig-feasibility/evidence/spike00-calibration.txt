@@ -1,0 +1,19 @@
+Spike 00 calibration for Spike 11, 2026-10-20 (run after the candidate runs, not before; see README)
+Unchanged experiments/platform-baseline at edfd936 (last change f8f80df), PlatformBaselineUITests/testBoardPanelTerrainAndLifecycle, once per geometry.
+Host: Mac14,6 Apple M2 Max, macOS 27.2 (26B5112a); Xcode 27.1 (27A9275); iOS 26.0 (23A5287g) simulator; Debug; scene-update callback intervals, not presented frames.
+
+[iphone12] owned simulator 'GameCore Spike11 calibration iphone12', deleted after the run
+SPIKE00 BLOCKS: Window 352 intervals · p50/p95/p99 16.7/16.7/35.6 ms · worst 362.1 ms · >33.3 ms 7 · footprint 40.3 MiB
+SPIKE00 PANEL: Window 301 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 33.3 ms · >33.3 ms 1 · footprint 43.3 MiB
+SPIKE00 MESH: Revision 2 · mesh 1.38 ms · collision 14.78 ms
+SPIKE00 TERRAIN: Window 423 intervals · p50/p95/p99 16.7/17.6/29.3 ms · worst 143.3 ms · >33.3 ms 2 · footprint 67.2 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 1.16 ms · collision 19.27 ms
+Test Case '-[PlatformBaselineUITests.PlatformBaselineUITests testBoardPanelTerrainAndLifecycle]' passed (51.725 seconds).
+
+[ipad9] owned simulator 'GameCore Spike11 calibration ipad9', deleted after the run
+SPIKE00 BLOCKS: Window 300 intervals · p50/p95/p99 16.7/16.7/19.8 ms · worst 3280.2 ms · >33.3 ms 1 · footprint 39.7 MiB
+SPIKE00 PANEL: Window 300 intervals · p50/p95/p99 16.7/16.7/16.7 ms · worst 16.7 ms · >33.3 ms 0 · footprint 42.1 MiB
+SPIKE00 MESH: Revision 2 · mesh 1.12 ms · collision 15.23 ms
+SPIKE00 TERRAIN: Window 424 intervals · p50/p95/p99 16.7/16.8/21.6 ms · worst 153.9 ms · >33.3 ms 1 · footprint 68.5 MiB
+SPIKE00 SURFACE: Revision 3 · mesh 1.04 ms · collision 13.93 ms
+Test Case '-[PlatformBaselineUITests.PlatformBaselineUITests testBoardPanelTerrainAndLifecycle]' passed (55.945 seconds).

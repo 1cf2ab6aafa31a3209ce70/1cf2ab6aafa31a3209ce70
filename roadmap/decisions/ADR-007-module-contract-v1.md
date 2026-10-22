@@ -1,6 +1,6 @@
 # ADR-007 — Module contract version 1
 
-**Date:** 2026-10-19. **Status:** Accepted for Epic 07; provisional until [Spike 11](../spikes/11-dig-feasibility.md) confirms that a terrain title fits it.
+**Date:** 2026-10-19. **Status:** Accepted for Epic 07. [Spike 11](../spikes/11-dig-feasibility.md) confirmed on 2026-10-20 that a terrain title fits version 1 without change: all four dig candidates register through it with `Packages` unchanged and no terrain type in the contract ([ADR-008](ADR-008-dig-terrain-feasibility.md)). Version 1 is no longer provisional. [ADR-010](ADR-010-block-match-rules.md) adds two optional members with defaults, `ModuleSession.resultSummary` and `ShellPresentation.successRetryLabel`; a registration that leaves them out compiles and behaves as before, so the version stays 1.
 
 ## Context
 

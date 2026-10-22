@@ -6,7 +6,7 @@ Works in disposable copies of the repository's tracked and new files:
 1. For each title, delete its directories, regenerate the project, run the
    foundation checks and the core and platform package tests, and build every
    remaining title.
-2. Scaffold a third skeletal title with scripts/new-title.py, then run the
+2. Scaffold one more skeletal title with scripts/new-title.py, then run the
    checks and its content tests and build it, tests included.
 
 Every step must succeed; the original checkout is never modified.

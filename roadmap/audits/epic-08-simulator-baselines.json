@@ -1,0 +1,247 @@
+{
+  "schemaVersion": 1,
+  "kind": "gamecore-simulator-regression-baseline",
+  "notice": "Simulator observations on the recorded host, runtime and geometry, measured with an injected test-only probe in a Debug build. They are regression baselines for comparable hosts, not physical-device budgets.",
+  "recordedAt": "2026-10-21T06:10:29+00:00",
+  "source": {
+    "revision": "b0276d8b2326692e7b3e69b69e22eb02d93a411e",
+    "worktreeDirty": true,
+    "inputsSHA256": "366cb4f767433f284c7d0356f504bf17895f18d3ab0549b43b4054d1902f5502",
+    "inputFiles": 142
+  },
+  "toolchain": {
+    "xcode": "Xcode 27.1 Build version 27A9275",
+    "swift": "swift-driver version: 1.168.6 Apple Swift version 6.4 (swiftlang-6.4.0.34.1 clang-2100.3.34.1)",
+    "iphonesimulatorSDK": "27.1",
+    "iphoneosSDK": "27.1"
+  },
+  "runtime": {
+    "identifier": "com.apple.CoreSimulator.SimRuntime.iOS-26-0",
+    "version": "26.0",
+    "build": "23A5287g"
+  },
+  "host": {
+    "model": "Mac14,6",
+    "cpu": "Apple M2 Max",
+    "logicalCPUs": 12,
+    "memoryBytes": 34359738368,
+    "macOS": "27.2",
+    "macOSBuild": "26B5112a",
+    "architecture": "arm64",
+    "loadAverageAtStart": [
+      14.2,
+      56.59,
+      72.16
+    ],
+    "githubActions": false,
+    "runnerName": null,
+    "loadAverageAtEnd": [
+      145.69,
+      173.54,
+      134.82
+    ]
+  },
+  "instrumentation": {
+    "probe": "scripts/baseline-probe/BaselineProbe.m, injected with DYLD_INSERT_LIBRARIES into the Debug app (simctl launch environment and the xctestrun UITargetAppEnvironmentVariables)",
+    "probeSourceSHA256": "577dcd937456e940d891e621d06fb88c84af3a6b4fa168eccf49142855d4cc59",
+    "buildConfiguration": {
+      "runtime": "Debug (UI tests need DEBUG test hooks)",
+      "package": "Release"
+    },
+    "launches": 5
+  },
+  "titles": {
+    "BlockTitle": {
+      "bundleIdentifier": "local.gamecore.BlockTitle",
+      "package": {
+        "configuration": "Release",
+        "sdk": "iphoneos",
+        "signed": false,
+        "appBundleBytes": 1335319,
+        "files": 12,
+        "executableBytes": 1262408,
+        "zipBytes": 358702,
+        "zipMethod": "Payload/<App>.app, deflate level 9, sorted entries, fixed timestamps (Python zipfile)"
+      },
+      "geometries": {
+        "iphone12": {
+          "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+          "coldLaunch": {
+            "definition": "process start (kern.proc p_starttime) to the first display-link frame after UIApplicationDidBecomeActive; simctl launch after simctl terminate",
+            "firstLaunchAfterInstallMs": 543.45,
+            "samplesMs": [
+              457.21,
+              468.23,
+              430.97,
+              436.93,
+              447.02
+            ],
+            "medianMs": 447.02,
+            "minMs": 430.97,
+            "maxMs": 468.23,
+            "becameActiveMedianMs": 436.17
+          },
+          "sceneUpdates": {
+            "signal": "intervals between successive -[SKScene update:] calls (injected probe); recorded only while a SpriteKit scene is shown and unpaused",
+            "interaction": "BlockTitleUITests/BlockTitleUITests/testClearFirstBoardThenRelaunchContinuesWithTheSecond",
+            "appProcesses": 2,
+            "count": 598,
+            "meanMs": 17.36,
+            "p50Ms": 16.67,
+            "p95Ms": 17.43,
+            "p99Ms": 32.75,
+            "maxMs": 300.0,
+            "over20Ms": 21,
+            "over33Ms": 4,
+            "gapsAtLeast1sMs": []
+          },
+          "memory": {
+            "signal": "phys_footprint of the simulated app's host process (task_info TASK_VM_INFO)",
+            "launchFootprintMedianMiB": 22.39,
+            "interactionPeakMiB": 64.02,
+            "interactionLastMiB": 63.33
+          }
+        },
+        "ipad9": {
+          "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation",
+          "coldLaunch": {
+            "definition": "process start (kern.proc p_starttime) to the first display-link frame after UIApplicationDidBecomeActive; simctl launch after simctl terminate",
+            "firstLaunchAfterInstallMs": 477.92,
+            "samplesMs": [
+              434.64,
+              454.55,
+              442.91,
+              445.4,
+              456.74
+            ],
+            "medianMs": 445.4,
+            "minMs": 434.64,
+            "maxMs": 456.74,
+            "becameActiveMedianMs": 432.63
+          },
+          "sceneUpdates": {
+            "signal": "intervals between successive -[SKScene update:] calls (injected probe); recorded only while a SpriteKit scene is shown and unpaused",
+            "interaction": "BlockTitleUITests/BlockTitleUITests/testClearFirstBoardThenRelaunchContinuesWithTheSecond",
+            "appProcesses": 2,
+            "count": 627,
+            "meanMs": 17.25,
+            "p50Ms": 16.67,
+            "p95Ms": 17.28,
+            "p99Ms": 28.77,
+            "maxMs": 269.73,
+            "over20Ms": 19,
+            "over33Ms": 4,
+            "gapsAtLeast1sMs": []
+          },
+          "memory": {
+            "signal": "phys_footprint of the simulated app's host process (task_info TASK_VM_INFO)",
+            "launchFootprintMedianMiB": 22.72,
+            "interactionPeakMiB": 62.78,
+            "interactionLastMiB": 62.57
+          }
+        }
+      }
+    },
+    "DevelopmentTitle": {
+      "bundleIdentifier": "local.gamecore.DevelopmentTitle",
+      "package": {
+        "configuration": "Release",
+        "sdk": "iphoneos",
+        "signed": false,
+        "appBundleBytes": 1370067,
+        "files": 15,
+        "executableBytes": 1296048,
+        "zipBytes": 370349,
+        "zipMethod": "Payload/<App>.app, deflate level 9, sorted entries, fixed timestamps (Python zipfile)"
+      },
+      "geometries": {
+        "iphone12": {
+          "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPhone-12",
+          "coldLaunch": {
+            "definition": "process start (kern.proc p_starttime) to the first display-link frame after UIApplicationDidBecomeActive; simctl launch after simctl terminate",
+            "firstLaunchAfterInstallMs": 719.59,
+            "samplesMs": [
+              447.4,
+              446.64,
+              446.26,
+              438.07,
+              444.37
+            ],
+            "medianMs": 446.26,
+            "minMs": 438.07,
+            "maxMs": 447.4,
+            "becameActiveMedianMs": 430.8
+          },
+          "sceneUpdates": {
+            "signal": "intervals between successive -[SKScene update:] calls (injected probe); recorded only while a SpriteKit scene is shown and unpaused",
+            "interaction": "DevelopmentTitleUITests/DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart",
+            "appProcesses": 1,
+            "count": 763,
+            "meanMs": 17.09,
+            "p50Ms": 16.67,
+            "p95Ms": 17.25,
+            "p99Ms": 20.27,
+            "maxMs": 266.67,
+            "over20Ms": 9,
+            "over33Ms": 1,
+            "gapsAtLeast1sMs": [
+              3523.7,
+              2683.8,
+              5249.9,
+              2667.0
+            ]
+          },
+          "memory": {
+            "signal": "phys_footprint of the simulated app's host process (task_info TASK_VM_INFO)",
+            "launchFootprintMedianMiB": 22.47,
+            "interactionPeakMiB": 64.02,
+            "interactionLastMiB": 63.91
+          }
+        },
+        "ipad9": {
+          "deviceType": "com.apple.CoreSimulator.SimDeviceType.iPad-9th-generation",
+          "coldLaunch": {
+            "definition": "process start (kern.proc p_starttime) to the first display-link frame after UIApplicationDidBecomeActive; simctl launch after simctl terminate",
+            "firstLaunchAfterInstallMs": 453.76,
+            "samplesMs": [
+              437.48,
+              441.31,
+              823.96,
+              432.72,
+              446.4
+            ],
+            "medianMs": 441.31,
+            "minMs": 432.72,
+            "maxMs": 823.96,
+            "becameActiveMedianMs": 431.16
+          },
+          "sceneUpdates": {
+            "signal": "intervals between successive -[SKScene update:] calls (injected probe); recorded only while a SpriteKit scene is shown and unpaused",
+            "interaction": "DevelopmentTitleUITests/DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart",
+            "appProcesses": 1,
+            "count": 759,
+            "meanMs": 17.1,
+            "p50Ms": 16.67,
+            "p95Ms": 17.02,
+            "p99Ms": 20.32,
+            "maxMs": 264.24,
+            "over20Ms": 10,
+            "over33Ms": 1,
+            "gapsAtLeast1sMs": [
+              2636.3,
+              2650.2,
+              5249.9,
+              2666.6
+            ]
+          },
+          "memory": {
+            "signal": "phys_footprint of the simulated app's host process (task_info TASK_VM_INFO)",
+            "launchFootprintMedianMiB": 22.36,
+            "interactionPeakMiB": 63.08,
+            "interactionLastMiB": 62.96
+          }
+        }
+      }
+    }
+  }
+}

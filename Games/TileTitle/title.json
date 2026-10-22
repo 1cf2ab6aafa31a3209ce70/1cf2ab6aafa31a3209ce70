@@ -1,0 +1,10 @@
+{
+  "schemaVersion": 1,
+  "target": "TileTitle",
+  "titleID": "tile-match",
+  "appDisplayName": "Few Tiles",
+  "bundleIdentifier": "local.gamecore.TileTitle",
+  "contentPackage": "Games/TileContent",
+  "unitTests": "Tests/TileTitleTests",
+  "uiTests": "Tests/TileTitleUITests"
+}

@@ -18,6 +18,10 @@ on:
         description: Run only the Spike 06 module-seam checks on both geometries
         type: boolean
         default: false
+      dig_feasibility:
+        description: Run only the Spike 11 dig-feasibility checks and measurements on both geometries
+        type: boolean
+        default: false
 permissions:
   contents: read
 concurrency:
@@ -28,7 +32,7 @@ jobs:
     # Titles come from Games/*/title.json. A pull request tests the titles its
     # changes touch, and every title when a shared path changes; pushes and
     # manual runs test every title.
-    if: github.event_name != 'workflow_dispatch' || !inputs.module_seam
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.dig_feasibility)
     runs-on: ubuntu-latest
     outputs:
       titles: ${{ steps.select.outputs.titles }}
@@ -61,11 +65,13 @@ jobs:
           echo "lifecycle=$lifecycle" >> "$GITHUB_OUTPUT"
   verify:
     # Shared packages, every title's content and every build, on every change.
-    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only)
+    if: github.event_name != 'workflow_dispatch' || (!inputs.module_seam && !inputs.navigation_only && !inputs.dig_feasibility)
     runs-on: macos-26
     timeout-minutes: 45
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      # The network observation fixture runs on the foundation matrix's runtime, not the newest installed.
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
     steps:
       - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
       - name: Check pinned toolchain
@@ -74,12 +80,22 @@ jobs:
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
       - name: Verify packages and mobile builds
         run: bash scripts/verify.sh "$RUNNER_TEMP/foundation-verification"
+      - name: Check runtime gates against seeded violations
+        run: |
+          set -o pipefail
+          python3 scripts/test-mobile-runner.py | tee "$RUNNER_TEMP/foundation-verification/mobile-runner-tests.log"
+          python3 scripts/test-record-baselines.py | tee "$RUNNER_TEMP/foundation-verification/record-baselines-tests.log"
+          python3 scripts/test-network-observation.py --simulator | tee "$RUNNER_TEMP/foundation-verification/network-observation-tests.log"
       - name: Retain verification logs
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
           name: mobile-verification-logs
-          path: ${{ runner.temp }}/foundation-verification/*.log
+          # Release gates write their failure lists to <gate>.log.err.
+          path: |
+            ${{ runner.temp }}/foundation-verification/*.log
+            ${{ runner.temp }}/foundation-verification/*.log.err
+            ${{ runner.temp }}/foundation-verification/reproducible-evidence/
           if-no-files-found: ignore
           retention-days: 30
   foundation:
@@ -120,6 +136,9 @@ jobs:
             ${{ runner.temp }}/foundation-ui/inventory.json
             ${{ runner.temp }}/foundation-ui/*-restart.json
             ${{ runner.temp }}/foundation-ui/*-retries.json
+            ${{ runner.temp }}/foundation-ui/*-network.json
+            ${{ runner.temp }}/foundation-ui/*-network-samples.jsonl
+            ${{ runner.temp }}/foundation-ui/*-network-log.ndjson
             ${{ runner.temp }}/foundation-ui/*.xcresult
             ${{ runner.temp }}/foundation-ui/*-diagnostics/
             ${{ runner.temp }}/foundation-ui/action-journals/
@@ -127,7 +146,7 @@ jobs:
           retention-days: 30
   title-lifecycle:
     # Removing each title leaves the checks, core tests and other titles
-    # building; a scaffolded third title builds before any gameplay.
+    # building; a newly scaffolded title builds before any gameplay.
     needs: plan
     if: needs.plan.outputs.lifecycle == 'true'
     runs-on: macos-26
@@ -140,7 +159,7 @@ jobs:
         run: |
           toolchain_version="$(xcodebuild -version)"
           test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
-      - name: Remove each title and scaffold a third
+      - name: Remove each title and scaffold another
         run: python3 scripts/test-title-lifecycle.py "$RUNNER_TEMP/title-lifecycle"
       - name: Retain lifecycle evidence
         if: always()
@@ -154,9 +173,15 @@ jobs:
           retention-days: 30
   minimum-runtime:
     # The deployment floor is iOS 18.0; ADR-003 keeps minimum-runtime execution explicit.
+    # Every title runs on both geometries, one geometry per job: two titles on
+    # one geometry took up to 33 minutes, so a third needs more than 60.
     if: github.event_name == 'push' || (github.event_name == 'workflow_dispatch' && inputs.minimum_runtime)
+    strategy:
+      fail-fast: false
+      matrix:
+        model: [iphone12, ipad9]
     runs-on: macos-26
-    timeout-minutes: 60
+    timeout-minutes: 90
     env:
       DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
       GAMECORE_SIM_RUNTIME_VERSION: '18.0'
@@ -177,18 +202,23 @@ jobs:
             xcrun simctl list runtimes
             exit 1
           fi
-      - name: Test every title on iphone12 on the minimum runtime
-        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model iphone12
+      - name: Test every title on ${{ matrix.model }} on the minimum runtime
+        env:
+          MODEL: ${{ matrix.model }}
+        run: bash scripts/test-mobile.sh "$RUNNER_TEMP/minimum-runtime-ui" --model "$MODEL"
       - name: Retain minimum-runtime evidence
         if: always()
         uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
         with:
-          name: mobile-minimum-runtime-evidence
+          name: mobile-minimum-runtime-evidence-${{ matrix.model }}
           path: |
             ${{ runner.temp }}/minimum-runtime-ui/**/*.log
             ${{ runner.temp }}/minimum-runtime-ui/inventory.json
             ${{ runner.temp }}/minimum-runtime-ui/**/*-restart.json
             ${{ runner.temp }}/minimum-runtime-ui/**/*-retries.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network.json
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network-samples.jsonl
+            ${{ runner.temp }}/minimum-runtime-ui/**/*-network-log.ndjson
             ${{ runner.temp }}/minimum-runtime-ui/**/*.xcresult
             ${{ runner.temp }}/minimum-runtime-ui/**/*-diagnostics/
             ${{ runner.temp }}/minimum-runtime-ui/**/action-journals/
@@ -221,5 +251,36 @@ jobs:
             ${{ runner.temp }}/module-seam/receipt.json
             ${{ runner.temp }}/module-seam/*.log
             ${{ runner.temp }}/module-seam/*.xcresult
+          if-no-files-found: ignore
+          retention-days: 30
+  dig-feasibility:
+    # Spike 11 dig feasibility: pure rules, contract registration, behaviour and timing runs, on demand.
+    if: github.event_name == 'workflow_dispatch' && inputs.dig_feasibility
+    runs-on: macos-26
+    timeout-minutes: 180
+    env:
+      DEVELOPER_DIR: /Applications/Xcode_26.6.app/Contents/Developer
+      GAMECORE_SIM_RUNTIME_VERSION: '26.5'
+    steps:
+      - uses: actions/checkout@fbc6f3992d24b796d5a048ff273f7fcc4a7b6c09 # v5
+      - name: Check pinned toolchain
+        run: |
+          toolchain_version="$(xcodebuild -version)"
+          test "$toolchain_version" = $'Xcode 26.6\nBuild version 17F113'
+      - name: Check verifier orchestration
+        run: python3 experiments/dig-feasibility/scripts/test-verifier.py
+      - name: Run dig-feasibility checks on iphone12 and ipad9
+        run: python3 experiments/dig-feasibility/scripts/verify.py "$RUNNER_TEMP/dig-feasibility"
+      - name: Retain dig-feasibility evidence
+        if: always()
+        uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7, Node 24
+        with:
+          name: dig-feasibility-evidence
+          path: |
+            ${{ runner.temp }}/dig-feasibility/receipt.json
+            ${{ runner.temp }}/dig-feasibility/measurements.json
+            ${{ runner.temp }}/dig-feasibility/*.log
+            ${{ runner.temp }}/dig-feasibility/*/dig-*.json
+            ${{ runner.temp }}/dig-feasibility/*.xcresult
           if-no-files-found: ignore
           retention-days: 30

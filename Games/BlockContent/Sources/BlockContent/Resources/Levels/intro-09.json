@@ -1,0 +1,19 @@
+{
+  "schemaVersion": 1,
+  "id": "intro-09",
+  "gameType": "block",
+  "contentVersion": 2,
+  "seed": 109016,
+  "payload": {
+    "chapter": 1,
+    "columns": 5,
+    "rows": 5,
+    "cells": [0, 0, 0, 2, 0,
+              2, 1, 0, 1, 1,
+              2, 1, 0, 2, 1,
+              2, 1, 2, 1, 2,
+              2, 1, 2, 1, 2],
+    "solution": [8, 8, 19, 5, 17, 18, 6],
+    "nextLevelIDs": ["intro-10"]
+  }
+}

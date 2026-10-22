@@ -22,19 +22,23 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     @ObservedObject private var controller: ShellController
     @Environment(\.scenePhase) private var scenePhase
     @Environment(\.accessibilityReduceMotion) private var reduceMotion
+    @Environment(\.dynamicTypeSize) private var dynamicTypeSize
     @State private var showingSettings = false
     private let presentation: ShellPresentation
     private let forceReducedMotion: Bool
+    private let resultSummary: () -> String?
     private let gameplayHost: () -> GameplayHost
     private let gameplayControls: (Bool) -> GameplayControls
 
     public init(controller: ShellController, presentation: ShellPresentation,
                 forceReducedMotion: Bool = false,
+                resultSummary: @escaping () -> String? = { nil },
                 @ViewBuilder gameplayHost: @escaping () -> GameplayHost,
                 @ViewBuilder gameplayControls: @escaping (Bool) -> GameplayControls) {
         self.controller = controller
         self.presentation = presentation
         self.forceReducedMotion = forceReducedMotion
+        self.resultSummary = resultSummary
         self.gameplayHost = gameplayHost
         self.gameplayControls = gameplayControls
     }
@@ -44,9 +48,10 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
     public var body: some View {
         ScrollView {
             VStack(alignment: .leading, spacing: 24) {
+                // Each page's ShellHeading is its one heading; the title's
+                // name repeats above every page.
                 Text(controller.flow.title.displayName)
                     .font(.largeTitle.bold())
-                    .accessibilityAddTraits(.isHeader)
                 if showsGameplayHost {
                     gameplayHost()
                 }
@@ -73,8 +78,22 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
         }
         .accessibilityIdentifier("shell.scroll")
         .background(Color(.systemGroupedBackground))
+        .overlay(alignment: .top) {
+            // The page scrolls behind the status bar; without a backdrop its
+            // text runs into the clock, which the audit reports as text with
+            // no accessibility element (S-8). A zero-height strip at the top
+            // of the safe area extends its background up over the bar.
+            Color.clear
+                .frame(height: 0)
+                .background(Color(.systemGroupedBackground).ignoresSafeArea(edges: .top))
+                .allowsHitTesting(false)
+                .accessibilityHidden(true)
+        }
         .sheet(isPresented: $showingSettings) {
+            // UIKit presents the sheet at the process's text size, so a size
+            // set on the title's root view reaches it only through here.
             SharedShellSettingsView(controller: controller, presentation: presentation)
+                .dynamicTypeSize(dynamicTypeSize)
         }
         .onAppear {
             controller.finishSplash()
@@ -85,6 +104,21 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
         }
         .onChange(of: reducesMotion) { _, enabled in
             controller.setReducedMotion(enabled)
+        }
+        .onChange(of: page) { _, _ in
+            // A page change removes the control that has keyboard focus. Left
+            // alone, Full Keyboard Access keeps its highlight on the removed
+            // control whenever nothing takes its place, so ask the focus system
+            // to choose again once the new page is laid out. VoiceOver is told
+            // the screen changed.
+            UIAccessibility.post(notification: .screenChanged, argument: nil)
+            DispatchQueue.main.async {
+                guard let window = UIApplication.shared.connectedScenes
+                    .compactMap({ ($0 as? UIWindowScene)?.keyWindow }).first,
+                      let focus = UIFocusSystem.focusSystem(for: window) else { return }
+                focus.requestFocusUpdate(to: window)
+                focus.updateFocusIfNeeded()
+            }
         }
     }
 
@@ -123,13 +157,30 @@ public struct SharedShellView<GameplayHost: View, GameplayControls: View>: View 
             ShellHeading(outcome == .success ? presentation.successHeading : presentation.failureHeading,
                          id: outcome == .success ? "shell.result.success" : "shell.result.failure")
             Text(outcome == .success ? presentation.successMessage : presentation.failureMessage)
-            ShellActionButton(presentation.retryLabel, id: "shell.result.retry", prominent: true, action: controller.restart)
+            if let summary = resultSummary() {
+                Text(summary).accessibilityIdentifier("shell.result.summary")
+            }
+            ShellActionButton(outcome == .success ? presentation.successRetryLabel : presentation.retryLabel,
+                              id: "shell.result.retry", prominent: true, action: controller.restart)
             ShellActionButton("Back to menu", id: "shell.result.menu", action: controller.returnToMenu)
         case .loadFailed(_, let message):
             ShellHeading("Unable to start", id: "shell.load-error")
             Text(message)
             ShellActionButton("Try again", id: "shell.load.retry", prominent: true, action: controller.restart)
             ShellActionButton("Back to menu", id: "shell.menu.back", action: controller.returnToMenu)
+        }
+    }
+
+    /// The page the flow state shows; requests, pause reasons and outcomes do not change it.
+    private var page: String {
+        switch controller.flow.state {
+        case .splash: return "splash"
+        case .menu: return "menu"
+        case .loading: return "loading"
+        case .playing: return "playing"
+        case .paused: return "paused"
+        case .result: return "result"
+        case .loadFailed: return "loadFailed"
         }
     }
 
@@ -204,7 +255,7 @@ private struct SharedShellSettingsView: View {
     var body: some View {
         NavigationStack {
             Form {
-                Section("Feedback") {
+                Section {
                     Toggle("Sound effects", isOn: Binding(get: { controller.flow.settings.soundEnabled },
                         set: { controller.updateSettings(sound: $0) }))
                         .accessibilityIdentifier("settings.sound")
@@ -214,35 +265,44 @@ private struct SharedShellSettingsView: View {
                     Toggle("Haptics", isOn: Binding(get: { controller.flow.settings.hapticsEnabled },
                         set: { controller.updateSettings(haptics: $0) }))
                         .accessibilityIdentifier("settings.haptics")
+                } header: {
+                    SettingsHeader(title: "Feedback")
                 }
                 .disabled(!controller.persistenceReady || controller.recoveryRequired)
-                Section("Language") {
+                Section {
                     LabeledContent("Language", value: presentation.languageName)
-                    Text(presentation.languageMessage).foregroundStyle(.secondary)
+                    Text(presentation.languageMessage)
+                } header: {
+                    SettingsHeader(title: "Language")
                 }
                 Section {
                     Text(controller.hasPersistence ? "Settings and progress are saved on this device. Automatic backup and sync are disabled. Uninstalling the app or losing the device can erase them." : "Settings apply to this session and reset when the app closes.")
-                        .foregroundStyle(.secondary)
                 }
                 if controller.hasPersistence {
-                    Section("Local data") {
+                    Section {
                         if let message = controller.persistenceMessage {
                             Text(message).accessibilityIdentifier("settings.save-message")
                         }
                         Text("Export creates a JSON copy using Files. A provider you choose may transfer that copy. The developer receives nothing. Exported copies remain under your control after reset or deletion.")
-                        Button("Export local data") {
+                        Button {
                             Task {
                                 do {
                                     exportDocument = SaveExportDocument(data: try await controller.exportLocalData())
                                     showingExporter = true
                                 } catch { controller.reportExportFailure(error) }
                             }
+                        } label: {
+                            LocalDataLabel(title: "Export local data", symbol: "square.and.arrow.up")
                         }.accessibilityIdentifier("save.export")
                             .disabled(!controller.persistenceReady || controller.recoveryRequired || controller.isSaving)
-                        Button("Reset progress", role: .destructive) { confirmation = .reset }
-                            .accessibilityIdentifier("save.reset")
-                        Button("Delete local data", role: .destructive) { confirmation = .delete }
-                            .accessibilityIdentifier("save.delete")
+                        Button(role: .destructive) { confirmation = .reset } label: {
+                            LocalDataLabel(title: "Reset progress", symbol: "arrow.counterclockwise")
+                        }.accessibilityIdentifier("save.reset")
+                        Button(role: .destructive) { confirmation = .delete } label: {
+                            LocalDataLabel(title: "Delete local data", symbol: "trash")
+                        }.accessibilityIdentifier("save.delete")
+                    } header: {
+                        SettingsHeader(title: "Local data")
                     }
                 }
             }
@@ -265,11 +325,48 @@ private struct SharedShellSettingsView: View {
                 ToolbarItem(placement: .confirmationAction) {
                     Button("Done") { dismiss() }
                         .accessibilityIdentifier("settings.done")
+                        .tint(doneTint)
                 }
             }
         }
     }
+
+    /// iOS 18 draws Done in the accent tint on the sheet's bar, which falls
+    /// below 4.5:1; iOS 26 draws it in the primary color.
+    private var doneTint: Color? {
+        if #available(iOS 26, *) { return nil }
+        return Color(uiColor: UIColor { traits in
+            traits.userInterfaceStyle == .dark ? UIColor(red: 0.39, green: 0.69, blue: 1, alpha: 1)
+                : UIColor(red: 0, green: 0.35, blue: 0.8, alpha: 1)
+        })
+    }
 }
+
+/// Section header text in the primary color: the default secondary header
+/// falls below 4.5:1 at body size.
+private struct SettingsHeader: View {
+    let title: String
+
+    var body: some View {
+        Text(title).foregroundStyle(Color.primary)
+    }
+}
+
+/// A local-data action with primary-colored text: the accent and destructive
+/// colors fall below 4.5:1 as text, so they color only the symbol.
+private struct LocalDataLabel: View {
+    let title: String
+    let symbol: String
+
+    var body: some View {
+        Label {
+            Text(title).foregroundStyle(Color.primary)
+        } icon: {
+            Image(systemName: symbol)
+        }
+    }
+}
+
 private enum LocalDataAction { case reset, delete }
 
 private struct SaveExportDocument: FileDocument {
