@@ -2,7 +2,9 @@
 
 **Outcome:** Ship an original offline tile-match puzzle title as a separate app target whose rules differ from the block title, without duplicating shell code.
 
-**Entry:** Epic 09A passed the Epic 08 release checklist. **Next:** Epic 10. This epic depends on all earlier ordered work.
+**Entry:** Epic 09A closed for rules, levels and play, passing the Epic 08 automated gates; its remaining checklist items are in [Polishing](../polishing.md). **Next:** Epic 10. This epic depends on all earlier ordered work.
+
+**Polishing:** as for Epic 09A, original art, audio, animation, release metadata and hands-on or device accessibility steps go to [Polishing](../polishing.md) (owner decision, 2026-10-21). This epic closes on rules, levels and play that pass the automated gates.
 
 ## Scope and tasks
 
