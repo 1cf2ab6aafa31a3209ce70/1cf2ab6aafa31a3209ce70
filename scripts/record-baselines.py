@@ -48,6 +48,7 @@ SCHEMA_VERSION = 1
 # title needs an entry before it can be baselined.
 INTERACTIONS = {
     "BlockTitle": "BlockTitleUITests/BlockTitleUITests/testClearFirstBoardThenRelaunchContinuesWithTheSecond",
+    "TileTitle": "TileTitleUITests/TileTitleUITests/testClearFirstBoardThenRelaunchContinuesWithTheSecond",
     "DevelopmentTitle": "DevelopmentTitleUITests/DevelopmentTitleUITests/testNavigationSuccessFailureResumeAndRestart",
 }
 GAP_MS = 1000.0
