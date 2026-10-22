@@ -12,7 +12,7 @@ public enum BundledContent {
         }
         return catalog.deletingLastPathComponent()
     }
-    public static func load() throws -> TileContentCatalog {
+    public static func load() throws -> TileCatalog {
         let root = try resourceDirectory()
         return try load(readResource: { path in
             try Data(contentsOf: root.appendingPathComponent(path))
@@ -20,7 +20,7 @@ public enum BundledContent {
     }
 
     /// Shared entry point for the app, package tests and the authoring CLI.
-    public static func load(readResource: (String) throws -> Data) throws -> TileContentCatalog {
+    public static func load(readResource: (String) throws -> Data) throws -> TileCatalog {
         func bounded(_ path: String) throws -> Data {
             do {
                 let data = try readResource(path)
@@ -37,6 +37,6 @@ public enum BundledContent {
         // Validate relative paths and identifiers before attempting any resource read.
         try catalog.validate(availableAssets: Set(catalog.assets))
         for asset in catalog.assets { _ = try bounded(asset) }
-        return try TileContentCatalog.decode(catalogData: data, availableAssets: Set(catalog.assets), levelData: bounded)
+        return try TileCatalog.decode(catalogData: data, availableAssets: Set(catalog.assets), levelData: bounded)
     }
 }
