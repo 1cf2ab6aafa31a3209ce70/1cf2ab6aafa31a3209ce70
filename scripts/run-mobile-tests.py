@@ -499,7 +499,10 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
             observer = network_observation.Observer(device, executable, output, model).start()
             # Hosted accessibility queries can exceed 120 seconds for a passing
             # multi-step UI case. Each case gets 180 seconds; the separate
-            # 900-second whole-suite cap remains the aggregate failure bound.
+            # 1,800-second whole-suite cap remains the aggregate failure bound.
+            # Three titles' suites outgrew 900 seconds: Few Tiles' 20 cases on a
+            # hosted iPhone 12 hit it with every finished case passing, one of
+            # them held 84 seconds by an N08 query stall (run 39726770631).
             # A failed case runs once more (N06 in the navigation-contact audit:
             # XCTest's synthesized touches race backboardd on loaded simulators).
             # Every retry is reported by name, and a second failure still fails.
@@ -515,7 +518,7 @@ def test_title(title, selected_models, output, runtime, record_device, navigatio
                              "-parallel-testing-enabled", "NO", "-test-timeouts-enabled", "YES",
                              "-maximum-test-execution-time-allowance", "180",
                              "-retry-tests-on-failure", "-test-iterations", "2"] + selectors + ["test-without-building"],
-                    log=output / f"{model}.log", timeout=900)
+                    log=output / f"{model}.log", timeout=1800)
             finally:
                 collect_action_journals(device, model, output, title.bundle_identifier)
                 journal_collected = True
